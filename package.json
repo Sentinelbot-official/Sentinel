@@ -21,6 +21,7 @@
   "author": "NexusBot-official",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.13.2",
     "botlist.me.js": "^1.0.3",
     "compression": "^1.7.4",
     "discord.js": "^14.14.1",
@@ -28,8 +29,11 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "node-cron": "^3.0.3",
+    "otplib": "^12.0.1",
     "passport": "^0.7.0",
     "passport-discord": "^0.1.4",
+    "qrcode": "^1.5.4",
+    "redis": "^5.10.0",
     "sqlite3": "^5.1.6",
     "topgg-autoposter": "^2.0.0"
   },
