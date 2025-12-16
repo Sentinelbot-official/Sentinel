@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node shard.js",
     "dev": "node index.js",
-    "shard": "node shard.js",
     "cluster": "node cluster.js",
     "test": "jest"
     },
