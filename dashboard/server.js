@@ -4128,7 +4128,24 @@ class DashboardServer {
   }
 
   setupPublicAPI() {
+    // GET /api/v1/banner - Public endpoint to get banner (for website display)
+    // This must be defined BEFORE the catch-all /api/v1 middleware
+    this.app.get("/api/v1/banner", async (req, res) => {
+      try {
+        const fs = require("fs").promises;
+        const path = require("path");
+        const bannerPath = path.join(__dirname, "../docs/banner.json");
+
+        const data = await fs.readFile(bannerPath, "utf8");
+        res.json(JSON.parse(data));
+      } catch (error) {
+        logger.error("Dashboard", "Error reading banner", error);
+        res.json({ enabled: false });
+      }
+    });
+
     // Remove /api/v1: return 410 Gone to indicate removal (deprecated and removed)
+    // Exception: /api/v1/banner is still active for website compatibility (defined above)
     this.app.use("/api/v1", (req, res) => {
       res.setHeader("X-API-Deprecated", "true");
       res.setHeader("X-API-Removed", "true");
@@ -8486,21 +8503,6 @@ class DashboardServer {
         res
           .status(500)
           .json({ error: "Failed to update banner configuration" });
-      }
-    });
-
-    // GET /api/v1/banner - Public endpoint to get banner (for website display)
-    this.app.get("/api/v1/banner", async (req, res) => {
-      try {
-        const fs = require("fs").promises;
-        const path = require("path");
-        const bannerPath = path.join(__dirname, "../docs/banner.json");
-
-        const data = await fs.readFile(bannerPath, "utf8");
-        res.json(JSON.parse(data));
-      } catch (error) {
-        logger.error("Dashboard", "Error reading banner", error);
-        res.json({ enabled: false });
       }
     });
 
