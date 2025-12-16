@@ -1439,28 +1439,40 @@ async function loadDiscordAutoModRules() {
       <div class="rules-grid">
         ${rules
           .map(
-            (rule) => `
+            (rule) => {
+              // SECURITY: Sanitize all user-controlled data
+              const safeRuleId = sanitizeForHtml(String(rule.id || ""), 50);
+              const safeRuleName = sanitizeForHtml(rule.name || "Unnamed Rule", 100);
+              const safeKeywords = rule.triggerMetadata?.keywordFilter
+                ? rule.triggerMetadata.keywordFilter
+                    .slice(0, 5)
+                    .map((k) => sanitizeForHtml(k, 50))
+                    .join(", ")
+                : "";
+              const hasMoreKeywords = rule.triggerMetadata?.keywordFilter?.length > 5;
+              
+              return `
           <div class="rule-card" style="background:#2c2f33; border:1px solid #40444b; border-radius:12px; padding:20px; margin-bottom:15px;">
             <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:15px;">
               <div>
-                <h3 style="margin:0 0 5px 0; color:#fff;">${rule.name}</h3>
+                <h3 style="margin:0 0 5px 0; color:#fff;">${safeRuleName}</h3>
                 <span class="action-badge" style="background:${rule.enabled ? "#10b981" : "#6b7280"}; color:white;">
                   ${rule.enabled ? "✅ Enabled" : "❌ Disabled"}
                 </span>
               </div>
               <div style="display:flex; gap:10px;">
-                <button onclick="toggleDiscordAutoModRule('${rule.id}', ${!rule.enabled})" 
-                        class="btn btn-small" 
+                <button data-rule-id="${safeRuleId}" data-action="toggle" data-enabled="${!rule.enabled}" 
+                        class="btn btn-small discord-automod-toggle" 
                         style="padding:5px 15px; font-size:0.85rem;">
                   ${rule.enabled ? "Disable" : "Enable"}
                 </button>
-                <button onclick="editDiscordAutoModRule('${rule.id}')" 
-                        class="btn btn-small" 
+                <button data-rule-id="${safeRuleId}" data-action="edit" 
+                        class="btn btn-small discord-automod-edit" 
                         style="padding:5px 15px; font-size:0.85rem; background:#5865f2;">
                   Edit
                 </button>
-                <button onclick="deleteDiscordAutoModRule('${rule.id}')" 
-                        class="btn btn-small" 
+                <button data-rule-id="${safeRuleId}" data-action="delete" 
+                        class="btn btn-small discord-automod-delete" 
                         style="padding:5px 15px; font-size:0.85rem; background:#ef4444;">
                   Delete
                 </button>
@@ -1469,14 +1481,14 @@ async function loadDiscordAutoModRules() {
             
             <div style="margin-top:15px; padding-top:15px; border-top:1px solid #40444b;">
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.9em; opacity:0.8;">
-                <div><strong>Trigger:</strong> ${getTriggerTypeLabel(rule.triggerType)}</div>
-                <div><strong>Action:</strong> ${getActionTypeLabel(rule.actions[0]?.type)}</div>
+                <div><strong>Trigger:</strong> ${sanitizeForHtml(getTriggerTypeLabel(rule.triggerType) || "", 50)}</div>
+                <div><strong>Action:</strong> ${sanitizeForHtml(getActionTypeLabel(rule.actions[0]?.type) || "", 50)}</div>
               </div>
               ${
                 rule.triggerMetadata?.keywordFilter?.length > 0
                   ? `
                 <div style="margin-top:10px;">
-                  <strong>Keywords:</strong> ${rule.triggerMetadata.keywordFilter.slice(0, 5).join(", ")}${rule.triggerMetadata.keywordFilter.length > 5 ? "..." : ""}
+                  <strong>Keywords:</strong> ${safeKeywords}${hasMoreKeywords ? "..." : ""}
                 </div>
               `
                   : ""
@@ -1493,17 +1505,36 @@ async function loadDiscordAutoModRules() {
               }
             </div>
           </div>
-        `
+        `;
+            }
           )
           .join("")}
       </div>
     `;
+    
+    // SECURITY: Use event delegation instead of inline onclick handlers
+    container.addEventListener("click", (e) => {
+      const btn = e.target.closest(".discord-automod-toggle, .discord-automod-edit, .discord-automod-delete");
+      if (!btn) return;
+      
+      const ruleId = btn.getAttribute("data-rule-id");
+      if (!ruleId) return;
+      
+      if (btn.classList.contains("discord-automod-toggle")) {
+        const enabled = btn.getAttribute("data-enabled") === "true";
+        toggleDiscordAutoModRule(ruleId, enabled);
+      } else if (btn.classList.contains("discord-automod-edit")) {
+        editDiscordAutoModRule(ruleId);
+      } else if (btn.classList.contains("discord-automod-delete")) {
+        deleteDiscordAutoModRule(ruleId);
+      }
+    });
   } catch (error) {
     console.error("Failed to load Discord AutoMod rules:", error);
     container.innerHTML = `
       <div class="info-box" style="background:#ef444420; border-color:#ef4444;">
         <strong>❌ Error loading rules</strong><br>
-        <p style="margin-top:10px;">${error.message}</p>
+        <p style="margin-top:10px;">${sanitizeForHtml(error.message || "Unknown error", 200)}</p>
       </div>
     `;
   }
@@ -1604,7 +1635,7 @@ async function editDiscordAutoModRule(ruleId) {
           </div>
           <div class="form-group">
             <label>Trigger Pattern (regex or keywords, comma-separated)</label>
-            <textarea id="editRuleTrigger" class="form-control" rows="3" required>${rule.trigger || ""}</textarea>
+            <textarea id="editRuleTrigger" class="form-control" rows="3" required>${sanitizeForHtml(rule.trigger || "", 500)}</textarea>
             <small style="opacity:0.7;">Example: discord.gg, bit.ly, .* (any text)</small>
           </div>
           <div class="form-group">
@@ -1625,14 +1656,14 @@ async function editDiscordAutoModRule(ruleId) {
           </div>
           <div class="modal-actions">
             <button type="button" class="btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-            <button type="button" class="btn-primary" onclick="saveAutoModRuleEdit(${ruleId})">Save Changes</button>
+            <button type="button" class="btn-primary" data-rule-id="${sanitizeForHtml(String(ruleId || ""), 50)}" id="saveAutoModRuleBtn">Save Changes</button>
           </div>
         </form>
       </div>
     `;
     document.body.appendChild(modal);
   } catch (error) {
-    alert(`❌ Error loading rule: ${error.message}`);
+    alert(`❌ Error loading rule: ${sanitizeForHtml(error.message || "Unknown error", 100)}`);
   }
 }
 
@@ -2730,7 +2761,7 @@ async function loadAdvancedAnalytics() {
       <p>${data.badge}</p>
     `;
   } catch (error) {
-    contentArea.innerHTML += `<p style="color: var(--danger);">❌ Failed to load analytics</p>`;
+    contentArea.innerHTML += `<p style="color: var(--danger);">❌ Failed to load analytics: ${sanitizeForHtml(error.message || "Unknown error", 100)}</p>`;
   }
 }
 
@@ -3313,33 +3344,41 @@ document.addEventListener("DOMContentLoaded", () => {
         ` +
           data.workflows
             .map(
-              (w) => `
+              (w) => {
+                // SECURITY: Sanitize all user-controlled data
+                const safeWorkflowId = sanitizeForHtml(String(w.id || ""), 50);
+                const safeName = sanitizeForHtml(w.name || "Unnamed Workflow", 100);
+                const safeDescription = sanitizeForHtml(w.description || "No description", 200);
+                const safeTriggerType = sanitizeForHtml(w.trigger_type || "Not configured", 50);
+                const safeActionType = sanitizeForHtml(w.action_type || "Not configured", 50);
+                
+                return `
           <div class="setting-card" style="margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
               <div>
-                <h3>${w.name}</h3>
-                <p style="opacity: 0.7; margin: 5px 0;">${w.description || "No description"}</p>
+                <h3>${safeName}</h3>
+                <p style="opacity: 0.7; margin: 5px 0;">${safeDescription}</p>
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" ${w.enabled ? "checked" : ""} onchange="toggleWorkflow(${w.id}, this.checked)">
+                <input type="checkbox" ${w.enabled ? "checked" : ""} data-workflow-id="${safeWorkflowId}" class="workflow-toggle">
                 <span class="toggle-slider"></span>
               </label>
             </div>
             
             <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
               <div style="margin-bottom: 10px;">
-                <strong>Trigger:</strong> ${w.trigger_type || "Not configured"}
+                <strong>Trigger:</strong> ${safeTriggerType}
               </div>
               <div>
-                <strong>Actions:</strong> ${w.action_type || "Not configured"}
+                <strong>Actions:</strong> ${safeActionType}
               </div>
             </div>
             
             <div style="display: flex; gap: 10px;">
-              <button class="btn btn-secondary" onclick="editWorkflow(${w.id})" style="flex: 1;">
+              <button class="btn btn-secondary workflow-edit" data-workflow-id="${safeWorkflowId}" style="flex: 1;">
                 ✏️ Edit
               </button>
-              <button class="btn btn-danger" onclick="deleteWorkflow(${w.id})" style="flex: 1;">
+              <button class="btn btn-danger workflow-delete" data-workflow-id="${safeWorkflowId}" style="flex: 1;">
                 🗑️ Delete
               </button>
             </div>
@@ -3363,9 +3402,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
       }
-    } catch (error) {
-      workflowsList.innerHTML = `<div class="error">Failed to load workflows: ${error.message}</div>`;
-    }
+  } catch (error) {
+    workflowsList.innerHTML = `<div class="error">Failed to load workflows: ${sanitizeForHtml(error.message || "Unknown error", 200)}</div>`;
+  }
   };
 
   window.showCreateWorkflowModal = function () {
@@ -3701,17 +3740,17 @@ async function loadAPIKeysContent() {
           <h2 style="margin-bottom: 15px;">⏳ Pending Request</h2>
           <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 10px;">
             <div style="margin-bottom: 15px;">
-              <strong>Purpose:</strong> ${pendingRequest.purpose || "N/A"}
+              <strong>Purpose:</strong> ${sanitizeForHtml(pendingRequest.purpose || "N/A", 200)}
             </div>
-            ${pendingRequest.notes ? `<div style="margin-bottom: 15px;"><strong>Notes:</strong> ${pendingRequest.notes}</div>` : ""}
+            ${pendingRequest.notes ? `<div style="margin-bottom: 15px;"><strong>Notes:</strong> ${sanitizeForHtml(pendingRequest.notes, 500)}</div>` : ""}
             <div style="margin-bottom: 20px; color: #ffd700;">
-              <strong>⏰ Expires in:</strong> ${expiresIn} minute(s)
+              <strong>⏰ Expires in:</strong> ${sanitizeForHtml(String(expiresIn || 0), 10)} minute(s)
             </div>
             <div style="display: flex; gap: 15px;">
-              <button class="btn" onclick="confirmAPIKeyRequest('${pendingRequest.request_id}')" style="background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);">
+              <button class="btn api-key-approve" data-request-id="${sanitizeForHtml(pendingRequest.request_id || "", 100)}" style="background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);">
                 ✅ Confirm & Generate
               </button>
-              <button class="btn" onclick="declineAPIKeyRequest('${pendingRequest.request_id}')" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);">
+              <button class="btn api-key-decline" data-request-id="${sanitizeForHtml(pendingRequest.request_id || "", 100)}" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);">
                 ❌ Decline
               </button>
             </div>

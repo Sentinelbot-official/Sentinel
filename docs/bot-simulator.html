@@ -525,6 +525,13 @@
       }
 
       function addUserMessage(text) {
+        // SECURITY: Sanitize user input to prevent XSS
+        function escapeHtml(str) {
+          const div = document.createElement("div");
+          div.textContent = str;
+          return div.innerHTML;
+        }
+        
         const userAvatar = "https://cdn.discordapp.com/embed/avatars/0.png";
         const time = new Date().toLocaleTimeString([], {
           hour: "2-digit",
@@ -537,9 +544,9 @@
             <div class="message-content">
               <div class="message-header">
                 <span class="username">You</span>
-                <span class="timestamp">${time}</span>
+                <span class="timestamp">${escapeHtml(time)}</span>
               </div>
-              <div class="message-text">${text}</div>
+              <div class="message-text">${escapeHtml(text)}</div>
             </div>
           </div>
         `;
