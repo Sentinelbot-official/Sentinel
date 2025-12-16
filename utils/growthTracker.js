@@ -1,5 +1,6 @@
 const db = require("./database");
 const logger = require("./logger");
+const cron = require("node-cron");
 
 class GrowthTracker {
   constructor() {
@@ -7,6 +8,63 @@ class GrowthTracker {
     setImmediate(() => {
       this.initTable();
     });
+    this.client = null;
+  }
+
+  // Set client reference (needed for daily snapshots)
+  setClient(client) {
+    this.client = client;
+    this.startDailySnapshots();
+  }
+
+  // Start automatic daily snapshot creation
+  startDailySnapshots() {
+    if (!this.client) {
+      logger.warn("GrowthTracker", "Client not set, cannot start daily snapshots");
+      return;
+    }
+
+    // Create snapshot daily at midnight
+    cron.schedule("0 0 * * *", async () => {
+      try {
+        await this.createDailySnapshot(this.client);
+        logger.info("GrowthTracker", "Daily snapshot created automatically");
+      } catch (error) {
+        logger.error("GrowthTracker", "Failed to create daily snapshot", error);
+      }
+    });
+
+    // Create initial snapshot on startup (if not already created today)
+    setTimeout(async () => {
+      try {
+        const today = new Date().toISOString().split("T")[0];
+        const existing = await new Promise((resolve) => {
+          db.db.get(
+            "SELECT date FROM daily_snapshots WHERE date = ?",
+            [today],
+            (err, row) => {
+              if (err || !row) {
+                resolve(null);
+              } else {
+                resolve(row);
+              }
+            }
+          );
+        });
+
+        if (!existing) {
+          await this.createDailySnapshot(this.client);
+          logger.info("GrowthTracker", "Initial daily snapshot created");
+        }
+      } catch (error) {
+        logger.error("GrowthTracker", "Failed to create initial snapshot", error);
+      }
+    }, 30000); // Wait 30 seconds after startup
+
+    logger.info(
+      "GrowthTracker",
+      "Daily snapshot scheduler started (runs at midnight)"
+    );
   }
 
   initTable() {

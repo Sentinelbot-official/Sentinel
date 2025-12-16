@@ -74,6 +74,11 @@ client.antiRaid = {
 const HeatSystem = require("./utils/heatSystem");
 client.heatSystem = new HeatSystem(client);
 
+// Growth Tracker (set client reference for daily snapshots)
+const growthTracker = require("./utils/growthTracker");
+growthTracker.setClient(client);
+client.growthTracker = growthTracker;
+
 // Advanced Verification System
 const VerificationSystem = require("./utils/verificationSystem");
 client.verificationSystem = new VerificationSystem(client);

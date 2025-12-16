@@ -33,17 +33,12 @@ module.exports = {
     let joinedAt = null;
     let daysActive = 0;
 
-    // Track with growth tracker (calculate days active first)
-    await growthTracker
-      .trackServerRemove(guild.id, "left", daysActive)
-      .catch((err) => {
-        logger.error("Growth tracker error:", err);
-      });
-
+    // Calculate days active BEFORE tracking
     try {
-      const trackingInfo = await new Promise((resolve, reject) => {
+      // First check server_joins table
+      const joinInfo = await new Promise((resolve, reject) => {
         db.db.get(
-          "SELECT source, invited_at FROM guild_invite_tracking WHERE guild_id = ?",
+          "SELECT joined_at, source FROM server_joins WHERE guild_id = ?",
           [guild.id],
           (err, row) => {
             if (err) {
@@ -55,16 +50,46 @@ module.exports = {
         );
       });
 
-      if (trackingInfo) {
-        inviteSource = trackingInfo.source;
-        joinedAt = trackingInfo.invited_at;
+      if (joinInfo && joinInfo.joined_at) {
+        joinedAt = joinInfo.joined_at;
+        inviteSource = joinInfo.source || "unknown";
         daysActive = Math.floor(
           (Date.now() - joinedAt) / (1000 * 60 * 60 * 24)
         );
+      } else {
+        // Fallback to guild_invite_tracking
+        const trackingInfo = await new Promise((resolve, reject) => {
+          db.db.get(
+            "SELECT source, invited_at FROM guild_invite_tracking WHERE guild_id = ?",
+            [guild.id],
+            (err, row) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(row);
+              }
+            }
+          );
+        });
+
+        if (trackingInfo && trackingInfo.invited_at) {
+          inviteSource = trackingInfo.source || "unknown";
+          joinedAt = trackingInfo.invited_at;
+          daysActive = Math.floor(
+            (Date.now() - joinedAt) / (1000 * 60 * 60 * 24)
+          );
+        }
       }
     } catch (error) {
       logger.error("Guild Delete", "Failed to get tracking info", error);
     }
+
+    // Track with growth tracker (now with correct daysActive)
+    await growthTracker
+      .trackServerRemove(guild.id, "left", daysActive)
+      .catch((err) => {
+        logger.error("Growth tracker error:", err);
+      });
 
     // Log server leave
     try {
