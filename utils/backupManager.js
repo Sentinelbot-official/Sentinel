@@ -203,18 +203,28 @@ class BackupManager {
         };
       }
 
+      // Handle old backup format (flat structure) vs new format (nested structure)
+      // Old format: { guild_id, timestamp, config, modLogs, ... }
+      // New format: { id, guildId, guildName, timestamp, data: { config, roles, channels, ... } }
+      const isOldFormat = backupData.guild_id !== undefined && !backupData.data;
+      const backupGuildId = isOldFormat ? backupData.guild_id : backupData.guildId;
+      const backupConfig = isOldFormat ? backupData.config : backupData.data?.config;
+      const backupRoles = isOldFormat ? [] : backupData.data?.roles || [];
+      const backupChannels = isOldFormat ? [] : backupData.data?.channels || [];
+      const backupTimestamp = backupData.timestamp;
+
       // Exception: Allow specific backup to be restored to new guild
       const ALLOWED_BACKUP_MIGRATIONS = {
         "1444737803660558396_1764534899859": "1450529013302038639", // Old Nexus guild -> New Nexus guild
       };
 
-      if (backupData.guildId !== guild.id) {
+      if (backupGuildId !== guild.id) {
         // Check if this is an allowed migration
         const allowedTargetGuild = ALLOWED_BACKUP_MIGRATIONS[backupId];
         if (allowedTargetGuild && guild.id === allowedTargetGuild) {
           logger.info(
             "BackupManager",
-            `Allowing backup migration: ${backupId} from ${backupData.guildId} to ${guild.id}`
+            `Allowing backup migration: ${backupId} from ${backupGuildId} to ${guild.id}`
           );
         } else {
           return {
@@ -231,21 +241,21 @@ class BackupManager {
       };
 
       // Restore bot configuration
-      if (restoreConfig && backupData.data.config) {
-        await this.restoreConfig(guild.id, backupData.data.config);
+      if (restoreConfig && backupConfig) {
+        await this.restoreConfig(guild.id, backupConfig);
         restored.config = true;
       }
 
       // Restore roles (careful with this!)
-      if (restoreRoles && backupData.data.roles) {
-        restored.roles = await this.restoreRoles(guild, backupData.data.roles);
+      if (restoreRoles && backupRoles && backupRoles.length > 0) {
+        restored.roles = await this.restoreRoles(guild, backupRoles);
       }
 
       // Restore channels (careful with this!)
-      if (restoreChannels && backupData.data.channels) {
+      if (restoreChannels && backupChannels && backupChannels.length > 0) {
         restored.channels = await this.restoreChannels(
           guild,
-          backupData.data.channels
+          backupChannels
         );
       }
 
@@ -253,7 +263,7 @@ class BackupManager {
         success: true,
         restored,
         backupId,
-        timestamp: backupData.timestamp,
+        timestamp: backupTimestamp,
         message: "Backup restored successfully",
       };
     } catch (error) {
