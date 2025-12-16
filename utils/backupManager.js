@@ -203,11 +203,25 @@ class BackupManager {
         };
       }
 
+      // Exception: Allow specific backup to be restored to new guild
+      const ALLOWED_BACKUP_MIGRATIONS = {
+        "1444737803660558396_1764534899859": "1450529013302038639", // Old Nexus guild -> New Nexus guild
+      };
+
       if (backupData.guildId !== guild.id) {
-        return {
-          success: false,
-          error: "Backup is from a different server",
-        };
+        // Check if this is an allowed migration
+        const allowedTargetGuild = ALLOWED_BACKUP_MIGRATIONS[backupId];
+        if (allowedTargetGuild && guild.id === allowedTargetGuild) {
+          logger.info(
+            "BackupManager",
+            `Allowing backup migration: ${backupId} from ${backupData.guildId} to ${guild.id}`
+          );
+        } else {
+          return {
+            success: false,
+            error: "Backup is from a different server",
+          };
+        }
       }
 
       const restored = {
