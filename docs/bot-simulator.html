@@ -510,10 +510,11 @@
         let response = commands[cmd] || commands[baseCommand];
 
         if (!response) {
+          // SECURITY FIX: Escape user input in response description
           response = {
             title: "❓ Unknown Command",
             color: "#ff0000",
-            description: `Command \`${cmd}\` not recognized. Try \`/help\``,
+            description: `Command \`${escapeHtml(cmd)}\` not recognized. Try \`/help\``,
           };
         }
 
@@ -589,27 +590,28 @@
           response.color || "#5865f2"
         }">`;
 
+        // SECURITY FIX: Sanitize all response data before inserting into HTML
         if (response.title) {
-          embedHTML += `<div class="embed-title">${response.title}</div>`;
+          embedHTML += `<div class="embed-title">${escapeHtml(response.title)}</div>`;
         }
 
         if (response.description) {
-          embedHTML += `<div class="embed-description">${response.description}</div>`;
+          embedHTML += `<div class="embed-description">${escapeHtml(response.description)}</div>`;
         }
 
         if (response.fields) {
           response.fields.forEach((field) => {
             embedHTML += `
               <div class="embed-field">
-                <div class="embed-field-name">${field.name}</div>
-                <div class="embed-field-value">${field.value}</div>
+                <div class="embed-field-name">${escapeHtml(field.name)}</div>
+                <div class="embed-field-value">${escapeHtml(field.value)}</div>
               </div>
             `;
           });
         }
 
         if (response.footer) {
-          embedHTML += `<div style="color: #72767d; font-size: 12px; margin-top: 8px">${response.footer}</div>`;
+          embedHTML += `<div style="color: #72767d; font-size: 12px; margin-top: 8px">${escapeHtml(response.footer)}</div>`;
         }
 
         embedHTML += `</div>`;
@@ -621,7 +623,7 @@
               <div class="message-header">
                 <span class="username">Nexus</span>
                 <span class="bot-tag">BOT</span>
-                <span class="timestamp">${time}</span>
+                <span class="timestamp">${escapeHtml(time)}</span>
               </div>
               ${embedHTML}
             </div>
