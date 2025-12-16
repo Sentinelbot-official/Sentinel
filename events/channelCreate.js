@@ -6,6 +6,15 @@ const logger = require("../utils/logger");
 module.exports = {
   name: "channelCreate",
   async execute(channel, client) {
+    // Skip anti-nuke checks if backup restore is in progress
+    const backupManager = require("../utils/backupManager");
+    if (backupManager.isRestoring(channel.guild.id)) {
+      logger.debug(
+        `[channelCreate] Skipping anti-nuke check - backup restore in progress for ${channel.guild.id}`
+      );
+      return; // Don't process during backup restore
+    }
+
     // If server is in lockdown, DELETE the channel immediately
     if (
       client.advancedAntiNuke &&

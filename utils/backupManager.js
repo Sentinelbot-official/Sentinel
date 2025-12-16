@@ -11,6 +11,7 @@ class BackupManager {
   constructor() {
     this.backupDir = path.join(__dirname, "../backups");
     this.ensureBackupDir();
+    this.restoringGuilds = new Set(); // Track guilds currently restoring backups
   }
 
   async ensureBackupDir() {
@@ -193,6 +194,9 @@ class BackupManager {
       restoreChannels = false,
     } = options;
 
+    // Mark guild as restoring to prevent anti-nuke from interfering
+    this.restoringGuilds.add(guild.id);
+
     try {
       // Load backup data
       const backupData = await this.loadBackup(backupId);
@@ -274,7 +278,19 @@ class BackupManager {
         success: false,
         error: error.message,
       };
+    } finally {
+      // Remove from restoring set after a delay to allow channels to be created
+      setTimeout(() => {
+        this.restoringGuilds.delete(guild.id);
+      }, 30000); // 30 second grace period
     }
+  }
+
+  /**
+   * Check if a guild is currently restoring a backup
+   */
+  isRestoring(guildId) {
+    return this.restoringGuilds.has(guildId);
   }
 
   /**
@@ -338,34 +354,56 @@ class BackupManager {
     if (!permissions) return 0n;
 
     // If it's already a number/string number, convert directly
-    if (typeof permissions === "number" || typeof permissions === "string") {
-      const num = typeof permissions === "string" ? parseInt(permissions, 10) : permissions;
-      if (!isNaN(num)) {
+    if (typeof permissions === "number") {
+      return BigInt(permissions);
+    }
+
+    if (typeof permissions === "string") {
+      // Try to parse as number first
+      const num = parseInt(permissions, 10);
+      if (!isNaN(num) && num.toString() === permissions.trim()) {
         return BigInt(num);
       }
+
+      // If it's a comma-separated string, split and convert
+      if (permissions.includes(",")) {
+        const permNames = permissions.split(",").map((p) => p.trim());
+        let bitfield = 0n;
+        for (const permName of permNames) {
+          const permValue = PermissionFlagsBits[permName];
+          if (permValue !== undefined) {
+            bitfield |= BigInt(permValue);
+          }
+        }
+        return bitfield;
+      }
+
+      // Single permission name as string
+      const permValue = PermissionFlagsBits[permissions.trim()];
+      if (permValue !== undefined) {
+        return BigInt(permValue);
+      }
+
+      // If we can't convert it, return 0n
+      logger.warn(
+        "BackupManager",
+        `Unknown permission format: ${permissions}`
+      );
+      return 0n;
     }
 
     // If it's an array of permission names, convert them
     if (Array.isArray(permissions)) {
       let bitfield = 0n;
       for (const permName of permissions) {
-        // Convert permission name to PermissionFlagsBits value
-        const permValue = PermissionFlagsBits[permName];
-        if (permValue !== undefined) {
-          bitfield |= BigInt(permValue);
-        }
-      }
-      return bitfield;
-    }
-
-    // If it's a comma-separated string, split and convert
-    if (typeof permissions === "string" && permissions.includes(",")) {
-      const permNames = permissions.split(",").map((p) => p.trim());
-      let bitfield = 0n;
-      for (const permName of permNames) {
-        const permValue = PermissionFlagsBits[permName];
-        if (permValue !== undefined) {
-          bitfield |= BigInt(permValue);
+        // Handle both string names and numbers in array
+        if (typeof permName === "number") {
+          bitfield |= BigInt(permName);
+        } else if (typeof permName === "string") {
+          const permValue = PermissionFlagsBits[permName];
+          if (permValue !== undefined) {
+            bitfield |= BigInt(permValue);
+          }
         }
       }
       return bitfield;
@@ -396,14 +434,16 @@ class BackupManager {
             roleData.permissions
           );
 
-          await guild.roles.create({
+          const roleOptions = {
             name: roleData.name,
-            colors: roleData.color, // Use 'colors' instead of deprecated 'color'
+            color: roleData.color, // Use 'color' (Discord.js v14 uses 'color', not 'colors')
             permissions: permissions,
             hoist: roleData.hoist,
             mentionable: roleData.mentionable,
             reason: "Restored from backup",
-          });
+          };
+
+          await guild.roles.create(roleOptions);
           restored++;
         } catch (err) {
           logger.error(

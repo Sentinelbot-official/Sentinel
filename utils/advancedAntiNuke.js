@@ -1405,8 +1405,15 @@ class AdvancedAntiNuke {
       }
 
       // Also delete ANY channel created in the last 60 seconds (aggressive cleanup)
+      // BUT skip if backup restore is in progress
+      const backupManager = require("./backupManager");
+      const isRestoring = backupManager.isRestoring(guild.id);
+
       const allChannels = Array.from(guild.channels.cache.values()).filter(
         (c) => {
+          if (isRestoring) {
+            return false; // Don't delete channels during backup restore
+          }
           const createdTimestamp = c.createdTimestamp || 0;
           return now - createdTimestamp < 60000; // Created in last 60 seconds
         }
