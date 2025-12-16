@@ -1601,6 +1601,17 @@ class DashboardServer {
       this.checkAuth,
       async (req, res) => {
         try {
+          // SECURITY FIX: Verify user has permission to access this guild
+          const userGuilds = req.user?.guilds || [];
+          const hasAccess = userGuilds.some(
+            (g) => g.id === req.params.id && (g.permissions & 0x8) === 0x8 // ADMINISTRATOR permission
+          );
+
+          if (!hasAccess) {
+            logger.warn("Dashboard", `Unauthorized modlogs access attempt to guild ${req.params.id} by user ${req.user?.id}`);
+            return res.status(403).json({ error: "Access denied. You don't have permission to access this server." });
+          }
+
           const limit = parseInt(req.query.limit) || 50;
           const userId = req.query.userId || null;
           const logs = await db.getModLogs(req.params.id, userId, limit);
@@ -1617,6 +1628,17 @@ class DashboardServer {
       this.checkAuth,
       async (req, res) => {
         try {
+          // SECURITY FIX: Verify user has permission to access this guild
+          const userGuilds = req.user?.guilds || [];
+          const hasAccess = userGuilds.some(
+            (g) => g.id === req.params.id && (g.permissions & 0x8) === 0x8 // ADMINISTRATOR permission
+          );
+
+          if (!hasAccess) {
+            logger.warn("Dashboard", `Unauthorized warnings access attempt to guild ${req.params.id} by user ${req.user?.id}`);
+            return res.status(403).json({ error: "Access denied. You don't have permission to access this server." });
+          }
+
           const userId = req.query.userId;
           if (!userId) {
             return res.status(400).json({ error: "userId required" });
@@ -1636,6 +1658,17 @@ class DashboardServer {
       this.checkAuth,
       async (req, res) => {
         try {
+          // SECURITY FIX: Verify user has permission to access this guild
+          const userGuilds = req.user?.guilds || [];
+          const hasAccess = userGuilds.some(
+            (g) => g.id === req.params.id && (g.permissions & 0x8) === 0x8 // ADMINISTRATOR permission
+          );
+
+          if (!hasAccess) {
+            logger.warn("Dashboard", `Unauthorized security logs access attempt to guild ${req.params.id} by user ${req.user?.id}`);
+            return res.status(403).json({ error: "Access denied. You don't have permission to access this server." });
+          }
+
           const logs = await db.searchLogs(req.params.id, {
             category: "security",
             limit: parseInt(req.query.limit) || 50,
@@ -2652,6 +2685,17 @@ class DashboardServer {
           return res.status(404).json({ error: "Server not found" });
         }
 
+        // SECURITY FIX: Verify user has permission to access this guild
+        const userGuilds = req.user?.guilds || [];
+        const hasAccess = userGuilds.some(
+          (g) => g.id === req.params.id && (g.permissions & 0x8) === 0x8 // ADMINISTRATOR permission
+        );
+
+        if (!hasAccess) {
+          logger.warn("Dashboard", `Unauthorized stats access attempt to guild ${req.params.id} by user ${req.user?.id}`);
+          return res.status(403).json({ error: "Access denied. You don't have permission to access this server." });
+        }
+
         // Get counts from database
         const [modLogsCount, warningsCount, securityLogsCount, antiRaidCount] =
           await Promise.all([
@@ -2772,6 +2816,17 @@ class DashboardServer {
             return res.status(404).json({ error: "Server not found" });
           }
 
+          // SECURITY FIX: Verify user has permission to access this guild
+          const userGuilds = req.user?.guilds || [];
+          const hasAccess = userGuilds.some(
+            (g) => g.id === req.params.id && (g.permissions & 0x8) === 0x8 // ADMINISTRATOR permission
+          );
+
+          if (!hasAccess) {
+            logger.warn("Dashboard", `Unauthorized automod access attempt to guild ${req.params.id} by user ${req.user?.id}`);
+            return res.status(403).json({ error: "Access denied. You don't have permission to access this server." });
+          }
+
           const rules = await DiscordAutoMod.getRules(guild);
           res.json(
             rules.map((rule) => DiscordAutoMod.formatRuleForDashboard(rule))
@@ -2791,6 +2846,17 @@ class DashboardServer {
           const guild = this.client.guilds.cache.get(req.params.id);
           if (!guild) {
             return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this guild
+          const userGuilds = req.user?.guilds || [];
+          const hasAccess = userGuilds.some(
+            (g) => g.id === req.params.id && (g.permissions & 0x8) === 0x8 // ADMINISTRATOR permission
+          );
+
+          if (!hasAccess) {
+            logger.warn("Dashboard", `Unauthorized automod create attempt to guild ${req.params.id} by user ${req.user?.id}`);
+            return res.status(403).json({ error: "Access denied. You don't have permission to modify this server." });
           }
 
           const rule = await DiscordAutoMod.createRule(guild, req.body);
