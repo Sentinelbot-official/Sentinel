@@ -3030,6 +3030,24 @@ class DashboardServer {
     // Admin authentication
     this.app.post("/api/admin/auth", async (req, res) => {
       try {
+        const ip = this.getRealIP(req);
+        
+        // Check if IP is blocked
+        const failedInfo = this.adminFailedAttempts.get(ip);
+        if (
+          failedInfo &&
+          failedInfo.blockedUntil &&
+          Date.now() < failedInfo.blockedUntil
+        ) {
+          const remainingMs = failedInfo.blockedUntil - Date.now();
+          const remainingMinutes = Math.ceil(remainingMs / (60 * 1000));
+          return res.status(403).json({
+            error: "Too many failed attempts",
+            message: `Temporarily blocked. Try again in ${remainingMinutes} minute(s).`,
+            blockedUntil: failedInfo.blockedUntil,
+          });
+        }
+
         const { password } = req.body;
         const adminPassword = process.env.ADMIN_PASSWORD;
 
@@ -3040,6 +3058,9 @@ class DashboardServer {
         }
 
         if (password === adminPassword) {
+          // Clear any failed attempts on successful login
+          this.clearAdminFailures(ip);
+
           // Generate secure token using crypto (not predictable)
           const crypto = require("crypto");
           const token = crypto.randomBytes(32).toString("hex");
@@ -3060,6 +3081,8 @@ class DashboardServer {
 
           res.json({ success: true, token, expires });
         } else {
+          // Record failed attempt
+          this.recordAdminFailure(ip);
           res.status(401).json({ error: "Invalid password" });
         }
       } catch (error) {
