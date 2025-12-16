@@ -239,28 +239,17 @@ module.exports = {
 
       const config = importData.config.serverConfig;
 
-      // Import server config
+      // SECURITY FIX: Use setServerConfig which has built-in whitelist validation
+      // This prevents SQL injection by only allowing valid column names
       if (overwrite || !(await db.getServerConfig(interaction.guild.id))) {
-        await new Promise((resolve, reject) => {
-          const keys = Object.keys(config).filter((k) => k !== "guild_id");
-          const values = keys.map((k) => config[k]);
-
-          db.db.run(
-            `INSERT INTO server_config (guild_id, ${keys.join(", ")}) 
-             VALUES (?, ${keys.map(() => "?").join(", ")}) 
-             ON CONFLICT(guild_id) DO UPDATE SET ${keys
-               .map((k) => `${k} = excluded.${k}`)
-               .join(", ")}`,
-            [interaction.guild.id, ...values],
-            (err) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            }
-          );
-        });
+        try {
+          // setServerConfig validates keys against ALLOWED_CONFIG_KEYS whitelist
+          await db.setServerConfig(interaction.guild.id, config);
+        } catch (error) {
+          return interaction.editReply({
+            content: `❌ Failed to import configuration: ${error.message}`,
+          });
+        }
       }
 
       // Import join gate if present

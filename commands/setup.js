@@ -290,27 +290,9 @@ module.exports = {
       const config = await db.getServerConfig(interaction.guild.id);
       const newConfig = { ...config, ...preset.config };
 
-      await new Promise((resolve, reject) => {
-        db.db.run(
-          `INSERT INTO server_config (guild_id, ${Object.keys(
-            preset.config
-          ).join(", ")}) 
-           VALUES (?, ${Object.keys(preset.config)
-             .map(() => "?")
-             .join(", ")}) 
-           ON CONFLICT(guild_id) DO UPDATE SET ${Object.keys(preset.config)
-             .map((k) => `${k} = excluded.${k}`)
-             .join(", ")}`,
-          [interaction.guild.id, ...Object.values(preset.config)],
-          (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          }
-        );
-      });
+      // SECURITY FIX: Use setServerConfig which has built-in whitelist validation
+      // This prevents SQL injection by only allowing valid column names
+      await db.setServerConfig(interaction.guild.id, preset.config);
 
       // Set up join gate for applicable presets
       if (
