@@ -9,6 +9,7 @@ const {
 } = require("discord.js");
 const db = require("../utils/database");
 const ErrorMessages = require("../utils/errorMessages");
+const CommandSecurity = require("../utils/commandSecurity");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -67,31 +68,44 @@ module.exports = {
   async execute(interaction) {
     const subcommand = interaction.options.getSubcommand();
 
+    // Get bot member for security checks
+    const botMember = await interaction.guild.members.fetch(interaction.client.user.id);
+
     if (subcommand === "create") {
       const name = interaction.options.getString("name");
       const rolesStr = interaction.options.getString("roles");
 
-      // Parse role IDs from mentions or raw IDs
-      const roleIds = rolesStr
-        .split(/\s+/)
-        .map((r) => {
-          const match = r.match(/<@&(\d+)>|(\d+)/);
-          return match ? match[1] || match[2] : null;
-        })
-        .filter((id) => id && interaction.guild.roles.cache.has(id));
+      // Input validation using security utility
+      const nameValidation = CommandSecurity.validateInput(name, "Template name", 1, 100);
+      if (nameValidation) return interaction.reply(nameValidation);
 
-      if (roleIds.length === 0) {
-        return interaction.reply({
-          content: "❌ No valid roles found!",
+      // Sanitize template name (prevent XSS)
+      const sanitizedName = CommandSecurity.sanitizeInput(name, 100);
+
+      // Check bot permission
+      const botPermCheck = CommandSecurity.checkBotPermission(botMember, PermissionFlagsBits.ManageRoles);
+      if (botPermCheck) return interaction.reply(botPermCheck);
+
+      // Parse and validate roles using security utility
+      const rolesResult = CommandSecurity.parseAndValidateRoles(rolesStr, interaction.guild, botMember);
+      if (!rolesResult.valid) {
+        return interaction.reply(rolesResult.error);
+      }
+
+      if (rolesResult.warning) {
+        await interaction.reply({
+          content: rolesResult.warning,
           flags: MessageFlags.Ephemeral,
         });
       }
+
+      const manageableRoles = rolesResult.roleIds;
 
       // Check if template exists
       const existing = await new Promise((resolve, reject) => {
         db.db.get(
           "SELECT * FROM role_templates WHERE guild_id = ? AND template_name = ?",
-          [interaction.guild.id, name],
+          [interaction.guild.id, sanitizedName],
           (err, row) => {
             if (err) {
               reject(err);
@@ -114,8 +128,8 @@ module.exports = {
           "INSERT INTO role_templates (guild_id, template_name, role_ids, created_by, created_at) VALUES (?, ?, ?, ?, ?)",
           [
             interaction.guild.id,
-            name,
-            JSON.stringify(roleIds),
+            sanitizedName,
+            JSON.stringify(manageableRoles),
             interaction.user.id,
             Date.now(),
           ],
@@ -129,12 +143,12 @@ module.exports = {
         );
       });
 
-      const roles = roleIds.map((id) => `<@&${id}>`).join(", ");
+      const roles = manageableRoles.map((id) => `<@&${id}>`).join(", ");
 
       const embed = new EmbedBuilder()
         .setTitle("✅ Role Template Created")
         .setDescription(
-          `**Template:** \`${name}\`\n**Roles:** ${roles}\n\n💡 Use \`/roletemplate apply template:${name}\` to apply this template.`
+          `**Template:** \`${sanitizedName}\`\n**Roles:** ${roles}\n\n💡 Use \`/roletemplate apply template:${sanitizedName}\` to apply this template.`
         )
         .setColor(0x00ff00)
         .setTimestamp();
@@ -142,13 +156,31 @@ module.exports = {
       await interaction.reply({ embeds: [embed] });
     } else if (subcommand === "apply") {
       const templateName = interaction.options.getString("template");
+      
+      // Input validation using security utility
+      const templateValidation = CommandSecurity.validateInput(templateName, "Template name", 1, 100);
+      if (templateValidation) return interaction.reply(templateValidation);
+
+      // Sanitize template name
+      const sanitizedTemplateName = CommandSecurity.sanitizeInput(templateName, 100);
+      
       const user = interaction.options.getUser("user");
-      const member = await interaction.guild.members.fetch(user.id);
+      const targetMember = await interaction.guild.members.fetch(user.id);
+      
+      // Security check using utility
+      const securityCheck = await CommandSecurity.checkRoleManagementSecurity(
+        interaction,
+        PermissionFlagsBits.ManageRoles,
+        targetMember
+      );
+      if (securityCheck) return interaction.reply(securityCheck);
+
+      const member = targetMember;
 
       const template = await new Promise((resolve, reject) => {
         db.db.get(
           "SELECT * FROM role_templates WHERE guild_id = ? AND template_name = ?",
-          [interaction.guild.id, templateName],
+          [interaction.guild.id, sanitizedTemplateName],
           (err, row) => {
             if (err) {
               reject(err);
@@ -169,20 +201,24 @@ module.exports = {
       await interaction.deferReply();
 
       const roleIds = JSON.parse(template.role_ids);
-      const roles = roleIds
-        .map((id) => interaction.guild.roles.cache.get(id))
-        .filter((r) => r);
+      
+      // Filter roles bot can actually manage using security utility
+      const manageableRoles = CommandSecurity.filterManageableRoles(
+        roleIds,
+        interaction.guild,
+        botMember
+      );
 
-      if (roles.length === 0) {
+      if (manageableRoles.length === 0) {
         return interaction.editReply({
-          content: "❌ All roles in this template are invalid!",
+          content: "❌ I cannot manage any roles in this template! The bot's role may be too low.",
         });
       }
 
       const added = [];
       const failed = [];
 
-      for (const role of roles) {
+      for (const role of manageableRoles) {
         try {
           if (member.roles.cache.has(role.id)) {
             continue; // Already has role
@@ -197,7 +233,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle("✅ Template Applied")
         .setDescription(
-          `**Template:** \`${templateName}\`\n**User:** ${user}\n\n` +
+          `**Template:** \`${sanitizedTemplateName}\`\n**User:** ${user}\n\n` +
             (added.length > 0
               ? `✅ **Added:** ${added.map((r) => r.toString()).join(", ")}\n`
               : "") +
@@ -243,7 +279,9 @@ module.exports = {
                   return role ? role.name : `Unknown (${id})`;
                 })
                 .join(", ");
-              return `**${t.template_name}**\n${roles || "No roles"}`;
+              // Sanitize template name to prevent XSS
+              const safeName = (t.template_name || "").replace(/[<>]/g, "");
+              return `**${safeName}**\n${roles || "No roles"}`;
             })
             .join("\n\n")
         )
@@ -254,10 +292,17 @@ module.exports = {
     } else if (subcommand === "delete") {
       const templateName = interaction.options.getString("template");
 
+      // Input validation using security utility
+      const templateValidation = CommandSecurity.validateInput(templateName, "Template name", 1, 100);
+      if (templateValidation) return interaction.reply(templateValidation);
+
+      // Sanitize template name
+      const sanitizedTemplateName = CommandSecurity.sanitizeInput(templateName, 100);
+
       const result = await new Promise((resolve, reject) => {
         db.db.run(
           "DELETE FROM role_templates WHERE guild_id = ? AND template_name = ?",
-          [interaction.guild.id, templateName],
+          [interaction.guild.id, sanitizedTemplateName],
           function (err) {
             if (err) {
               reject(err);
@@ -276,7 +321,7 @@ module.exports = {
       }
 
       await interaction.reply({
-        content: `✅ Template \`${templateName}\` deleted!`,
+        content: `✅ Template \`${sanitizedTemplateName}\` deleted!`,
         flags: MessageFlags.Ephemeral,
       });
     }
