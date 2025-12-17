@@ -31,8 +31,9 @@ class TokenScanner {
     this.doxSites = [
       {
         name: "Doxbin",
-        url: "https://doxbin.com/home",
-        type: "scrape",
+        baseUrl: "https://doxbin.com/home",
+        type: "paginated",
+        pages: 5, // Scan first 5 pages
       },
     ];
   }
@@ -132,6 +133,30 @@ class TokenScanner {
           },
         });
         content = response.data;
+      } else if (site.type === "paginated") {
+        // Paginated scraping (for sites like Doxbin)
+        const pages = site.pages || 5;
+        for (let page = 1; page <= pages; page++) {
+          try {
+            // Doxbin uses ?page=X format
+            const url = `${site.baseUrl}?page=${page}`;
+            const response = await axios.get(url, {
+              timeout: 10000,
+              headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+              },
+            });
+            content += response.data + "\n";
+
+            // Small delay between pages to avoid rate limiting
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          } catch (pageError) {
+            logger.debug(
+              `[TokenScanner] Failed to scan ${site.name} page ${page}:`,
+              pageError.message
+            );
+          }
+        }
       }
 
       // Check if token appears in content
@@ -158,7 +183,7 @@ class TokenScanner {
     const leakInfo = {
       source: {
         name: site.name,
-        url: site.url || site.searchUrl,
+        url: site.url || site.searchUrl || site.baseUrl,
         type: "web_scraper",
       },
       timestamp: new Date().toISOString(),
@@ -168,7 +193,9 @@ class TokenScanner {
     logger.error(
       `[TokenScanner] 🚨 CRITICAL: Token detected on ${site.name}`
     );
-    logger.error(`[TokenScanner] URL: ${site.url || site.searchUrl}`);
+    logger.error(
+      `[TokenScanner] URL: ${site.url || site.searchUrl || site.baseUrl}`
+    );
 
     // Alert owner(s)
     await this.alertOwners(leakInfo);
