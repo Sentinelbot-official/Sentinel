@@ -6,6 +6,7 @@ const {
 const Moderation = require("../utils/moderation");
 const db = require("../utils/database");
 const ms = require("ms");
+const CommandSecurity = require("../utils/commandSecurity");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -36,6 +37,14 @@ module.exports = {
 
     const constants = require("../utils/constants");
     const ErrorMessages = require("../utils/errorMessages");
+    
+    // Get bot member for security checks
+    const botMember = await interaction.guild.members.fetch(interaction.client.user.id);
+
+    // Security: Check bot permission
+    const botPermCheck = CommandSecurity.checkBotPermission(botMember, PermissionFlagsBits.ModerateMembers);
+    if (botPermCheck) return interaction.reply(botPermCheck);
+
     const duration = ms(durationStr);
     if (
       !duration ||
@@ -66,8 +75,9 @@ module.exports = {
       return interaction.reply(ErrorMessages.userNotFound());
     }
 
-    // Check if moderator is server owner (owners can mute anyone)
-    const isOwner = interaction.member.id === interaction.guild.ownerId;
+    // Security: Check role hierarchy using utility
+    const targetCheck = CommandSecurity.checkCanTarget(interaction.member, member, interaction.guild);
+    if (targetCheck) return interaction.reply(targetCheck);
 
     // Check if member is manageable
     if (!member.moderatable) {
@@ -76,14 +86,6 @@ module.exports = {
           "❌ I cannot mute this user (they have a higher role than me or are the server owner)!",
         flags: MessageFlags.Ephemeral,
       });
-    }
-
-    // Check role hierarchy (unless moderator is owner)
-    if (
-      !isOwner &&
-      member.roles.highest.position >= interaction.member.roles.highest.position
-    ) {
-      return interaction.reply(ErrorMessages.targetHigherRole("mute"));
     }
 
     const result = await Moderation.mute(

@@ -8,6 +8,7 @@ const {
 const db = require("../utils/database");
 const ErrorMessages = require("../utils/errorMessages");
 const logger = require("../utils/logger");
+const CommandSecurity = require("../utils/commandSecurity");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -48,10 +49,17 @@ module.exports = {
   async execute(interaction) {
     const subcommand = interaction.options.getSubcommand();
 
+    // Get bot member for security checks
+    const botMember = await interaction.guild.members.fetch(interaction.client.user.id);
+
     if (subcommand === "add") {
       const user = interaction.options.getUser("user");
       const reason =
         interaction.options.getString("reason") || "No reason provided";
+
+      // Security: Check bot permission
+      const botPermCheck = CommandSecurity.checkBotPermission(botMember, PermissionFlagsBits.ManageRoles);
+      if (botPermCheck) return interaction.reply(botPermCheck);
 
       // Safety checks
       if (user.id === interaction.user.id) {
@@ -78,26 +86,9 @@ module.exports = {
         return interaction.reply(ErrorMessages.userNotFound());
       }
 
-      // Check if moderator is server owner (owners can quarantine anyone)
-      const isOwner = interaction.member.id === interaction.guild.ownerId;
-
-      // Check role hierarchy (unless moderator is owner)
-      if (
-        !isOwner &&
-        member.roles.highest.position >=
-          interaction.member.roles.highest.position
-      ) {
-        return interaction.reply({
-          content:
-            "❌ You cannot quarantine someone with equal or higher roles!",
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-
-      // Check if bot can manage this member
-      const botMember = await interaction.guild.members.fetch(
-        interaction.client.user.id
-      );
+      // Security: Check role hierarchy using utility
+      const targetCheck = CommandSecurity.checkCanTarget(interaction.member, member, interaction.guild);
+      if (targetCheck) return interaction.reply(targetCheck);
       if (!member.manageable) {
         return interaction.reply({
           content:

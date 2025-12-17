@@ -7,6 +7,7 @@ const {
 const Moderation = require("../utils/moderation");
 const db = require("../utils/database");
 const ErrorMessages = require("../utils/errorMessages");
+const CommandSecurity = require("../utils/commandSecurity");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -56,11 +57,18 @@ module.exports = {
   async execute(interaction) {
     const subcommand = interaction.options.getSubcommand();
 
+    // Get bot member for security checks
+    const botMember = await interaction.guild.members.fetch(interaction.client.user.id);
+
     if (subcommand === "add") {
       const user = interaction.options.getUser("user");
       const reason =
         interaction.options.getString("reason") || "No reason provided";
       const deleteDays = interaction.options.getInteger("delete_days") || 0;
+
+      // Security: Check bot permission
+      const botPermCheck = CommandSecurity.checkBotPermission(botMember, PermissionFlagsBits.BanMembers);
+      if (botPermCheck) return interaction.reply(botPermCheck);
 
       if (user.id === interaction.user.id) {
         return interaction.reply(ErrorMessages.cannotTargetSelf());
@@ -79,25 +87,13 @@ module.exports = {
         .fetch(user.id)
         .catch(() => null);
 
-      // Check if moderator is server owner (owners can ban anyone)
-      const isOwner = interaction.member.id === interaction.guild.ownerId;
-
-      // Check if member is manageable (bot can ban them)
+      // Security: Check role hierarchy using utility
       if (member) {
-        const botMember = await interaction.guild.members.fetch(
-          interaction.client.user.id
-        );
+        const targetCheck = CommandSecurity.checkCanTarget(interaction.member, member, interaction.guild);
+        if (targetCheck) return interaction.reply(targetCheck);
+
         if (!member.manageable) {
           return interaction.reply(ErrorMessages.botTargetHigherRole("ban"));
-        }
-
-        // Check role hierarchy (unless moderator is owner)
-        if (
-          !isOwner &&
-          member.roles.highest.position >=
-            interaction.member.roles.highest.position
-        ) {
-          return interaction.reply(ErrorMessages.targetHigherRole("ban"));
         }
       }
 
