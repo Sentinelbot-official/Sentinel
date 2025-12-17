@@ -887,6 +887,7 @@ class TokenMonitor {
       activitiesLast24h: recentActivities.length,
       suspiciousPatterns: this.suspiciousPatterns.length,
       recentAlerts: this.suspiciousPatterns.slice(-10),
+      trackingFingerprint: this.trackingFingerprint ? `${this.trackingFingerprint.substring(0, 8)}...` : "Not set",
       baseline: {
         averageCommandsPerHour: this.baseline.averageCommandsPerHour,
         commonGuilds: this.baseline.commonGuilds.size,
