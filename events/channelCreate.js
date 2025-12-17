@@ -38,10 +38,14 @@ module.exports = {
           ? await client.advancedAntiNuke.isWhitelisted(channel.guild.id, entry.executor.id)
           : false;
         
+        logger.info(
+          `[channelCreate] Lockdown active - Channel "${channel.name}" created by ${entry.executor.tag} (${entry.executor.id}) | Owner: ${channel.guild.ownerId} | isOwner: ${isOwner} | isBot: ${isBot} | isWhitelisted: ${isWhitelisted}`
+        );
+        
         // Skip lockdown for bot, owner, or whitelisted users
         if (isBot || isOwner || isWhitelisted) {
-          logger.debug(
-            `[channelCreate] Skipping lockdown for ${isBot ? 'bot' : isOwner ? 'owner' : 'whitelisted user'} ${entry.executor.tag}`
+          logger.info(
+            `[channelCreate] ✅ Allowing channel "${channel.name}" - created by ${isBot ? 'bot' : isOwner ? 'owner' : 'whitelisted user'} ${entry.executor.tag}`
           );
           return; // Allow and skip all monitoring
         }
@@ -134,7 +138,7 @@ module.exports = {
         // INSTANT RESPONSE: If rapid creation OR raid channel detected (but NOT owner/bot/whitelisted)
         if ((isRapidCreation || isRaidChannel) && !isOwner && !isBot && !isWhitelisted) {
           logger.warn(
-            `[Anti-Nuke] INSTANT DETECTION: ${isRapidCreation ? `Rapid channel creation (${recentCreations.length} in 10s)` : 'Raid channel'} "${channel.name}" by ${entry.executor.tag} in ${channel.guild.name}`
+            `[Anti-Nuke] INSTANT DETECTION: ${isRapidCreation ? `Rapid channel creation (${recentCreations.length} in 10s)` : 'Raid channel'} "${channel.name}" by ${entry.executor.tag} (${entry.executor.id}) | Owner: ${channel.guild.ownerId} | isOwner: ${isOwner} in ${channel.guild.name}`
           );
 
           // Delete channel immediately
