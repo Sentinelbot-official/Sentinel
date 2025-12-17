@@ -8,8 +8,8 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #1a2332 100%);
+  color: #e6f1ff;
   line-height: 1.6;
 }
 
@@ -90,25 +90,26 @@ body {
 }
 
 .btn-primary {
-  background: #fff;
-  color: #667eea;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  color: #0a192f;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+  background: linear-gradient(135deg, #00e5ff 0%, #00b8e6 100%);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 212, 255, 0.1);
+  color: #00d4ff;
+  border: 2px solid rgba(0, 212, 255, 0.3);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 212, 255, 0.2);
+  border-color: rgba(0, 212, 255, 0.6);
 }
 
 .btn-large {
@@ -183,8 +184,8 @@ body {
 
 .dashboard-link-btn {
   display: inline-block;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  color: #0a192f;
   padding: 12px 30px;
   border-radius: 10px;
   text-decoration: none;
