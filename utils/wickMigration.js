@@ -84,7 +84,8 @@ class WickMigration {
     recommendations.push({
       category: "Security",
       title: "Upgrade to 4 Anti-Raid Algorithms",
-      description: "Wick uses 1 algorithm, Sentinel uses 4 for better detection",
+      description:
+        "Wick uses 1 algorithm, Sentinel uses 4 for better detection",
       priority: "high",
     });
 

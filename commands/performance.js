@@ -60,13 +60,13 @@ module.exports = {
 
     // Add performance context
     if (stats.totalRaidDetections > 0 || stats.totalBans > 0) {
-      const nexusTotal =
+      const sentinelTotal =
         (stats.avgRaidResponse || 0.15) + (stats.avgBanResponse || 80);
 
       embed.addFields({
         name: "🚀 Total Response Time",
         value:
-          `**Detection + Action:** ${nexusTotal.toFixed(2)}ms\n` +
+          `**Detection + Action:** ${sentinelTotal.toFixed(2)}ms\n` +
           `**Sub-millisecond detection:** ✅\n` +
           `**Full response under 200ms:** ✅`,
         inline: false,

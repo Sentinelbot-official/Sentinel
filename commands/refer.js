@@ -58,7 +58,7 @@ module.exports = {
     const embed = new EmbedBuilder()
       .setTitle("🔗 Your Referral Link")
       .setDescription(
-        "Share this link to invite Nexus to other servers and earn rewards!\n\n" +
+        "Share this link to invite Sentinel to other servers and earn rewards!\n\n" +
           `**Your Referral Link:**\n${inviteLink}\n\n` +
           "**Rewards:**\n" +
           "🎁 **3 referrals** - Custom bot status message\n" +
@@ -70,7 +70,7 @@ module.exports = {
           "Use `/refer stats` to track your progress!"
       )
       .setColor(0x2196f3)
-      .setFooter({ text: "Help Nexus grow and get rewarded!" });
+      .setFooter({ text: "Help Sentinel grow and get rewarded!" });
 
     await interaction.editReply({ embeds: [embed] });
 
@@ -182,7 +182,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle("🏆 Referral Leaderboard")
         .setDescription(
-          "No referrals yet! Be the first to refer Nexus to other servers!"
+          "No referrals yet! Be the first to refer Sentinel to other servers!"
         )
         .setColor(0x9e9e9e);
 
@@ -218,7 +218,7 @@ module.exports = {
           "\n\n*Want to climb the leaderboard? Use `/refer link` to get started!*"
       )
       .setColor(0xffd700)
-      .setFooter({ text: "Thank you for helping Nexus grow!" });
+      .setFooter({ text: "Thank you for helping Sentinel grow!" });
 
     await interaction.editReply({ embeds: [embed] });
 

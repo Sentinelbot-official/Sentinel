@@ -228,7 +228,9 @@ class MetricsCollector {
     // Threats blocked
     lines.push("# HELP Sentinel_threats_blocked_total Total threats blocked");
     lines.push("# TYPE Sentinel_threats_blocked_total counter");
-    lines.push(`Sentinel_threats_blocked_total ${this.metrics.threats_blocked}`);
+    lines.push(
+      `Sentinel_threats_blocked_total ${this.metrics.threats_blocked}`
+    );
     lines.push("");
 
     // Raids detected
@@ -258,7 +260,9 @@ class MetricsCollector {
     const cacheTotal = this.metrics.cache_hits + this.metrics.cache_misses;
     const cacheHitRate =
       cacheTotal > 0 ? (this.metrics.cache_hits / cacheTotal) * 100 : 0;
-    lines.push("# HELP Sentinel_cache_hit_rate_percent Cache hit rate percentage");
+    lines.push(
+      "# HELP Sentinel_cache_hit_rate_percent Cache hit rate percentage"
+    );
     lines.push("# TYPE Sentinel_cache_hit_rate_percent gauge");
     lines.push(`Sentinel_cache_hit_rate_percent ${cacheHitRate.toFixed(2)}`);
     lines.push("");
@@ -294,7 +298,9 @@ class MetricsCollector {
     lines.push("# HELP Sentinel_api_requests_total API requests");
     lines.push("# TYPE Sentinel_api_requests_total counter");
     for (const [endpoint, count] of this.metrics.api_requests) {
-      lines.push(`Sentinel_api_requests_total{endpoint="${endpoint}"} ${count}`);
+      lines.push(
+        `Sentinel_api_requests_total{endpoint="${endpoint}"} ${count}`
+      );
     }
     lines.push("");
 

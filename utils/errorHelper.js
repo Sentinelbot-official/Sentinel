@@ -16,7 +16,7 @@ class ErrorHelper {
         message: "❌ Missing permissions to execute this command.",
         solution:
           "Make sure the bot has the required permissions. Use `/help` to see required permissions.",
-        help: "Check bot permissions in Server Settings > Roles > Nexus Bot",
+        help: "Check bot permissions in Server Settings > Roles > Sentinel Bot",
       };
     }
 

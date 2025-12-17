@@ -1,6 +1,6 @@
 {
-  "name": "Nexus Bot Dashboard",
-  "short_name": "Nexus",
+  "name": "Sentinel Bot Dashboard",
+  "short_name": "Sentinel",
   "description": "Advanced Discord security bot dashboard - Better than Wick",
   "start_url": "/dashboard",
   "display": "standalone",

@@ -126,13 +126,13 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle("🔑 Recovery Key")
           .setDescription(
-            "If you lose control over Nexus in your server (you can't access your owner account and no one is above Nexus ownership), use the authenticator code from your app to recover."
+            "If you lose control over Sentinel in your server (you can't access your owner account and no one is above Sentinel ownership), use the authenticator code from your app to recover."
           )
           .addFields({
             name: "⚠️ IMPORTANT",
             value: [
               "• Keep your authenticator app secure!",
-              "• Anyone with access to your authenticator can get dangerous Nexus permissions",
+              "• Anyone with access to your authenticator can get dangerous Sentinel permissions",
               "• This rescue key is used ONLY when you lose physical owner account access",
               "• This rescue key grants you NEXUS owner permissions, not Discord ownership.",
             ].join("\n"),
@@ -246,7 +246,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle("✅ Rescue Key Used Successfully")
           .setDescription(
-            `You have successfully claimed Nexus ownership in **${targetGuild.name}** using the rescue key.`
+            `You have successfully claimed Sentinel ownership in **${targetGuild.name}** using the rescue key.`
           )
           .setColor(0x00ff00)
           .setTimestamp();

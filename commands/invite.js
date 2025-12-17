@@ -18,12 +18,12 @@ module.exports = {
     // Plus basic: View Channels (1024) + Send Messages (2048) + Embed Links (16384) + Attach Files (32768) + Read Message History (65536) + Use External Emojis (262144)
     // Total: 268435456 + 16 + 4 + 2 + 8192 + 1024 + 2048 + 16384 + 32768 + 65536 + 262144 = 268443574
     const permissions = "268443574";
-    const inviteUrl = `https://nexusbot-official.github.io/Nexus/invite.html?source=discord-bot`;
+    const inviteUrl = `https://sentinelbot-official.github.io/Sentinel/invite.html?source=discord-bot`;
 
     const embed = new EmbedBuilder()
-      .setTitle("🔗 Invite Nexus Bot")
+      .setTitle("🔗 Invite Sentinel Bot")
       .setDescription(
-        "Add Nexus to your server for advanced security and moderation features!"
+        "Add Sentinel to your server for advanced security and moderation features!"
       )
       .addFields(
         {
@@ -50,13 +50,13 @@ module.exports = {
       )
       .setColor(0x0099ff)
       .setFooter({
-        text: "Nexus - Beyond Wick. Free. Open Source. Powerful.",
+        text: "Sentinel - Beyond Wick. Free. Open Source. Powerful.",
       })
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setLabel("Invite Nexus")
+        .setLabel("Invite Sentinel")
         .setURL(inviteUrl)
         .setStyle(ButtonStyle.Link),
       new ButtonBuilder()
@@ -65,7 +65,7 @@ module.exports = {
         .setStyle(ButtonStyle.Link),
       new ButtonBuilder()
         .setLabel("GitHub")
-        .setURL("https://github.com/NexusBot-official/Nexus")
+        .setURL("https://github.com/SentinelBot-official/Sentinel")
         .setStyle(ButtonStyle.Link)
     );
 

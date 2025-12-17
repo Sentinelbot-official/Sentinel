@@ -153,7 +153,7 @@ class SupportChat {
         </div>
         <div class="chat-body" id="chatBody">
           <div class="chat-message bot">
-            <strong>Nexus Support</strong><br>
+            <strong>Sentinel Support</strong><br>
             Hi! How can we help you today?<br><br>
             Quick links:<br>
             • <a href="docs.html" style="color: #667eea;">Documentation</a><br>
@@ -210,7 +210,7 @@ function sendMessage() {
   setTimeout(() => {
     const botMsg = document.createElement("div");
     botMsg.className = "chat-message bot";
-    botMsg.innerHTML = `<strong>Nexus Support</strong><br>Thanks for your message! For the fastest response, please join our Discord support server where our team and community can help you immediately.`;
+    botMsg.innerHTML = `<strong>Sentinel Support</strong><br>Thanks for your message! For the fastest response, please join our Discord support server where our team and community can help you immediately.`;
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
   }, 1000);

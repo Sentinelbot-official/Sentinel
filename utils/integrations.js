@@ -138,9 +138,9 @@ class IntegrationSystem {
         {
           headers: {
             "Content-Type": "application/json",
-            "X-Nexus-Signature": signature,
-            "X-Nexus-Event": eventType,
-            "User-Agent": "NexusBot-Webhooks/1.0",
+            "X-Sentinel-Signature": signature,
+            "X-Sentinel-Event": eventType,
+            "User-Agent": "SentinelBot-Webhooks/1.0",
           },
           timeout: 5000,
         }

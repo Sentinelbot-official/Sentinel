@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Server Widget Generator - Nexus Bot</title>
+    <title>Server Widget Generator - Sentinel Bot</title>
     <link
       rel="icon"
       type="image/webp"
@@ -246,7 +246,7 @@
               <div><div style="opacity: 0.7;">Uptime</div><div style="font-size: 1.5rem; font-weight: 700; color: ' + themeColors.accent + ';">99.9%</div></div>
               <div><div style="opacity: 0.7;">Protected</div><div style="font-size: 1.5rem; font-weight: 700; color: ' + themeColors.accent + ';">24/7</div></div>
             </div>
-            <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; opacity: 0.6;">Powered by Nexus</div>
+            <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; opacity: 0.6;">Powered by Sentinel</div>
           </div>
         `;
         } else if (type === "status") {
@@ -254,7 +254,7 @@
           <div style="background: ${themeColors.bg}; padding: 15px 20px; border-radius: 12px; color: ${themeColors.text}; width: ${width}px; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="width: 10px; height: 10px; background: #00ff00; border-radius: 50%; box-shadow: 0 0 10px #00ff00;"></div>
-              <span style="font-weight: 600;">Nexus Bot</span>
+              <span style="font-weight: 600;">Sentinel Bot</span>
             </div>
             <div style="text-align: right; font-size: 0.85rem;">
               <div style="color: ${themeColors.accent}; font-weight: 700;">ONLINE</div>
@@ -266,9 +266,9 @@
           preview = `
           <div style="background: ${themeColors.bg}; padding: 20px; border-radius: 12px; color: ${themeColors.text}; width: ${width}px; text-align: center;">
             <img src="https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp?size=128" style="width: 64px; height: 64px; border-radius: 50%; margin-bottom: 15px;">
-            <h3 style="margin: 10px 0; color: ${themeColors.text};">Add Nexus to Your Server</h3>
+            <h3 style="margin: 10px 0; color: ${themeColors.text};">Add Sentinel to Your Server</h3>
             <p style="opacity: 0.8; margin: 10px 0; font-size: 0.9rem;">Free security bot that exceeds Wick</p>
-            <a href="https://nexusbot-official.github.io/Nexus/invite.html" style="display: inline-block; background: ${themeColors.accent}; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px;">Invite Now</a>
+            <a href="https://sentinelbot-official.github.io/Sentinel/invite.html" style="display: inline-block; background: ${themeColors.accent}; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px;">Invite Now</a>
           </div>
         `;
         }
@@ -292,7 +292,7 @@
 
         if (type === "invite") {
           const title = document.createElement("h3");
-          title.textContent = showName ? "Nexus Bot" : "Discord Bot";
+          title.textContent = showName ? "Sentinel Bot" : "Discord Bot";
           title.style.cssText =
             "color: " + themeColors.text + "; margin-bottom: 10px;";
           previewContainer.appendChild(title);
@@ -306,7 +306,7 @@
           previewContainer.appendChild(desc);
 
           const link = document.createElement("a");
-          link.href = "https://nexusbot-official.github.io/Nexus/invite.html";
+          link.href = "https://sentinelbot-official.github.io/Sentinel/invite.html";
           link.style.cssText =
             "display: inline-block; background: " +
             themeColors.accent +
@@ -318,9 +318,9 @@
         previewDiv.appendChild(previewContainer);
 
         // Generate embed code
-        const code = `<!-- Nexus Bot Widget -->
+        const code = `<!-- Sentinel Bot Widget -->
 <iframe 
-  src="https://nexusbot-official.github.io/Nexus/widget-embed.html?type=${type}&theme=${theme}&width=${width}&name=${showName}&members=${showMembers}${type === "stats" && guildId ? "&guild=" + guildId : ""}"
+  src="https://sentinelbot-official.github.io/Sentinel/widget-embed.html?type=${type}&theme=${theme}&width=${width}&name=${showName}&members=${showMembers}${type === "stats" && guildId ? "&guild=" + guildId : ""}"
   width="${width}"
   height="${type === "invite" ? "250" : type === "status" ? "80" : "220"}"
   frameborder="0"

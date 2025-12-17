@@ -1,9 +1,9 @@
 {
   "info": {
-    "name": "Nexus API - Complete Collection",
-    "description": "Complete Nexus Discord Bot API with all 34 endpoints. Import this into Postman for easy testing!",
+    "name": "Sentinel API - Complete Collection",
+    "description": "Complete Sentinel Discord Bot API with all 34 endpoints. Import this into Postman for easy testing!",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "nexus-bot"
+    "_exporter_id": "sentinel-bot"
   },
   "auth": {
     "type": "apikey",

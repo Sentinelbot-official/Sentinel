@@ -9,7 +9,7 @@ const logger = require("./logger");
 
 /**
  * Interactive Setup Wizard
- * Guide users through Nexus configuration with smart recommendations
+ * Guide users through Sentinel configuration with smart recommendations
  */
 class SetupWizard {
   constructor(client) {
@@ -40,9 +40,9 @@ class SetupWizard {
    */
   async showServerTypeSelection(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle("🎯 Nexus Setup Wizard")
+      .setTitle("🎯 Sentinel Setup Wizard")
       .setDescription(
-        "Let's configure Nexus to perfectly match your server!\n\n" +
+        "Let's configure Sentinel to perfectly match your server!\n\n" +
           "**First, what type of server is this?**\n" +
           "This helps us optimize settings for your community."
       )
@@ -128,7 +128,7 @@ class SetupWizard {
     const embed = new EmbedBuilder()
       .setTitle("🛡️ Security Level")
       .setDescription(
-        "How strict should Nexus be?\n\n" +
+        "How strict should Sentinel be?\n\n" +
           "**Higher security** = Better protection but more restrictive\n" +
           "**Lower security** = More relaxed but allows more risk"
       )
@@ -284,7 +284,7 @@ class SetupWizard {
     const embed = new EmbedBuilder()
       .setTitle("✅ Setup Complete!")
       .setDescription(
-        "Nexus has been configured for your server!\n\n" +
+        "Sentinel has been configured for your server!\n\n" +
           "**Features Enabled:**\n" +
           config.features.map((f) => `✅ ${f}`).join("\n")
       )
@@ -300,7 +300,7 @@ class SetupWizard {
         {
           name: "🛡️ You're Protected!",
           value:
-            "Nexus is now monitoring your server 24/7 with:\n" +
+            "Sentinel is now monitoring your server 24/7 with:\n" +
             "• 4 Anti-Raid Algorithms\n" +
             "• AI-Powered Threat Detection\n" +
             "• Hourly Auto-Backups\n" +

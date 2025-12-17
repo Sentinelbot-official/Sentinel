@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setup Wizard - Nexus Bot</title>
+    <title>Setup Wizard - Sentinel Bot</title>
     <link
       rel="icon"
       type="image/webp"
@@ -197,7 +197,7 @@
   <body>
     <div class="wizard-container">
       <h1 style="text-align: center; font-size: 3rem; margin-bottom: 10px">
-        🚀 Nexus Setup Wizard
+        🚀 Sentinel Setup Wizard
       </h1>
       <p
         style="
@@ -236,9 +236,9 @@
 
       <!-- Step 1: Invite -->
       <div class="step-content active" id="step1">
-        <h2>Step 1: Invite Nexus to Your Server</h2>
+        <h2>Step 1: Invite Sentinel to Your Server</h2>
         <p>
-          Click the button below to invite Nexus with all required permissions.
+          Click the button below to invite Sentinel with all required permissions.
           Make sure you have "Manage Server" permission on your Discord server.
         </p>
 
@@ -250,7 +250,7 @@
             style="font-size: 1.2rem; padding: 20px 50px"
             onclick="markInvited()"
           >
-            🤖 Invite Nexus Now
+            🤖 Invite Sentinel Now
           </a>
         </div>
 
@@ -542,7 +542,7 @@
         <div class="completion-banner">
           <h2>🎉 Setup Complete!</h2>
           <p style="font-size: 1.3rem; opacity: 0.9; margin: 20px 0">
-            Your server is now protected by Nexus!
+            Your server is now protected by Sentinel!
           </p>
 
           <div
@@ -659,7 +659,7 @@
       let selectedTemplate = null;
 
       // Load saved progress
-      const savedStep = localStorage.getItem("nexus-setup-step");
+      const savedStep = localStorage.getItem("sentinel-setup-step");
       if (savedStep) {
         currentStep = parseInt(savedStep);
         showStep(currentStep);
@@ -706,7 +706,7 @@
       }
 
       function saveProgress() {
-        localStorage.setItem("nexus-setup-step", currentStep);
+        localStorage.setItem("sentinel-setup-step", currentStep);
       }
 
       function markInvited() {
@@ -785,7 +785,7 @@
 
       // Clear progress on completion
       if (currentStep === totalSteps) {
-        localStorage.removeItem("nexus-setup-step");
+        localStorage.removeItem("sentinel-setup-step");
       }
     </script>
   </body>

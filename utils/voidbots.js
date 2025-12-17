@@ -115,9 +115,7 @@ class VoidBots {
       30 * 60 * 1000
     );
 
-    logger.info(
-      "[Void Bots] Stats posting initialized (posting immediately)"
-    );
+    logger.info("[Void Bots] Stats posting initialized (posting immediately)");
   }
 
   /**

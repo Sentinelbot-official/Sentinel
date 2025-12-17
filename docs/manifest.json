@@ -1,7 +1,7 @@
 {
-  "name": "Nexus Bot - Free Discord Security Bot",
-  "short_name": "Nexus Bot",
-  "description": "Nexus exceeds Wick with AI-powered threat detection, 6 anti-raid algorithms, auto-recovery & 100% free. The #1 Wick alternative for Discord server security.",
+  "name": "Sentinel Bot - Free Discord Security Bot",
+  "short_name": "Sentinel Bot",
+  "description": "Sentinel exceeds Wick with AI-powered threat detection, 6 anti-raid algorithms, auto-recovery & 100% free. The #1 Wick alternative for Discord server security.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0d1117",
@@ -27,7 +27,7 @@
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "Open the Nexus Bot dashboard",
+      "description": "Open the Sentinel Bot dashboard",
       "url": "/dashboard",
       "icons": [
         {

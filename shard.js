@@ -319,7 +319,7 @@ if (process.env.VOIDBOTS_TOKEN) {
 
     // Post immediately
     postStats();
-    
+
     // Then post every 15 minutes
     if (!voidbotsInterval) {
       voidbotsInterval = setInterval(postStats, 15 * 60 * 1000);
@@ -328,7 +328,9 @@ if (process.env.VOIDBOTS_TOKEN) {
 
   // Wait for manager to spawn all shards, then initialize
   manager.on("shardCreate", (shard) => {
-    console.log(`[DEBUG] VoidBots: shardCreate event fired for shard ${shard.id}`);
+    console.log(
+      `[DEBUG] VoidBots: shardCreate event fired for shard ${shard.id}`
+    );
     shard.once("ready", async () => {
       console.log(`[DEBUG] VoidBots: Shard ${shard.id} ready event fired`);
       // Only initialize once when first shard is ready

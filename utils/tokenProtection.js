@@ -143,7 +143,7 @@ class TokenProtection {
       ],
       timestamp: leakInfo.timestamp,
       footer: {
-        text: "Token Protection System | Nexus Security",
+        text: "Token Protection System | Sentinel Security",
       },
     };
 

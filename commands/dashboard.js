@@ -79,7 +79,7 @@ module.exports = {
       const config = await db.getServerConfig(interaction.guild.id);
 
       const embed = new EmbedBuilder()
-        .setTitle("📊 Nexus Dashboard - Overview")
+        .setTitle("📊 Sentinel Dashboard - Overview")
         .setDescription("Comprehensive server analytics and insights")
         .addFields(
           {
@@ -111,7 +111,7 @@ module.exports = {
         .setColor(0x0099ff)
         .setTimestamp()
         .setFooter({
-          text: "Nexus - Beyond Wick. Free. Open Source. Powerful.",
+          text: "Sentinel - Beyond Wick. Free. Open Source. Powerful.",
         });
 
       const row1 = new ActionRowBuilder().addComponents(
@@ -141,7 +141,7 @@ module.exports = {
         new ButtonBuilder()
           .setLabel("🌐 Website")
           .setStyle(ButtonStyle.Link)
-          .setURL("https://nexusbot-official.github.io/Nexus/")
+          .setURL("https://sentinelbot-official.github.io/Sentinel/")
       );
 
       // Check if this is a button interaction (update) or command (reply)

@@ -26,7 +26,7 @@ module.exports = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName("bot")
-        .setDescription("View information about Nexus Bot")
+        .setDescription("View information about Sentinel Bot")
     ),
 
   async execute(interaction) {
@@ -206,7 +206,7 @@ module.exports = {
         .setColor(0x5865f2)
         .setTimestamp()
         .setFooter({
-          text: `Nexus Bot - Exceeding Wick in every way`,
+          text: `Sentinel Bot - Exceeding Wick in every way`,
           iconURL: bot.displayAvatarURL({ dynamic: true }),
         });
 

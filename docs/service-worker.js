@@ -1,9 +1,9 @@
-// Service Worker for Nexus GitHub Pages
+// Service Worker for Sentinel GitHub Pages
 // Provides offline support and caching for better performance
 
-const CACHE_NAME = "nexus-v1";
-const STATIC_CACHE = "nexus-static-v1";
-const API_CACHE = "nexus-api-v1";
+const CACHE_NAME = "sentinel-v1";
+const STATIC_CACHE = "sentinel-static-v1";
+const API_CACHE = "sentinel-api-v1";
 
 // Assets to cache on install
 const STATIC_ASSETS = [

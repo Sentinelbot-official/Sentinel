@@ -116,13 +116,13 @@ module.exports = {
     };
 
     const embed = new EmbedBuilder()
-      .setTitle("🛡️ Nexus Bot - Advanced Protection")
+      .setTitle("🛡️ Sentinel Bot - Advanced Protection")
       .setDescription(
         "Everything Wick does, plus AI, plus better UX, plus it's free and open source"
       )
       .setColor(0x0099ff)
       .setFooter({
-        text: "Need help? Join discord.gg/BE9jPs7Byd | Nexus - Beyond Wick.",
+        text: "Need help? Join discord.gg/BE9jPs7Byd | Sentinel - Beyond Wick.",
       })
       .setTimestamp();
 

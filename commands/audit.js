@@ -158,9 +158,9 @@ module.exports = {
       recommendations.push("✅ Server is discoverable - good for growth");
     }
 
-    // 10. Check Nexus Bot Configuration
+    // 10. Check Sentinel Bot Configuration
     const config = await db.getServerConfig(guild.id);
-    const nexusModules = {
+    const sentinelModules = {
       antiraid: config?.antiraid_enabled,
       automod: config?.automod_enabled,
       logging: config?.log_channel,
@@ -168,14 +168,14 @@ module.exports = {
       backup: config?.auto_backup,
     };
 
-    const enabledModules = Object.entries(nexusModules).filter(
+    const enabledModules = Object.entries(sentinelModules).filter(
       ([_, enabled]) => enabled
     ).length;
-    const totalModules = Object.keys(nexusModules).length;
+    const totalModules = Object.keys(sentinelModules).length;
 
     if (enabledModules < totalModules * 0.5) {
       recommendations.push(
-        `💡 Only ${enabledModules}/${totalModules} Nexus modules enabled - enable more for better protection`
+        `💡 Only ${enabledModules}/${totalModules} Sentinel modules enabled - enable more for better protection`
       );
       securityScore -= 10;
     }
@@ -299,7 +299,7 @@ module.exports = {
         `Verification: ${["None", "Low", "Medium", "High", "Highest"][verificationLevel]}`,
         `2FA Required: ${guild.mfaLevel === 1 ? "Yes ✅" : "No ❌"}`,
         `Content Filter: ${["Disabled", "No Role", "Everyone"][guild.explicitContentFilter]}`,
-        `Nexus Modules: ${enabledModules}/${totalModules} enabled`,
+        `Sentinel Modules: ${enabledModules}/${totalModules} enabled`,
       ].join("\n"),
       inline: false,
     });

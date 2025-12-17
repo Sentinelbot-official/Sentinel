@@ -65,25 +65,25 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle("🔒 Privacy Information")
         .setDescription(
-          "Nexus Bot is committed to protecting your privacy and complying with GDPR, CCPA, and other privacy regulations."
+          "Sentinel Bot is committed to protecting your privacy and complying with GDPR, CCPA, and other privacy regulations."
         )
         .addFields(
           {
             name: "📋 Privacy Policy",
             value:
-              "[View Full Privacy Policy](https://github.com/Azzraya/Nexus/blob/main/PRIVACY_POLICY.md)",
+              "[View Full Privacy Policy](https://github.com/Azzraya/Sentinel/blob/main/PRIVACY_POLICY.md)",
             inline: true,
           },
           {
             name: "📊 Data Handling",
             value:
-              "[View Data Handling Policy](https://github.com/Azzraya/Nexus/blob/main/DATA_HANDLING.md)",
+              "[View Data Handling Policy](https://github.com/Azzraya/Sentinel/blob/main/DATA_HANDLING.md)",
             inline: true,
           },
           {
             name: "⚖️ Terms of Service",
             value:
-              "[View Terms of Service](https://github.com/Azzraya/Nexus/blob/main/TERMS_OF_SERVICE.md)",
+              "[View Terms of Service](https://github.com/Azzraya/Sentinel/blob/main/TERMS_OF_SERVICE.md)",
             inline: true,
           },
           {
@@ -99,12 +99,12 @@ module.exports = {
           {
             name: "📧 Contact",
             value:
-              "For privacy concerns: nexusbot0@proton.me or join our [Support Server](https://discord.gg/BE9jPs7Byd)",
+              "For privacy concerns: sentinelbot0@proton.me or join our [Support Server](https://discord.gg/BE9jPs7Byd)",
             inline: false,
           }
         )
         .setColor(0x5865f2)
-        .setFooter({ text: "Nexus Bot - Privacy First" })
+        .setFooter({ text: "Sentinel Bot - Privacy First" })
         .setTimestamp();
 
       return interaction.reply({

@@ -4,11 +4,11 @@
 
 ## Agreement to Terms
 
-By inviting and using Nexus Bot ("the Bot", "we", "our", "us") to your Discord server, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Bot.
+By inviting and using Sentinel Bot ("the Bot", "we", "our", "us") to your Discord server, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Bot.
 
 ## Description of Service
 
-Nexus Bot is a Discord security and moderation bot that provides:
+Sentinel Bot is a Discord security and moderation bot that provides:
 
 - Anti-raid and anti-nuke protection
 - **Automatic server recovery** (snapshots and restoration of channels/roles after attacks)
@@ -164,7 +164,7 @@ We may terminate or suspend your access if:
 
 ## Open Source
 
-Nexus Bot is open source. You may:
+Sentinel Bot is open source. You may:
 
 - View, modify, and distribute the code
 - Contribute improvements
@@ -257,13 +257,13 @@ The Bot includes AI-powered features that may make automated decisions:
 For questions about these Terms:
 
 - **Discord Support Server:** https://discord.gg/BE9jPs7Byd (Preferred method)
-- **Legal/Privacy Email:** nexusbot0@proton.me (For formal legal inquiries)
+- **Legal/Privacy Email:** sentinelbot0@proton.me (For formal legal inquiries)
 - **General Contact:** Open a ticket in our support server
-- **GitHub Issues:** https://github.com/Azzraya/Nexus/issues (For code-related questions)
+- **GitHub Issues:** https://github.com/Azzraya/Sentinel/issues (For code-related questions)
 
 ## Acknowledgment
 
-By using Nexus Bot, you acknowledge that:
+By using Sentinel Bot, you acknowledge that:
 
 - You have read these Terms
 - You understand these Terms
@@ -271,4 +271,4 @@ By using Nexus Bot, you acknowledge that:
 
 ---
 
-**By using Nexus Bot, you agree to these Terms of Service.**
+**By using Sentinel Bot, you agree to these Terms of Service.**

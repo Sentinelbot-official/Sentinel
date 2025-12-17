@@ -9,7 +9,7 @@ const {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("tutorial")
-    .setDescription("Interactive tutorial to learn Nexus features")
+    .setDescription("Interactive tutorial to learn Sentinel features")
     .addStringOption((option) =>
       option
         .setName("topic")
@@ -38,9 +38,9 @@ module.exports = {
 
   async showMenu(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle("🎓 Nexus Interactive Tutorial")
+      .setTitle("🎓 Sentinel Interactive Tutorial")
       .setDescription(
-        "Welcome to Nexus! Choose a topic below to learn more about the bot's features.\n\n" +
+        "Welcome to Sentinel! Choose a topic below to learn more about the bot's features.\n\n" +
           "**Topics:**\n" +
           "🛡️ **Security & Protection** - Anti-raid, anti-nuke, and security features\n" +
           "⚙️ **Basic Setup** - Get started with `/quicksetup`\n" +
@@ -122,7 +122,7 @@ module.exports = {
           {
             title: "Anti-Raid System",
             description:
-              "Nexus uses **4 detection algorithms** to catch raids:\n\n" +
+              "Sentinel uses **4 detection algorithms** to catch raids:\n\n" +
               "1️⃣ **Join Rate** - Detects mass joins\n" +
               "2️⃣ **Account Age** - Flags new/suspicious accounts\n" +
               "3️⃣ **Username Pattern** - Detects similar names\n" +

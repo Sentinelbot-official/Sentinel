@@ -25,7 +25,7 @@ Sentinel is an **open-source Discord security bot** that matches everything Wick
 
 ## ⚔️ Sentinel vs Wick
 
-| Feature                    | Wick                | Sentinel                               |
+| Feature                    | Wick                | Sentinel                            |
 | -------------------------- | ------------------- | ----------------------------------- |
 | **💰 Price**               | $3-10/month premium | **100% FREE** ✅                    |
 | **🤖 AI Features**         | ❌ None             | ✅ Predictions, behavioral analysis |

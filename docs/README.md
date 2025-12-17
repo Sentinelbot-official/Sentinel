@@ -1,4 +1,4 @@
-# Nexus Landing Page with Click Tracking
+# Sentinel Landing Page with Click Tracking
 
 ## 🎯 Purpose
 
@@ -41,7 +41,7 @@ Discord webhook in your server - you'll get embeds showing each click/view.
 1. Push to GitHub
 2. Settings → Pages
 3. Source: `main` branch, `/website` folder
-4. Done! URL: `yourusername.github.io/nexus`
+4. Done! URL: `yourusername.github.io/sentinel`
 
 ### Option 3: Cloudflare Pages
 
@@ -106,7 +106,7 @@ Edit `index.html` - all text is easily modifiable.
 ### Click Webhook:
 
 ```
-📊 Nexus Invite Click
+📊 Sentinel Invite Click
 Source: topgg
 Referrer: https://top.gg/bot/...
 Time: December 2, 2025 5:30 PM
@@ -115,7 +115,7 @@ Time: December 2, 2025 5:30 PM
 ### Page View Webhook:
 
 ```
-👁️ Nexus Page View
+👁️ Sentinel Page View
 Referrer: https://reddit.com/r/Discord
 Page: /
 ```

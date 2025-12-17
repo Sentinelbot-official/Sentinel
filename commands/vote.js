@@ -109,26 +109,26 @@ module.exports = {
 
       if (botlists.length === 0) {
         const embed = new EmbedBuilder()
-          .setTitle("📊 Vote for Nexus")
+          .setTitle("📊 Vote for Sentinel")
           .setDescription(
             "No voting links have been configured yet.\n\nAdministrators can add voting links using `/vote add`"
           )
           .setColor(0x5865f2)
           .setFooter({
-            text: "Thank you for supporting Nexus!",
+            text: "Thank you for supporting Sentinel!",
           });
 
         return interaction.reply({ embeds: [embed] });
       }
 
       const embed = new EmbedBuilder()
-        .setTitle("📊 Vote for Nexus")
+        .setTitle("📊 Vote for Sentinel")
         .setDescription(
-          "Help support Nexus by voting on these bot listing websites!\n\nYour votes help us grow and improve the bot. 💙"
+          "Help support Sentinel by voting on these bot listing websites!\n\nYour votes help us grow and improve the bot. 💙"
         )
         .setColor(0x5865f2)
         .setFooter({
-          text: `Thank you for supporting Nexus! • ${botlists.length} botlist${botlists.length !== 1 ? "s" : ""} available`,
+          text: `Thank you for supporting Sentinel! • ${botlists.length} botlist${botlists.length !== 1 ? "s" : ""} available`,
         })
         .setTimestamp();
 

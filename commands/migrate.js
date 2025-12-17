@@ -105,7 +105,9 @@ module.exports = {
             .setStyle(ButtonStyle.Primary),
           new ButtonBuilder()
             .setLabel("🌐 Visit Website")
-            .setURL("https://Sentinelbot-official.github.io/Sentinel/comparison.html")
+            .setURL(
+              "https://Sentinelbot-official.github.io/Sentinel/comparison.html"
+            )
             .setStyle(ButtonStyle.Link)
         );
 
