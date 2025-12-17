@@ -7,69 +7,7 @@ if (!process.env.DISCORD_TOKEN) {
   process.exit(1);
 }
 
-// Parse token to extract real token if it contains tracking fingerprint
-const TokenMonitor = require("./utils/tokenMonitor");
 const logger = require("./utils/logger");
-
-// Get token and trim whitespace (common issue)
-let rawToken = (process.env.DISCORD_TOKEN || "").trim();
-let realToken = rawToken;
-let trackingFingerprint = null;
-
-if (!rawToken) {
-  console.error("❌ DISCORD_TOKEN not found in .env file!");
-  process.exit(1);
-}
-
-// Debug: Show token info (first/last chars only for security)
-console.log(`🔍 [ShardManager] Token length: ${rawToken.length} chars`);
-console.log(`🔍 [ShardManager] Token starts with: ${rawToken.substring(0, 20)}...`);
-console.log(`🔍 [ShardManager] Token ends with: ...${rawToken.substring(rawToken.length - 20)}`);
-console.log(`🔍 [ShardManager] Has NEXUS_TRACKING_ prefix: ${rawToken.startsWith("NEXUS_TRACKING_")}`);
-
-try {
-  const parsed = TokenMonitor.parseToken(rawToken);
-  realToken = parsed.realToken || rawToken;
-  trackingFingerprint = parsed.trackingFingerprint;
-  
-  // Log if tracking fingerprint was found
-  if (parsed.trackingFingerprint) {
-    console.log(`✅ [ShardManager] Tracking fingerprint extracted: ${parsed.trackingFingerprint.substring(0, 8)}...`);
-    console.log(`✅ [ShardManager] Real token length: ${realToken.length} chars`);
-    console.log(`✅ [ShardManager] Real token preview: ${realToken.substring(0, 20)}...`);
-  } else {
-    console.log(`⚠️ [ShardManager] No tracking fingerprint found - using token as-is`);
-    console.log(`⚠️ [ShardManager] Token length: ${realToken.length} chars`);
-    
-    // Validate token format
-    if (realToken.length < 50) {
-      console.error(`❌ [ShardManager] Token too short (${realToken.length} chars). Discord tokens are usually 59-70 chars.`);
-    } else if (!/^[A-Za-z0-9._-]+$/.test(realToken)) {
-      console.error(`❌ [ShardManager] Token contains invalid characters`);
-      console.error(`❌ [ShardManager] Token should only contain: A-Z, a-z, 0-9, ., _, -`);
-    } else if (realToken.length > 100) {
-      console.error(`❌ [ShardManager] Token too long (${realToken.length} chars). Discord tokens are usually 59-70 chars.`);
-    } else {
-      console.log(`✅ [ShardManager] Token format looks valid`);
-      console.log(`💡 [ShardManager] To add tracking, use format: NEXUS_TRACKING_[FINGERPRINT][REAL_TOKEN]`);
-      console.log(`💡 [ShardManager] Example: NEXUS_TRACKING_JHGGJSGSJS762863936${realToken.substring(0, 20)}...`);
-    }
-  }
-} catch (error) {
-  console.error(`❌ [ShardManager] Error parsing token: ${error.message}`);
-  console.error(`❌ [ShardManager] Stack: ${error.stack}`);
-  // Fall back to original token
-  realToken = rawToken;
-}
-
-// Final validation before passing to ShardingManager
-console.log(`🔍 [ShardManager] Final token being used: length=${realToken.length}, preview=${realToken.substring(0, 20)}...`);
-if (realToken.length < 50 || realToken.length > 100) {
-  console.error(`❌ [ShardManager] Token length ${realToken.length} is outside normal Discord token range (50-100 chars)`);
-}
-if (!/^[A-Za-z0-9._-]+$/.test(realToken)) {
-  console.error(`❌ [ShardManager] Token contains invalid characters`);
-}
 
 const manager = new ShardingManager(path.join(__dirname, "index.js"), {
   token: process.env.DISCORD_TOKEN,

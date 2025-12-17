@@ -2478,25 +2478,6 @@ class Database {
     this.db.run(`CREATE INDEX IF NOT EXISTS idx_audit_history_guild 
                  ON audit_history(guild_id, timestamp)`);
 
-    // Token Activity Monitoring
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS token_activity_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        activity_type TEXT NOT NULL,
-        command_name TEXT,
-        guild_id TEXT,
-        user_id TEXT,
-        shard_id INTEGER DEFAULT 0,
-        metadata TEXT,
-        timestamp INTEGER NOT NULL
-      )
-    `);
-
-    this.db.run(`CREATE INDEX IF NOT EXISTS idx_token_activity_timestamp 
-                 ON token_activity_logs(timestamp)`);
-    this.db.run(`CREATE INDEX IF NOT EXISTS idx_token_activity_type 
-                 ON token_activity_logs(activity_type, timestamp)`);
-
     // Integration Ecosystem
     this.db.run(`
       CREATE TABLE IF NOT EXISTS webhooks (
