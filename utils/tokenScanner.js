@@ -153,9 +153,7 @@ class TokenScanner {
       } else if (site.type === "paginated") {
         // Paginated scraping (for sites like Doxbin)
         const pages = site.pages || 5;
-        logger.info(
-          `[TokenScanner]   └─ Scanning ${pages} pages...`
-        );
+        logger.info(`[TokenScanner]   └─ Scanning ${pages} pages...`);
         for (let page = 1; page <= pages; page++) {
           try {
             // Doxbin uses ?page=X format
@@ -179,9 +177,7 @@ class TokenScanner {
               },
             });
             content += response.data + "\n";
-            logger.info(
-              `[TokenScanner]      ├─ Page ${page}/${pages} scanned`
-            );
+            logger.info(`[TokenScanner]      ├─ Page ${page}/${pages} scanned`);
 
             // Longer delay between pages to avoid detection
             await new Promise((resolve) => setTimeout(resolve, 2000));

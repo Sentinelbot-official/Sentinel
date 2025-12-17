@@ -104,11 +104,8 @@ class VoidBots {
 
     this.initialized = true;
 
-    // Don't post immediately - wait 3 minutes to respect rate limit
-    // This prevents double-posting on startup
-    setTimeout(() => {
-      this.postStats();
-    }, this.minPostInterval);
+    // Post immediately on startup
+    this.postStats();
 
     // Post every 30 minutes (well above the 3-minute minimum)
     this.postInterval = setInterval(
@@ -119,7 +116,7 @@ class VoidBots {
     );
 
     logger.info(
-      "[Void Bots] Stats posting initialized (first post in 3 minutes)"
+      "[Void Bots] Stats posting initialized (posting immediately)"
     );
   }
 
