@@ -8,7 +8,6 @@ if (!process.env.DISCORD_TOKEN) {
   process.exit(1);
 }
 
-
 // Cluster configuration
 const totalClusters = parseInt(process.env.CLUSTERS) || "auto"; // Auto-calculate or use env var
 const shardsPerCluster = parseInt(process.env.SHARDS_PER_CLUSTER) || 3; // 3 shards per cluster (optimal for most cases)
