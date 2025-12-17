@@ -27,14 +27,16 @@ class TokenScanner {
       },
     ];
 
-    // Doxbin-like sites (be careful with these)
+    // Doxbin-like sites (disabled - requires proxy/Cloudflare bypass)
+    // Doxbin blocks automated requests with 403 Forbidden
+    // Would need rotating proxies or headless browser to bypass
     this.doxSites = [
-      {
-        name: "Doxbin",
-        baseUrl: "https://doxbin.com/home",
-        type: "paginated",
-        pages: 5, // Scan first 5 pages
-      },
+      // {
+      //   name: "Doxbin",
+      //   baseUrl: "https://doxbin.com/home",
+      //   type: "paginated",
+      //   pages: 5,
+      // },
     ];
   }
 
