@@ -9,13 +9,13 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp?size=192",
+      "src": "https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png?size=192",
       "sizes": "192x192",
       "type": "image/webp",
       "purpose": "any maskable"
     },
     {
-      "src": "https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp?size=512",
+      "src": "https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png?size=512",
       "sizes": "512x512",
       "type": "image/webp",
       "purpose": "any maskable"
@@ -30,7 +30,7 @@
       "url": "/dashboard",
       "icons": [
         {
-          "src": "https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp?size=96",
+          "src": "https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png?size=96",
           "sizes": "96x96",
           "type": "image/webp"
         }
@@ -43,7 +43,7 @@
       "url": "/dashboard/alerts",
       "icons": [
         {
-          "src": "https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp?size=96",
+          "src": "https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png?size=96",
           "sizes": "96x96",
           "type": "image/webp"
         }
@@ -56,7 +56,7 @@
       "url": "/dashboard/logs",
       "icons": [
         {
-          "src": "https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp?size=96",
+          "src": "https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png?size=96",
           "sizes": "96x96",
           "type": "image/webp"
         }

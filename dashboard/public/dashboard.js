@@ -207,7 +207,7 @@ function showServerSelection(servers) {
           <div class="empty-icon">🛡️</div>
           <h2>Invite Sentinel to Your Server</h2>
           <p>You need to be an administrator in a server with Sentinel to access the dashboard.</p>
-          <a href="https://discord.com/oauth2/authorize?client_id=1444739230679957646&permissions=8&scope=bot%20applications.commands" 
+          <a href="https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=8&scope=bot%20applications.commands" 
              target="_blank" 
              class="invite-server-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -296,7 +296,7 @@ function showServerSelection(servers) {
                 <h3 class="server-name">${s.name}</h3>
                 <p class="server-members" style="opacity: 0.6;">Bot not added</p>
               </div>
-              <a href="https://discord.com/oauth2/authorize?client_id=1444739230679957646&permissions=8&scope=bot%20applications.commands&guild_id=${
+              <a href="https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=8&scope=bot%20applications.commands&guild_id=${
                 s.id
               }" 
                  target="_blank" 

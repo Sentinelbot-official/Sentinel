@@ -1,6 +1,6 @@
 // Discord invite link
 const DISCORD_INVITE =
-  "https://discord.com/oauth2/authorize?client_id=1444739230679957646&permissions=268443574&scope=bot%20applications.commands";
+  "https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=268443574&scope=bot%20applications.commands";
 
 // Simple redirect to Discord
 function redirectToDiscord() {

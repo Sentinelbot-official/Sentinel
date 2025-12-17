@@ -849,7 +849,7 @@ class DashboardServer {
     passport.use(
       new DiscordStrategy(
         {
-          clientID: process.env.CLIENT_ID || "1444739230679957646",
+          clientID: process.env.CLIENT_ID || "1450948411313619199",
           clientSecret: process.env.CLIENT_SECRET,
           callbackURL: process.env.DASHBOARD_URL + "/callback",
           scope: ["identify", "guilds"],
@@ -900,7 +900,7 @@ class DashboardServer {
 
         try {
           // Exchange code for access token
-          const clientId = process.env.CLIENT_ID || "1444739230679957646";
+          const clientId = process.env.CLIENT_ID || "1450948411313619199";
           const clientSecret = process.env.CLIENT_SECRET;
           const redirectUri =
             process.env.DASHBOARD_URL + "/callback?action=join_server";
@@ -1782,7 +1782,7 @@ class DashboardServer {
 
           if (!isInSupportServer) {
             // User is not in support server - return OAuth2 URL for joining
-            const clientId = process.env.CLIENT_ID || "1444739230679957646";
+            const clientId = process.env.CLIENT_ID || "1450948411313619199";
             const redirectUri = encodeURIComponent(
               process.env.DASHBOARD_URL + "/callback?action=join_server"
             );

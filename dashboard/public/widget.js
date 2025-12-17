@@ -91,7 +91,7 @@
     let html = `
       <div class="sentinel-widget">
         <div class="sentinel-widget-header">
-          <img src="https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp?size=256" 
+          <img src="https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png?size=256" 
                alt="Sentinel Bot" 
                class="sentinel-widget-avatar">
           <div>
@@ -133,7 +133,7 @@
 
     if (showButton) {
       html += `
-        <a href="https://discord.com/oauth2/authorize?client_id=1444739230679957646&permissions=8&scope=bot%20applications.commands" 
+        <a href="https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=8&scope=bot%20applications.commands" 
            target="_blank" 
            class="sentinel-widget-button">
           Invite to Server

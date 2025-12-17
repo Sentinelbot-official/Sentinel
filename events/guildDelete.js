@@ -150,7 +150,7 @@ module.exports = {
         const webhook = {
           username: "Sentinel Growth Tracker",
           avatar_url:
-            "https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp",
+            "https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png",
           embeds: [
             {
               title: "❌ Server Left",
@@ -159,7 +159,7 @@ module.exports = {
               thumbnail: {
                 url:
                   guild.iconURL() ||
-                  "https://cdn.discordapp.com/avatars/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.webp",
+                  "https://cdn.discordapp.com/app-icons/1450948411313619199/f3b87982830f72bc256ee6279bde8d03.png",
               },
               fields: [
                 {
