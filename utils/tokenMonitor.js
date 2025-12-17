@@ -44,9 +44,105 @@ class TokenMonitor {
   }
 
   /**
+   * Extract tracking fingerprint and real token from combined token string
+   * Format: NEXUS_TRACKING_[FINGERPRINT][REAL_TOKEN]
+   * Example: NEXUS_TRACKING_JHGGJSGSJS762863936HshHSGSjJJGHSSJjJshSJsjSHSJKDhjdshshdkdbnsb
+   * Returns: { trackingFingerprint, realToken }
+   */
+  static parseToken(combinedToken) {
+    if (!combinedToken || typeof combinedToken !== "string") {
+      return { trackingFingerprint: null, realToken: combinedToken };
+    }
+
+    // Check if token contains tracking prefix
+    if (combinedToken.startsWith("NEXUS_TRACKING_")) {
+      // Extract everything after "NEXUS_TRACKING_"
+      const afterPrefix = combinedToken.substring("NEXUS_TRACKING_".length);
+      
+      // Tracking fingerprint length (can be variable, but we'll detect it)
+      // Real Discord tokens are typically 59-70 characters
+      // We'll try to find where the real token starts by checking token format
+      
+      // Discord bot tokens are base64-like and typically start with letters/numbers
+      // Try different fingerprint lengths (8, 16, 24, 32 characters)
+      const possibleLengths = [8, 16, 24, 32, 40];
+      
+      for (const length of possibleLengths) {
+        if (afterPrefix.length > length) {
+          const possibleFingerprint = afterPrefix.substring(0, length);
+          const possibleToken = afterPrefix.substring(length);
+          
+          // Basic validation: Discord tokens are usually 50+ characters and contain alphanumeric + dots
+          // Real tokens typically have format like: XXXX.XXXX.XXXX or base64-like strings
+          if (possibleToken.length >= 50 && /^[A-Za-z0-9._-]+$/.test(possibleToken)) {
+            return { 
+              trackingFingerprint: possibleFingerprint, 
+              realToken: possibleToken 
+            };
+          }
+        }
+      }
+      
+      // Fallback: if we can't parse, assume first 32 chars are fingerprint
+      if (afterPrefix.length > 32) {
+        return {
+          trackingFingerprint: afterPrefix.substring(0, 32),
+          realToken: afterPrefix.substring(32),
+        };
+      }
+    }
+
+    // No tracking fingerprint found, return token as-is
+    return { trackingFingerprint: null, realToken: combinedToken };
+  }
+
+  /**
+   * Generate a unique tracking fingerprint for this instance
+   */
+  generateTrackingFingerprint() {
+    // Generate a unique fingerprint based on:
+    // - Bot user ID (if available)
+    // - Machine/process identifier
+    // - Timestamp
+    // - Random component
+    
+    const components = [
+      this.client.user?.id || "unknown",
+      process.pid || "unknown",
+      Date.now().toString(),
+      crypto.randomBytes(8).toString("hex"),
+    ];
+    
+    const combined = components.join("_");
+    const hash = crypto.createHash("sha256").update(combined).digest("hex");
+    
+    // Return first 32 characters as fingerprint
+    return hash.substring(0, 32).toUpperCase();
+  }
+
+  /**
    * Initialize monitoring
    */
   init() {
+    // Extract tracking fingerprint and real token from combined token if present
+    const rawToken = process.env.DISCORD_TOKEN || "";
+    const parsed = TokenMonitor.parseToken(rawToken);
+    
+    this.trackingFingerprint = parsed.trackingFingerprint || this.generateTrackingFingerprint();
+    this.realToken = parsed.realToken || rawToken;
+    
+    // Log what we found
+    if (parsed.trackingFingerprint) {
+      logger.info("TokenMonitor", `✅ Tracking fingerprint extracted: ${parsed.trackingFingerprint.substring(0, 8)}...`);
+      logger.info("TokenMonitor", `✅ Real token extracted (${this.realToken.length} chars)`);
+    } else {
+      logger.info("TokenMonitor", `⚠️ No tracking fingerprint in token, generated new one: ${this.trackingFingerprint.substring(0, 8)}...`);
+    }
+    
+    // Store the real token back in process.env for Discord.js to use
+    // This ensures Discord.js gets the clean token
+    process.env.DISCORD_TOKEN = this.realToken;
+    
     // Monitor client events
     this.client.on("ready", () => this.onBotReady());
     this.client.on("shardReady", (id) => this.onShardReady(id));
@@ -70,10 +166,18 @@ class TokenMonitor {
     // Monitor guild activity
     this.client.on("guildCreate", (guild) => this.trackGuildActivity(guild));
     this.client.on("guildDelete", (guild) => this.trackGuildActivity(guild));
+    
+    // Monitor bot's own presence to detect if tracking fingerprint is missing
+    this.client.on("presenceUpdate", (oldPresence, newPresence) => {
+      if (newPresence?.user?.id === this.client.user?.id) {
+        this.verifyTrackingFingerprint(newPresence);
+      }
+    });
 
     // Periodic analysis
     setInterval(() => this.analyzePatterns(), 5 * 60 * 1000); // Every 5 minutes
     setInterval(() => this.cleanupOldLogs(), 60 * 60 * 1000); // Every hour
+    setInterval(() => this.verifyAndSetTrackingFingerprint(), 2 * 60 * 1000); // Every 2 minutes
 
     logger.success("TokenMonitor", "Token usage monitoring initialized");
   }
@@ -607,6 +711,7 @@ class TokenMonitor {
       off_hours_activity: "low",
       token_conflict_detected: "critical",
       unknown_guild_activity: "high",
+      tracking_fingerprint_missing: "critical",
       command_from_unknown_guild: "high",
     };
 

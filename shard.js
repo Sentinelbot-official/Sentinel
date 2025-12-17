@@ -7,8 +7,18 @@ if (!process.env.DISCORD_TOKEN) {
   process.exit(1);
 }
 
+// Parse token to extract real token if it contains tracking fingerprint
+const TokenMonitor = require("./utils/tokenMonitor");
+const parsed = TokenMonitor.parseToken(process.env.DISCORD_TOKEN);
+const realToken = parsed.realToken || process.env.DISCORD_TOKEN;
+
+// Log if tracking fingerprint was found
+if (parsed.trackingFingerprint) {
+  console.log(`✅ [ShardManager] Tracking fingerprint extracted: ${parsed.trackingFingerprint.substring(0, 8)}...`);
+}
+
 const manager = new ShardingManager(path.join(__dirname, "index.js"), {
-  token: process.env.DISCORD_TOKEN,
+  token: realToken,
   totalShards: "auto", // Auto-calculate shard count
   respawn: true, // Auto-respawn shards if they crash
   execArgv: process.execArgv,
