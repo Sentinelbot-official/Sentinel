@@ -88,6 +88,18 @@ class TokenMonitor {
 
     this.logActivity(activity);
     this.updateBaseline(activity);
+    
+    // Check if command is from an unknown guild
+    if (interaction.guildId && !this.baseline.commonGuilds.has(interaction.guildId)) {
+      this.triggerAlert("command_from_unknown_guild", {
+        message: `Command "${interaction.commandName}" executed in unknown guild: ${interaction.guild?.name || interaction.guildId}`,
+        command: interaction.commandName,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name || "Unknown",
+        userId: interaction.user.id,
+        userTag: interaction.user.tag,
+      });
+    }
   }
 
   /**
@@ -101,10 +113,22 @@ class TokenMonitor {
       memberCount: guild.memberCount,
       timestamp: Date.now(),
       shardId: guild.shardId || 0,
+      event: guild.joined ? "guild_create" : "guild_delete",
     };
 
     this.logActivity(activity);
     this.checkSuspiciousGuildActivity(activity);
+    
+    // Check if this is a guild we've never seen before
+    if (!this.baseline.commonGuilds.has(guild.id)) {
+      this.triggerAlert("unknown_guild_activity", {
+        message: `Bot ${guild.joined ? "joined" : "left"} an unknown guild: ${guild.name} (${guild.id})`,
+        guildId: guild.id,
+        guildName: guild.name,
+        action: guild.joined ? "joined" : "left",
+        timestamp: activity.timestamp,
+      });
+    }
   }
 
   /**
@@ -326,6 +350,37 @@ class TokenMonitor {
         expected: expectedShards,
         detected: uniqueShards.size,
         shards: Array.from(uniqueShards),
+        message: "Multiple bot instances may be running simultaneously - token may be compromised",
+      });
+    }
+
+    // Check for rapid connect/disconnect cycles (indicates token conflict)
+    const connectDisconnectPairs = [];
+    for (let i = 0; i < recentConnections.length - 1; i++) {
+      const current = recentConnections[i];
+      const next = recentConnections[i + 1];
+      
+      if (
+        (current.type === "shard_ready" || current.type === "ready") &&
+        (next.type === "shard_disconnect" || next.event === "shard_disconnect")
+      ) {
+        const timeDiff = next.timestamp - current.timestamp;
+        // If connection and disconnect happen within 30 seconds, it's suspicious
+        if (timeDiff < 30000) {
+          connectDisconnectPairs.push({
+            shardId: current.shardId || next.shardId,
+            timeDiff,
+            timestamp: current.timestamp,
+          });
+        }
+      }
+    }
+
+    if (connectDisconnectPairs.length >= 3) {
+      this.triggerAlert("token_conflict_detected", {
+        message: "Rapid connect/disconnect cycles detected - another instance may be using your token",
+        cycles: connectDisconnectPairs.length,
+        pairs: connectDisconnectPairs.slice(0, 5), // First 5 pairs
       });
     }
   }
@@ -459,6 +514,9 @@ class TokenMonitor {
       unexpected_disconnect: "medium",
       suspicious_shard_activity: "high",
       off_hours_activity: "low",
+      token_conflict_detected: "critical",
+      unknown_guild_activity: "high",
+      command_from_unknown_guild: "high",
     };
 
     return severityMap[alertType] || "low";

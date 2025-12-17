@@ -10,7 +10,9 @@ const ErrorMessages = require("../utils/errorMessages");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("tokenstatus")
-    .setDescription("View bot token usage monitoring and security status (Owner Only)"),
+    .setDescription(
+      "View bot token usage monitoring and security status (Owner Only)"
+    ),
 
   async execute(interaction) {
     // SECURITY: Owner-only command
@@ -78,7 +80,10 @@ module.exports = {
 
         embed.addFields({
           name: "🚨 Recent Security Alerts",
-          value: alertsList.length > 1024 ? alertsList.substring(0, 1021) + "..." : alertsList,
+          value:
+            alertsList.length > 1024
+              ? alertsList.substring(0, 1021) + "..."
+              : alertsList,
           inline: false,
         });
       }
@@ -109,4 +114,3 @@ module.exports = {
     }
   },
 };
-
