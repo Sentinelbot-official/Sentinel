@@ -179,7 +179,9 @@ if (process.env.DISCORDBOTLIST_TOKEN) {
 
 // Initialize VoidBots stats posting (if token is provided)
 // Note: For sharded mode, we'll use manual posting since the package doesn't directly support ShardingManager
+console.log(`[DEBUG] VOIDBOTS_TOKEN exists: ${!!process.env.VOIDBOTS_TOKEN}`);
 if (process.env.VOIDBOTS_TOKEN) {
+  console.log(`[DEBUG] VoidBots initialization starting...`);
   let voidbotsInterval = null;
   let botId = null;
   let voidbotsInitialized = false;
@@ -291,15 +293,20 @@ if (process.env.VOIDBOTS_TOKEN) {
 
   // Initialize only once when first shard is ready
   manager.once("shardCreate", async (shard) => {
+    console.log(`[DEBUG] VoidBots: shardCreate event fired`);
     shard.once("clientReady", async () => {
+      console.log(`[DEBUG] VoidBots: clientReady event fired`);
       if (voidbotsInitialized) {
+        console.log(`[DEBUG] VoidBots: Already initialized, skipping`);
         return;
       }
 
       if (!botId) {
         try {
+          console.log(`[DEBUG] VoidBots: Fetching bot ID...`);
           const clientValues = await manager.fetchClientValues("user.id");
           botId = clientValues[0];
+          console.log(`[DEBUG] VoidBots: Bot ID fetched: ${botId}`);
         } catch (error) {
           console.error("❌ [VoidBots] Failed to get bot ID:", error.message);
           return;
