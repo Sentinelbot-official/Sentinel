@@ -7770,9 +7770,24 @@ class DashboardServer {
     });
 
     // 18. POST /api/v1/threat/report - Report threat pattern
-    this.app.post("/api/v1/threat/report", async (req, res) => {
+    this.app.post("/api/v1/threat/report", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId, pattern, description, severity } = req.body;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         // Log threat report
         await new Promise((resolve, reject) => {
@@ -8060,7 +8075,7 @@ class DashboardServer {
     );
 
     // 25. POST /api/v1/webhooks/test - Test webhook
-    this.app.post("/api/v1/webhooks/test", async (req, res) => {
+    this.app.post("/api/v1/webhooks/test", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { url } = req.body;
 
@@ -8304,9 +8319,25 @@ class DashboardServer {
     // ==================== COMMUNITY API (31-35) ====================
 
     // 31. POST /api/v1/appeals/create - Submit ban appeal
-    this.app.post("/api/v1/appeals/create", async (req, res) => {
+    this.app.post("/api/v1/appeals/create", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId, userId, reason, contact } = req.body;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        // Users can only submit appeals for servers they're a member of
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         await new Promise((resolve, reject) => {
           db.db.run(
@@ -8373,9 +8404,24 @@ class DashboardServer {
     );
 
     // 33. POST /api/v1/showcase/nominate - Nominate server for showcase
-    this.app.post("/api/v1/showcase/nominate", async (req, res) => {
+    this.app.post("/api/v1/showcase/nominate", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId, reason, contactEmail } = req.body;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         await new Promise((resolve, reject) => {
           db.db.run(
