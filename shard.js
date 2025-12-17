@@ -72,7 +72,7 @@ if (!/^[A-Za-z0-9._-]+$/.test(realToken)) {
 }
 
 const manager = new ShardingManager(path.join(__dirname, "index.js"), {
-  token: realToken,
+  token: process.env.DISCORD_TOKEN,
   totalShards: "auto", // Auto-calculate shard count
   respawn: true, // Auto-respawn shards if they crash
   execArgv: process.execArgv,

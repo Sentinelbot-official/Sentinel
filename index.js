@@ -99,11 +99,6 @@ client.advancedAntiNuke = new AdvancedAntiNuke(client);
 const AutoBackup = require("./utils/autoBackup");
 client.autoBackup = new AutoBackup(client);
 
-// Token Usage Monitor (EXCEEDS WICK - Advanced token security)
-const TokenMonitor = require("./utils/tokenMonitor");
-client.tokenMonitor = new TokenMonitor(client);
-// Initialize token monitoring BEFORE login (extracts real token from combined token)
-client.tokenMonitor.init();
 
 // Data Retention System (GDPR compliance - automatic cleanup)
 const dataRetention = require("./utils/dataRetention");
@@ -613,8 +608,7 @@ redisCache.connect().catch((err) => {
 // Only login if we're running index.js directly (not via shard.js)
 if (!process.env.USING_SHARDING) {
   // Single shard mode - login directly
-  // Use the extracted real token from TokenMonitor (already parsed in init())
-  const realToken = client.tokenMonitor?.realToken || process.env.DISCORD_TOKEN;
+  const realToken = process.env.DISCORD_TOKEN;
   if (!realToken) {
     logger.error("❌ DISCORD_TOKEN not found in .env file!");
     process.exit(1);
