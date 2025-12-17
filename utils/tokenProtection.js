@@ -159,12 +159,11 @@ class TokenProtection {
   }
 
   /**
-   * Create token file and push to GitHub to force Discord invalidation
+   * Create public gist with token to force Discord invalidation
    * @param {Object} leakInfo - Information about the leak
    */
   async invalidateToken(leakInfo) {
     const filename = `LEAKED_TOKEN_${Date.now()}.txt`;
-    const filepath = `./${filename}`;
 
     const fileContent = `LEAKED BOT TOKEN - DISCORD PLEASE INVALIDATE
 
@@ -176,88 +175,94 @@ Leak Information:
 - Time: ${leakInfo.timestamp}
 - Message ID: ${leakInfo.location.messageId}
 
-This token was automatically detected as leaked and pushed to GitHub to trigger Discord's automatic token invalidation system.`;
+This token was automatically detected as leaked and posted publicly to trigger Discord's automatic token invalidation system.`;
 
     try {
-      // 1. Create the file
+      // METHOD 1: Create PUBLIC GitHub Gist (bypasses repository protection)
+      const githubToken = process.env.GITHUB_TOKEN;
+      
+      if (githubToken) {
+        try {
+          const axios = require("axios");
+          logger.info(`[TOKEN LEAK] Creating public GitHub Gist with token...`);
+          
+          const gistResponse = await axios.post(
+            "https://api.github.com/gists",
+            {
+              description: "LEAKED BOT TOKEN - Discord Please Invalidate",
+              public: true, // MUST be public for Discord to scan it
+              files: {
+                [filename]: {
+                  content: fileContent,
+                },
+              },
+            },
+            {
+              headers: {
+                Authorization: `token ${githubToken}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+
+          const gistUrl = gistResponse.data.html_url;
+          logger.info(
+            `[TOKEN LEAK] ✅ Created public gist: ${gistUrl}`
+          );
+          logger.info(
+            `[TOKEN LEAK] ✅ Discord will scan and invalidate token automatically`
+          );
+          logger.warn(
+            `[TOKEN LEAK] Token invalidation initiated. Bot will shut down. Regenerate token at https://discord.com/developers/applications`
+          );
+          return; // Success!
+        } catch (gistError) {
+          logger.error(
+            `[TOKEN LEAK] Failed to create gist:`,
+            gistError.message
+          );
+          logger.warn(`[TOKEN LEAK] Falling back to repository push...`);
+        }
+      } else {
+        logger.warn(
+          `[TOKEN LEAK] No GITHUB_TOKEN found, skipping gist creation`
+        );
+      }
+
+      // METHOD 2: Fallback - Try repository push (will likely fail)
+      logger.info(`[TOKEN LEAK] Attempting repository push as fallback...`);
+      const filepath = `./${filename}`;
       fs.writeFileSync(filepath, fileContent);
-      logger.info(`[TOKEN LEAK] Created token file: ${filename}`);
-
-      // 2. Git add, commit, and push
+      
       await execAsync(`git add ${filename}`);
-      logger.info(`[TOKEN LEAK] Added file to git`);
-
       await execAsync(
         `git commit -m "🚨 SECURITY: Leaked token detected - auto-invalidation"`
       );
-      logger.info(`[TOKEN LEAK] Committed file`);
-
-      // 3. Try to push (will likely fail due to GitHub secret scanning)
+      
       try {
         await execAsync(`git push`);
         logger.info(
-          `[TOKEN LEAK] ✅ Pushed to GitHub - Discord will invalidate token`
+          `[TOKEN LEAK] ✅ Pushed to repository - Discord will invalidate token`
         );
       } catch (pushError) {
-        // GitHub blocked the push - extract the bypass URL from error
-        const errorMessage = pushError.message || pushError.stderr || "";
-        const bypassUrlMatch = errorMessage.match(
-          /https:\/\/github\.com\/[^\s]+\/unblock-secret\/[^\s]+/
+        logger.error(
+          `[TOKEN LEAK] Repository push blocked by GitHub protection`
         );
-
-        if (bypassUrlMatch) {
-          const bypassUrl = bypassUrlMatch[0];
-          logger.warn(
-            `[TOKEN LEAK] GitHub blocked push. Bypass URL: ${bypassUrl}`
-          );
-          logger.warn(
-            `[TOKEN LEAK] Attempting to bypass using GitHub API...`
-          );
-
-          // Try to bypass using the URL (requires authentication)
-          try {
-            const axios = require("axios");
-            await axios.post(bypassUrl, {}, {
-              headers: {
-                Authorization: `token ${process.env.GITHUB_TOKEN || ""}`,
-              },
-            });
-            
-            // Try push again after bypass
-            await execAsync(`git push`);
-            logger.info(
-              `[TOKEN LEAK] ✅ Bypassed protection and pushed to GitHub - Discord will invalidate token`
-            );
-          } catch (bypassError) {
-            logger.error(
-              `[TOKEN LEAK] Failed to bypass GitHub protection:`,
-              bypassError.message
-            );
-            logger.error(
-              `[TOKEN LEAK] MANUAL ACTION REQUIRED:\n` +
-              `1. Visit: ${bypassUrl}\n` +
-              `2. Click "Allow secret" to bypass protection\n` +
-              `3. Run: git push\n` +
-              `4. OR regenerate token immediately at https://discord.com/developers/applications`
-            );
-          }
-        } else {
-          logger.error(
-            `[TOKEN LEAK] Could not extract bypass URL from error`
-          );
-          logger.error(
-            `[TOKEN LEAK] MANUAL ACTION REQUIRED: Token file created at ${filename}. Regenerate token immediately at https://discord.com/developers/applications`
-          );
-        }
+        logger.error(
+          `[TOKEN LEAK] CRITICAL: Could not automatically invalidate token!`
+        );
+        logger.error(
+          `[TOKEN LEAK] MANUAL ACTION REQUIRED:\n` +
+          `1. Regenerate token IMMEDIATELY at https://discord.com/developers/applications\n` +
+          `2. Update .env with new token\n` +
+          `3. Restart bot\n` +
+          `4. Add GITHUB_TOKEN to .env for automatic gist creation next time`
+        );
       }
-
-      logger.warn(
-        `[TOKEN LEAK] Token invalidation process completed. Bot will shut down.`
-      );
     } catch (error) {
-      logger.error(`[TOKEN LEAK] Failed to process token leak:`, error.message);
+      logger.error(`[TOKEN LEAK] Failed to invalidate token:`, error.message);
       logger.error(
-        `[TOKEN LEAK] MANUAL ACTION REQUIRED: Regenerate token immediately at https://discord.com/developers/applications`
+        `[TOKEN LEAK] CRITICAL: Regenerate token IMMEDIATELY at https://discord.com/developers/applications`
       );
     }
   }
