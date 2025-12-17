@@ -31,7 +31,7 @@ class TokenScanner {
     this.doxSites = [
       {
         name: "Doxbin",
-        url: "https://doxbin.com/recent",
+        url: "https://doxbin.com/home",
         type: "scrape",
       },
     ];
