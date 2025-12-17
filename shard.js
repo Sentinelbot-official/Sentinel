@@ -62,6 +62,15 @@ try {
   realToken = rawToken;
 }
 
+// Final validation before passing to ShardingManager
+console.log(`🔍 [ShardManager] Final token being used: length=${realToken.length}, preview=${realToken.substring(0, 20)}...`);
+if (realToken.length < 50 || realToken.length > 100) {
+  console.error(`❌ [ShardManager] Token length ${realToken.length} is outside normal Discord token range (50-100 chars)`);
+}
+if (!/^[A-Za-z0-9._-]+$/.test(realToken)) {
+  console.error(`❌ [ShardManager] Token contains invalid characters`);
+}
+
 const manager = new ShardingManager(path.join(__dirname, "index.js"), {
   token: realToken,
   totalShards: "auto", // Auto-calculate shard count
