@@ -298,6 +298,14 @@ class AdvancedAntiNuke {
       return;
     }
 
+    // Skip monitoring the server owner (they have full control)
+    if (userId === guild.ownerId) {
+      logger.debug(
+        `[Anti-Nuke] Skipping monitoring for server owner ${userId} in ${guild.name}`
+      );
+      return;
+    }
+
     // Check whitelist first
     if (await this.isWhitelisted(guild.id, userId)) {
       logger.warn(
