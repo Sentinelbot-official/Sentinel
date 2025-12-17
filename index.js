@@ -99,6 +99,10 @@ client.advancedAntiNuke = new AdvancedAntiNuke(client);
 const AutoBackup = require("./utils/autoBackup");
 client.autoBackup = new AutoBackup(client);
 
+// Token Usage Monitor (EXCEEDS WICK - Advanced token security)
+const TokenMonitor = require("./utils/tokenMonitor");
+client.tokenMonitor = new TokenMonitor(client);
+
 // Data Retention System (GDPR compliance - automatic cleanup)
 const dataRetention = require("./utils/dataRetention");
 dataRetention.init();
