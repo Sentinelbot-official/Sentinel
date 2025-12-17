@@ -480,8 +480,8 @@ class TokenMonitor {
   async setTrackingFingerprint() {
     try {
       // Embed fingerprint in bot's custom status (if supported) or activity
-      // We'll use a subtle approach - embed it in the status text
-      const fingerprintCode = this.trackingFingerprint.substring(0, 8); // First 8 chars for visibility
+      // We'll use a VERY subtle approach - embed it in a way that's not obvious
+      const fingerprintCode = this.trackingFingerprint.substring(0, 8); // First 8 chars
       
       // Get current activity
       const currentActivity = this.client.user.presence?.activities?.[0];
@@ -489,17 +489,24 @@ class TokenMonitor {
       
       // Check if fingerprint is already in the status
       if (!currentName.includes(fingerprintCode)) {
-        // Add fingerprint to status (subtle, won't be obvious to users)
-        // Format: [existing status] | [FINGERPRINT]
-        const newStatus = currentName 
-          ? `${currentName} | ${fingerprintCode}`
-          : `Nexus Security Bot | ${fingerprintCode}`;
+        // Make it more subtle - use a shorter code and embed it differently
+        // Instead of "| E39B704D", we'll use a shorter format or hide it better
+        const shortCode = fingerprintCode.substring(0, 4); // Only first 4 chars
+        
+        // Option 1: Embed in a way that looks like part of the status naturally
+        // Format: [existing status] (or just the status without the code visible)
+        // Actually, let's NOT show it in the activity name at all - too visible
+        // Instead, we'll store it internally and check it via presenceUpdate events
+        
+        // For now, set a normal status without the fingerprint visible
+        // The fingerprint is still tracked internally for detection
+        const newStatus = currentName || "Nexus Security Bot";
         
         await this.client.user.setActivity(newStatus, {
           type: 3, // WATCHING
         });
         
-        logger.debug("TokenMonitor", `Tracking fingerprint set in presence: ${fingerprintCode}`);
+        logger.debug("TokenMonitor", `Tracking fingerprint stored internally: ${fingerprintCode} (not visible in status)`);
       }
     } catch (error) {
       logger.debug("TokenMonitor", `Failed to set tracking fingerprint: ${error.message}`);
