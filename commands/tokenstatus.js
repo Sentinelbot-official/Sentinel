@@ -1,18 +1,23 @@
 const {
   SlashCommandBuilder,
-  PermissionFlagsBits,
   EmbedBuilder,
   MessageFlags,
 } = require("discord.js");
 const logger = require("../utils/logger");
+const Owner = require("../utils/owner");
+const ErrorMessages = require("../utils/errorMessages");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("tokenstatus")
-    .setDescription("View bot token usage monitoring and security status")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    .setDescription("View bot token usage monitoring and security status (Owner Only)"),
 
   async execute(interaction) {
+    // SECURITY: Owner-only command
+    if (!Owner.isOwner(interaction.user.id)) {
+      return interaction.reply(ErrorMessages.ownerOnly());
+    }
+
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
