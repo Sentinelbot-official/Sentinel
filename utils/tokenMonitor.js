@@ -100,26 +100,43 @@ class TokenMonitor {
             let score = 0;
             
             // Discord tokens typically:
-            // 1. Start with base64-like alphanumeric (not dots/dashes)
-            if (/^[A-Za-z0-9]/.test(possibleToken)) score += 10;
+            // 1. Start with base64-like alphanumeric (not dots/dashes/underscores)
+            //    This is CRITICAL - real tokens start with alphanumeric, not special chars
+            if (/^[A-Za-z0-9]{10,}/.test(possibleToken)) {
+              score += 20; // Big bonus for starting with alphanumeric sequence
+            } else if (/^[A-Za-z0-9]/.test(possibleToken)) {
+              score += 10;
+            } else {
+              // If it starts with a dot/dash/underscore, it's likely the middle of a token
+              score -= 20; // Heavy penalty
+            }
             
             // 2. Have dots (format: XXXX.XXXX.XXXX)
             if (possibleToken.includes('.')) score += 5;
             
-            // 3. Are 59-70 chars (most common range)
-            if (possibleToken.length >= 59 && possibleToken.length <= 70) score += 10;
+            // 3. Are 59-75 chars (most common range, but can be up to 72)
+            if (possibleToken.length >= 59 && possibleToken.length <= 75) score += 15;
+            else if (possibleToken.length >= 50 && possibleToken.length < 59) score += 5;
             
             // 4. Have exactly 2 dots (typical Discord token format)
             const dotCount = (possibleToken.match(/\./g) || []).length;
-            if (dotCount === 2) score += 5;
+            if (dotCount === 2) score += 10;
+            else if (dotCount > 2) score -= 5; // Too many dots is suspicious
             
-            // 5. Longer tokens are more likely to be complete
-            if (possibleToken.length > 60) score += 3;
+            // 5. Longer tokens are more likely to be complete (prefer full tokens)
+            if (possibleToken.length >= 70) score += 10; // Prefer longer tokens
+            else if (possibleToken.length >= 65) score += 5;
             
-            logger.debug("TokenMonitor", `Match score: ${score} for length ${fpLength}`);
+            // 6. Check if token has proper base64-like structure before first dot
+            const firstPart = possibleToken.split('.')[0];
+            if (firstPart && firstPart.length >= 20 && /^[A-Za-z0-9]+$/.test(firstPart)) {
+              score += 10; // Bonus for proper base64-like first part
+            }
             
-            // Only accept if it has a good score (at least starts with alphanumeric)
-            if (score >= 10 && score > bestScore) {
+            logger.debug("TokenMonitor", `Match score: ${score} for fpLength=${fpLength}, token starts="${possibleToken.substring(0, 15)}...", length=${possibleToken.length}`);
+            
+            // Only accept if it has a good score (must start with alphanumeric and be reasonable length)
+            if (score >= 15 && score > bestScore) {
               bestMatch = {
                 trackingFingerprint: possibleFingerprint,
                 realToken: possibleToken
