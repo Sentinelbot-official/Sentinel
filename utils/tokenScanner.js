@@ -117,22 +117,35 @@ class TokenScanner {
     try {
       let content = "";
 
+      // Enhanced headers to avoid bot detection
+      const browserHeaders = {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        Connection: "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Cache-Control": "max-age=0",
+      };
+
       if (site.type === "api") {
         // API-based search
         const response = await axios.get(site.searchUrl + this.botToken, {
-          timeout: 10000,
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-          },
+          timeout: 15000,
+          headers: browserHeaders,
         });
         content = JSON.stringify(response.data);
       } else if (site.type === "scrape") {
         // Web scraping
         const response = await axios.get(site.url, {
-          timeout: 10000,
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-          },
+          timeout: 15000,
+          headers: browserHeaders,
         });
         content = response.data;
       } else if (site.type === "paginated") {
@@ -146,9 +159,21 @@ class TokenScanner {
             // Doxbin uses ?page=X format
             const url = `${site.baseUrl}?page=${page}`;
             const response = await axios.get(url, {
-              timeout: 10000,
+              timeout: 15000,
               headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                "User-Agent":
+                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                Accept:
+                  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept-Encoding": "gzip, deflate, br",
+                Connection: "keep-alive",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Sec-Fetch-User": "?1",
+                "Cache-Control": "max-age=0",
               },
             });
             content += response.data + "\n";
@@ -156,8 +181,8 @@ class TokenScanner {
               `[TokenScanner]      ├─ Page ${page}/${pages} scanned`
             );
 
-            // Small delay between pages to avoid rate limiting
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            // Longer delay between pages to avoid detection
+            await new Promise((resolve) => setTimeout(resolve, 2000));
           } catch (pageError) {
             logger.warn(
               `[TokenScanner]      ├─ Page ${page} failed:`,
