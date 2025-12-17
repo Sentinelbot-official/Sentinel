@@ -87,19 +87,17 @@ class TokenScanner {
         }
       }
 
-      // Scan dox sites (optional - can be disabled)
-      if (process.env.SCAN_DOX_SITES === "true") {
-        for (const site of this.doxSites) {
-          try {
-            logger.info(`[TokenScanner] 📡 Scanning ${site.name}...`);
-            await this.scanSite(site);
-            logger.info(`[TokenScanner] ✅ ${site.name} - Clean`);
-          } catch (error) {
-            logger.warn(
-              `[TokenScanner] ⚠️ Failed to scan ${site.name}:`,
-              error.message
-            );
-          }
+      // Scan dox sites (always enabled)
+      for (const site of this.doxSites) {
+        try {
+          logger.info(`[TokenScanner] 📡 Scanning ${site.name}...`);
+          await this.scanSite(site);
+          logger.info(`[TokenScanner] ✅ ${site.name} - Clean`);
+        } catch (error) {
+          logger.warn(
+            `[TokenScanner] ⚠️ Failed to scan ${site.name}:`,
+            error.message
+          );
         }
       }
 
