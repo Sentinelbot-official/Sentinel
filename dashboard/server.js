@@ -4141,11 +4141,17 @@ class DashboardServer {
     });
 
     // Public API Endpoints (require API key)
-    this.app.get("/api/v1/server/:id", checkAPIKey, async (req, res) => {
+    this.app.get("/api/v1/server/:id", this.apiAuth.bind(this), async (req, res) => {
       try {
         const guild = this.client.guilds.cache.get(req.params.id);
         if (!guild) {
           return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
         }
 
         const config = await db.getServerConfig(req.params.id);
@@ -4169,7 +4175,7 @@ class DashboardServer {
 
     this.app.get(
       "/api/v1/user/:userId/warnings",
-      checkAPIKey,
+      this.apiAuth.bind(this),
       async (req, res) => {
         try {
           const guildId = req.query.guild_id;
@@ -4177,6 +4183,17 @@ class DashboardServer {
             return res
               .status(400)
               .json({ error: "guild_id query parameter required" });
+          }
+
+          const guild = this.client.guilds.cache.get(guildId);
+          if (!guild) {
+            return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
           }
 
           const warnings = await db.getWarnings(guildId, req.params.userId);
@@ -7165,9 +7182,20 @@ class DashboardServer {
     );
 
     // 4. GET /api/v1/server/:id/health - Get server health
-    this.app.get("/api/v1/server/:id/health", async (req, res) => {
+    this.app.get("/api/v1/server/:id/health", this.apiAuth.bind(this), async (req, res) => {
       try {
         const serverId = req.params.id;
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
+
         const serverHealth = require("../utils/serverHealth");
         const health = await serverHealth.calculateHealth(serverId);
 
@@ -7178,9 +7206,20 @@ class DashboardServer {
     });
 
     // 5. POST /api/v1/server/:id/analyze - Run health analysis
-    this.app.post("/api/v1/server/:id/analyze", async (req, res) => {
+    this.app.post("/api/v1/server/:id/analyze", this.apiAuth.bind(this), async (req, res) => {
       try {
         const serverId = req.params.id;
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
+
         const serverHealth = require("../utils/serverHealth");
         const health = await serverHealth.calculateHealth(serverId);
 
@@ -7412,9 +7451,24 @@ class DashboardServer {
     );
 
     // 10. GET /api/v1/moderation/logs - Get moderation logs
-    this.app.get("/api/v1/moderation/logs", async (req, res) => {
+    this.app.get("/api/v1/moderation/logs", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId, limit = 50, action, userId } = req.query;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         let query = "SELECT * FROM moderation_logs WHERE guild_id = ?";
         const params = [serverId];
@@ -7451,7 +7505,7 @@ class DashboardServer {
     // ==================== USER INTELLIGENCE API (11-14) ====================
 
     // 11. GET /api/v1/user/:id/risk - Get user risk score
-    this.app.get("/api/v1/user/:id/risk", async (req, res) => {
+    this.app.get("/api/v1/user/:id/risk", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.query;
         const userId = req.params.id;
@@ -7465,6 +7519,12 @@ class DashboardServer {
         const guild = this.client.guilds.cache.get(serverId);
         if (!guild) {
           return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
         }
 
         const member = await guild.members.fetch(userId).catch(() => null);
@@ -7482,10 +7542,25 @@ class DashboardServer {
     });
 
     // 12. GET /api/v1/user/:id/history - Get user moderation history
-    this.app.get("/api/v1/user/:id/history", async (req, res) => {
+    this.app.get("/api/v1/user/:id/history", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.query;
         const userId = req.params.id;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         const history = await new Promise((resolve, reject) => {
           db.db.all(
@@ -7522,14 +7597,24 @@ class DashboardServer {
     });
 
     // 13. POST /api/v1/user/:id/analyze - Deep user analysis
-    this.app.post("/api/v1/user/:id/analyze", async (req, res) => {
+    this.app.post("/api/v1/user/:id/analyze", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.body;
         const userId = req.params.id;
 
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
         const guild = this.client.guilds.cache.get(serverId);
         if (!guild) {
           return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
         }
 
         const member = await guild.members.fetch(userId).catch(() => null);
@@ -7568,10 +7653,19 @@ class DashboardServer {
       async (req, res) => {
         try {
           const { serverId, limit = 10 } = req.query;
-          const guild = this.client.guilds.cache.get(serverId);
+          if (!serverId) {
+            return res.status(400).json({ error: "serverId is required" });
+          }
 
+          const guild = this.client.guilds.cache.get(serverId);
           if (!guild) {
             return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
           }
 
           const memberIntelligence = require("../utils/memberIntelligence");
@@ -7590,13 +7684,22 @@ class DashboardServer {
     // ==================== AI PREDICTION API (15-18) ====================
 
     // 15. POST /api/v1/predict/threat - Run AI threat prediction
-    this.app.post("/api/v1/predict/threat", async (req, res) => {
+    this.app.post("/api/v1/predict/threat", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.body;
-        const guild = this.client.guilds.cache.get(serverId);
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
 
+        const guild = this.client.guilds.cache.get(serverId);
         if (!guild) {
           return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
         }
 
         const threatPredictor = require("../utils/threatPredictor");
@@ -7609,9 +7712,24 @@ class DashboardServer {
     });
 
     // 16. POST /api/v1/predict/retention - Predict member retention
-    this.app.post("/api/v1/predict/retention", async (req, res) => {
+    this.app.post("/api/v1/predict/retention", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.body;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         const retentionPredictor = require("../utils/retentionPredictor");
         const analysis = await retentionPredictor.analyzeRetention(serverId);
@@ -7679,10 +7797,25 @@ class DashboardServer {
 
     // ==================== ANALYTICS API (19-20) ====================
 
-    // 19. GET /api/v1/analytics/commands - Command analytics (already exists as admin endpoint, making public version)
-    this.app.get("/api/v1/analytics/commands", async (req, res) => {
+    // 19. GET /api/v1/analytics/commands - Command analytics
+    this.app.get("/api/v1/analytics/commands", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.query;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         const stats = await new Promise((resolve, reject) => {
           db.db.all(
@@ -7705,9 +7838,24 @@ class DashboardServer {
     });
 
     // 20. GET /api/v1/analytics/security - Security analytics
-    this.app.get("/api/v1/analytics/security", async (req, res) => {
+    this.app.get("/api/v1/analytics/security", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.query;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         const threats = await new Promise((resolve, reject) => {
           db.db.get(
@@ -7752,6 +7900,21 @@ class DashboardServer {
       async (req, res) => {
         try {
           const { serverId, format = "json", range = "7d" } = req.body;
+
+          if (!serverId) {
+            return res.status(400).json({ error: "serverId is required" });
+          }
+
+          const guild = this.client.guilds.cache.get(serverId);
+          if (!guild) {
+            return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
+          }
 
           let since = Date.now();
           switch (range) {
@@ -7819,10 +7982,19 @@ class DashboardServer {
       async (req, res) => {
         try {
           const { serverId } = req.body;
-          const guild = this.client.guilds.cache.get(serverId);
+          if (!serverId) {
+            return res.status(400).json({ error: "serverId is required" });
+          }
 
+          const guild = this.client.guilds.cache.get(serverId);
           if (!guild) {
             return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
           }
 
           const config = await db.getServerConfig(serverId);
@@ -7856,6 +8028,21 @@ class DashboardServer {
       async (req, res) => {
         try {
           const { serverId, url, events, name } = req.body;
+
+          if (!serverId) {
+            return res.status(400).json({ error: "serverId is required" });
+          }
+
+          const guild = this.client.guilds.cache.get(serverId);
+          if (!guild) {
+            return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ManageWebhooks");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
+          }
 
           const webhookHub = require("../utils/webhookHub");
           const result = await webhookHub.registerWebhook(
@@ -7968,9 +8155,24 @@ class DashboardServer {
     );
 
     // 27. GET /api/v1/commands/list - List custom commands
-    this.app.get("/api/v1/commands/list", async (req, res) => {
+    this.app.get("/api/v1/commands/list", this.apiAuth.bind(this), async (req, res) => {
       try {
         const { serverId } = req.query;
+
+        if (!serverId) {
+          return res.status(400).json({ error: "serverId is required" });
+        }
+
+        const guild = this.client.guilds.cache.get(serverId);
+        if (!guild) {
+          return res.status(404).json({ error: "Server not found" });
+        }
+
+        // SECURITY FIX: Verify user has permission to access this server
+        const permCheck = await this.checkServerPermissions(req, guild, "ManageGuild");
+        if (!permCheck.allowed) {
+          return res.status(403).json({ error: permCheck.error });
+        }
 
         const customCommands = require("../utils/customCommands");
         const commands = await customCommands.getCommands(serverId);
@@ -7989,6 +8191,21 @@ class DashboardServer {
         try {
           const { serverId } = req.query;
           const commandName = req.params.name;
+
+          if (!serverId) {
+            return res.status(400).json({ error: "serverId is required" });
+          }
+
+          const guild = this.client.guilds.cache.get(serverId);
+          if (!guild) {
+            return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ManageGuild");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
+          }
 
           const customCommands = require("../utils/customCommands");
           const result = await customCommands.deleteCommand(
@@ -8012,6 +8229,21 @@ class DashboardServer {
       async (req, res) => {
         try {
           const { serverId, name, trigger, actions } = req.body;
+
+          if (!serverId) {
+            return res.status(400).json({ error: "serverId is required" });
+          }
+
+          const guild = this.client.guilds.cache.get(serverId);
+          if (!guild) {
+            return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ManageGuild");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
+          }
 
           await new Promise((resolve, reject) => {
             db.db.run(
@@ -8040,7 +8272,22 @@ class DashboardServer {
       this.apiAuth.bind(this),
       async (req, res) => {
         try {
-          const { workflowId, data } = req.body;
+          const { workflowId, serverId, data } = req.body;
+
+          if (!workflowId || !serverId) {
+            return res.status(400).json({ error: "workflowId and serverId are required" });
+          }
+
+          const guild = this.client.guilds.cache.get(serverId);
+          if (!guild) {
+            return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ManageGuild");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
+          }
 
           // Trigger workflow execution
           res.json({
@@ -8088,6 +8335,21 @@ class DashboardServer {
       async (req, res) => {
         try {
           const { serverId, status = "pending" } = req.query;
+
+          if (!serverId) {
+            return res.status(400).json({ error: "serverId is required" });
+          }
+
+          const guild = this.client.guilds.cache.get(serverId);
+          if (!guild) {
+            return res.status(404).json({ error: "Server not found" });
+          }
+
+          // SECURITY FIX: Verify user has permission to access this server
+          const permCheck = await this.checkServerPermissions(req, guild, "ViewAuditLog");
+          if (!permCheck.allowed) {
+            return res.status(403).json({ error: permCheck.error });
+          }
 
           const appeals = await new Promise((resolve, reject) => {
             db.db.all(
