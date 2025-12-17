@@ -107,10 +107,24 @@ module.exports = {
       const limit = interaction.options.getInteger("limit") || 10;
 
       try {
+        // SECURITY: Validate actionType to prevent prototype pollution
+        let auditLogType = undefined;
+        if (actionType) {
+          // actionType is validated by Discord.js choices, but double-check it exists in AuditLogEvent
+          if (AuditLogEvent.hasOwnProperty(actionType)) {
+            auditLogType = AuditLogEvent[actionType];
+          } else {
+            // Invalid actionType - should not happen due to Discord.js validation, but handle gracefully
+            return interaction.editReply({
+              content: "❌ Invalid action type",
+            });
+          }
+        }
+
         // Fetch audit logs with filters
         const auditLogs = await interaction.guild.fetchAuditLogs({
           limit: 100, // Fetch more to filter
-          type: actionType ? AuditLogEvent[actionType] : undefined,
+          type: auditLogType,
           user: user || undefined,
         });
 
@@ -121,8 +135,9 @@ module.exports = {
           entries = entries.filter((entry) => entry.target?.id === target.id);
         }
 
-        // Limit results
-        entries = entries.slice(0, limit);
+        // Limit results (Discord has a 25 field limit per embed)
+        const maxFields = Math.min(limit, 25);
+        entries = entries.slice(0, maxFields);
 
         if (entries.length === 0) {
           return interaction.editReply({
@@ -132,7 +147,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
           .setTitle("🔍 Audit Log Search Results")
-          .setDescription(`Found ${entries.length} matching entries`)
+          .setDescription(`Found ${entries.length} matching entries${entries.length < limit ? ` (showing first ${entries.length} of ${limit} requested)` : ""}`)
           .setColor(0x0099ff)
           .setTimestamp();
 
@@ -142,13 +157,18 @@ module.exports = {
             ? entry.target.tag || entry.target.name || entry.target.id
             : "Unknown";
 
+          const fieldValue = [
+            `**Target:** ${targetInfo}`,
+            `**Reason:** ${entry.reason || "No reason"}`,
+            `**Time:** <t:${Math.floor(entry.createdTimestamp / 1000)}:R>`,
+          ].join("\n");
+
+          // SECURITY: Ensure field value doesn't exceed 1024 characters
+          const safeValue = fieldValue.length > 1024 ? fieldValue.substring(0, 1021) + "..." : fieldValue;
+
           embed.addFields({
             name: `${i + 1}. ${entry.action} by ${executor?.tag || "Unknown"}`,
-            value: [
-              `**Target:** ${targetInfo}`,
-              `**Reason:** ${entry.reason || "No reason"}`,
-              `**Time:** <t:${Math.floor(entry.createdTimestamp / 1000)}:R>`,
-            ].join("\n"),
+            value: safeValue,
             inline: false,
           });
         });
@@ -236,7 +256,9 @@ module.exports = {
       const limit = interaction.options.getInteger("limit") || 10;
 
       try {
-        const auditLogs = await interaction.guild.fetchAuditLogs({ limit });
+        // SECURITY: Limit to 25 fields (Discord's embed limit)
+        const maxFields = Math.min(limit, 25);
+        const auditLogs = await interaction.guild.fetchAuditLogs({ limit: maxFields });
         const entries = Array.from(auditLogs.entries.values());
 
         if (entries.length === 0) {
@@ -257,14 +279,19 @@ module.exports = {
             ? entry.target.tag || entry.target.name || entry.target.id
             : "Unknown";
 
+          const fieldValue = [
+            `**By:** ${executor?.tag || "Unknown"}`,
+            `**Target:** ${targetInfo}`,
+            `**Reason:** ${entry.reason || "No reason"}`,
+            `**Time:** <t:${Math.floor(entry.createdTimestamp / 1000)}:R>`,
+          ].join("\n");
+
+          // SECURITY: Ensure field value doesn't exceed 1024 characters
+          const safeValue = fieldValue.length > 1024 ? fieldValue.substring(0, 1021) + "..." : fieldValue;
+
           embed.addFields({
             name: `${i + 1}. ${entry.action}`,
-            value: [
-              `**By:** ${executor?.tag || "Unknown"}`,
-              `**Target:** ${targetInfo}`,
-              `**Reason:** ${entry.reason || "No reason"}`,
-              `**Time:** <t:${Math.floor(entry.createdTimestamp / 1000)}:R>`,
-            ].join("\n"),
+            value: safeValue,
             inline: false,
           });
         });
@@ -309,26 +336,39 @@ module.exports = {
           actionCounts[entry.action] = (actionCounts[entry.action] || 0) + 1;
         });
 
+        const actionSummaryValue = Object.entries(actionCounts)
+          .map(([action, count]) => `${action}: **${count}**`)
+          .join("\n");
+        
+        // SECURITY: Ensure field value doesn't exceed 1024 characters
+        const safeActionSummary = actionSummaryValue.length > 1024 
+          ? actionSummaryValue.substring(0, 1021) + "..." 
+          : actionSummaryValue;
+
         embed.addFields({
           name: "📊 Action Summary",
-          value: Object.entries(actionCounts)
-            .map(([action, count]) => `${action}: **${count}**`)
-            .join("\n"),
+          value: safeActionSummary,
           inline: false,
         });
 
-        entries.slice(0, 10).forEach((entry, i) => {
+        // SECURITY: Limit to 24 fields (25 total - 1 for action summary = 24 remaining)
+        entries.slice(0, 24).forEach((entry, i) => {
           const targetInfo = entry.target
             ? entry.target.tag || entry.target.name || entry.target.id
             : "Unknown";
 
+          const fieldValue = [
+            `**Target:** ${targetInfo}`,
+            `**Reason:** ${entry.reason || "No reason"}`,
+            `**Time:** <t:${Math.floor(entry.createdTimestamp / 1000)}:R>`,
+          ].join("\n");
+
+          // SECURITY: Ensure field value doesn't exceed 1024 characters
+          const safeValue = fieldValue.length > 1024 ? fieldValue.substring(0, 1021) + "..." : fieldValue;
+
           embed.addFields({
             name: `${i + 1}. ${entry.action}`,
-            value: [
-              `**Target:** ${targetInfo}`,
-              `**Reason:** ${entry.reason || "No reason"}`,
-              `**Time:** <t:${Math.floor(entry.createdTimestamp / 1000)}:R>`,
-            ].join("\n"),
+            value: safeValue,
             inline: false,
           });
         });
