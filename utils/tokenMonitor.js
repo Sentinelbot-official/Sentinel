@@ -123,7 +123,8 @@ class TokenMonitor {
             
             // 3. Are 59-75 chars (most common range, but can be up to 72)
             // Prefer tokens that are exactly 72 chars (most common Discord token length)
-            if (possibleToken.length === 72) score += 25; // Perfect match!
+            if (possibleToken.length === 72) score += 30; // Perfect match! Highest priority
+            else if (possibleToken.length === 71 || possibleToken.length === 73) score += 25; // Almost perfect
             else if (possibleToken.length >= 70 && possibleToken.length <= 74) score += 20; // Very close
             else if (possibleToken.length >= 59 && possibleToken.length <= 75) score += 15;
             else if (possibleToken.length >= 50 && possibleToken.length < 59) score += 5;
@@ -163,7 +164,12 @@ class TokenMonitor {
       
       // Return the best match if found
       if (bestMatch) {
-        logger.info("TokenMonitor", `✅ Successfully parsed: fingerprint=${bestMatch.trackingFingerprint.substring(0, 8)}..., token length=${bestMatch.realToken.length}`);
+        // Double-check: if the token is exactly 72 chars and starts with alphanumeric, it's almost certainly correct
+        if (bestMatch.realToken.length === 72 && /^[A-Za-z0-9]{10,}/.test(bestMatch.realToken)) {
+          logger.info("TokenMonitor", `✅ Successfully parsed (perfect match): fingerprint=${bestMatch.trackingFingerprint.substring(0, 8)}..., token length=${bestMatch.realToken.length}, starts="${bestMatch.realToken.substring(0, 20)}..."`);
+        } else {
+          logger.info("TokenMonitor", `✅ Successfully parsed: fingerprint=${bestMatch.trackingFingerprint.substring(0, 8)}..., token length=${bestMatch.realToken.length}, starts="${bestMatch.realToken.substring(0, 20)}..."`);
+        }
         return bestMatch;
       }
       
