@@ -295,7 +295,19 @@ class AutoRecovery {
         await Promise.all(
           batch.map(async (channelData) => {
             try {
-              const existingChannel = guild.channels.cache.get(channelData.id);
+              let existingChannel = guild.channels.cache.get(channelData.id);
+              
+              // Verify channel actually exists (cache might be stale)
+              if (existingChannel) {
+                try {
+                  await existingChannel.fetch();
+                } catch (error) {
+                  if (error.code === 10003) {
+                    // Channel doesn't actually exist (stale cache)
+                    existingChannel = null;
+                  }
+                }
+              }
 
               if (!existingChannel) {
                 // Channel was deleted, recreate it
