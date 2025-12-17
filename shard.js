@@ -308,26 +308,17 @@ if (process.env.VOIDBOTS_TOKEN) {
 
       voidbotsInitialized = true;
 
-      // Calculate initial delay - if we posted recently, wait the full interval
-      const now = Date.now();
-      const timeSinceLastPost = now - lastPostTime;
-      const initialDelay =
-        lastPostTime > 0 && timeSinceLastPost < MIN_POST_INTERVAL
-          ? MIN_POST_INTERVAL - timeSinceLastPost + 10000 // Add 10s buffer
-          : MIN_POST_INTERVAL;
-
       console.log(
-        `✅ [VoidBots] Stats posting initialized (first post in ${Math.ceil(
-          initialDelay / 1000
-        )}s)`
+        `✅ [VoidBots] Stats posting initialized (posting immediately)`
       );
 
-      setTimeout(() => {
-        postStats();
-        if (!voidbotsInterval) {
-          voidbotsInterval = setInterval(postStats, 15 * 60 * 1000);
-        }
-      }, initialDelay);
+      // Post immediately
+      postStats();
+      
+      // Then post every 15 minutes
+      if (!voidbotsInterval) {
+        voidbotsInterval = setInterval(postStats, 15 * 60 * 1000);
+      }
     });
   });
 } else {
