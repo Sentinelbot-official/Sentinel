@@ -312,6 +312,7 @@ class AutoRecovery {
                   channelData.permissions.length > 0
                 ) {
                   // Verify channel still exists before restoring permissions
+                  let channelExists = true;
                   try {
                     await newChannel.fetch();
                   } catch (error) {
@@ -320,36 +321,40 @@ class AutoRecovery {
                       logger.debug(
                         `[AutoRecovery] Skipping permission restore for deleted channel ${channelData.id}`
                       );
-                      continue; // Skip to next channel
+                      channelExists = false;
+                    } else {
+                      throw error; // Re-throw other errors
                     }
-                    throw error; // Re-throw other errors
                   }
 
-                  // Process permissions in smaller batches to avoid rate limits
-                  const permBatches = [];
-                  for (let i = 0; i < channelData.permissions.length; i += 5) {
-                    permBatches.push(channelData.permissions.slice(i, i + 5));
-                  }
+                  // Only restore permissions if channel still exists
+                  if (channelExists) {
+                    // Process permissions in smaller batches to avoid rate limits
+                    const permBatches = [];
+                    for (let i = 0; i < channelData.permissions.length; i += 5) {
+                      permBatches.push(channelData.permissions.slice(i, i + 5));
+                    }
 
-                  for (const permBatch of permBatches) {
-                    await Promise.all(
-                      permBatch.map((perm) =>
-                        newChannel.permissionOverwrites
-                          .edit(perm.id, {
-                            allow: perm.allow,
-                            deny: perm.deny,
-                          })
-                          .catch((err) => {
-                            // Silently skip if channel was deleted
-                            if (err.code !== 10003) {
-                              ErrorHandler.createSafeCatch(
-                                `autoRecovery [${guild.id}]`,
-                                `Restore permission overwrite for ${perm.id}`
-                              )(err);
-                            }
-                          })
-                      )
-                    );
+                    for (const permBatch of permBatches) {
+                      await Promise.all(
+                        permBatch.map((perm) =>
+                          newChannel.permissionOverwrites
+                            .edit(perm.id, {
+                              allow: perm.allow,
+                              deny: perm.deny,
+                            })
+                            .catch((err) => {
+                              // Silently skip if channel was deleted
+                              if (err.code !== 10003) {
+                                ErrorHandler.createSafeCatch(
+                                  `autoRecovery [${guild.id}]`,
+                                  `Restore permission overwrite for ${perm.id}`
+                                )(err);
+                              }
+                            })
+                        )
+                      );
+                    }
                   }
                 }
 

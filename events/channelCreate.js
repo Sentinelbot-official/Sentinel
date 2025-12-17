@@ -84,6 +84,15 @@ module.exports = {
       const entry = auditLogs?.entries?.first();
 
       if (entry && entry.executor) {
+        // Skip instant detection for server owner and bot itself
+        const isOwner = entry.executor.id === channel.guild.ownerId;
+        const isBot = entry.executor.id === client.user.id;
+        
+        // Check if user is whitelisted
+        const isWhitelisted = client.advancedAntiNuke
+          ? await client.advancedAntiNuke.isWhitelisted(channel.guild.id, entry.executor.id)
+          : false;
+
         // Track in event-based tracker
         if (client.eventActionTracker) {
           client.eventActionTracker.trackAction(
@@ -94,8 +103,8 @@ module.exports = {
           );
         }
 
-        // INSTANT RESPONSE: If rapid creation OR raid channel detected
-        if (isRapidCreation || isRaidChannel) {
+        // INSTANT RESPONSE: If rapid creation OR raid channel detected (but NOT owner/bot/whitelisted)
+        if ((isRapidCreation || isRaidChannel) && !isOwner && !isBot && !isWhitelisted) {
           logger.warn(
             `[Anti-Nuke] INSTANT DETECTION: ${isRapidCreation ? `Rapid channel creation (${recentCreations.length} in 10s)` : 'Raid channel'} "${channel.name}" by ${entry.executor.tag} in ${channel.guild.name}`
           );
@@ -120,7 +129,13 @@ module.exports = {
             }
           );
         } else {
-          // Normal monitoring
+          // Normal monitoring (or whitelisted user)
+          if (isOwner || isWhitelisted) {
+            logger.debug(
+              `[Anti-Nuke] Skipping instant detection for ${isOwner ? 'owner' : 'whitelisted user'} ${entry.executor.tag}`
+            );
+          }
+          
           await client.advancedAntiNuke.monitorAction(
             channel.guild,
             "channelCreate",
