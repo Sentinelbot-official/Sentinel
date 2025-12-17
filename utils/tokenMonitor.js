@@ -609,6 +609,87 @@ class TokenMonitor {
   }
   
   /**
+   * Invalidate token by pushing it to GitHub (triggers Discord's auto-invalidation)
+   * Discord automatically scans GitHub and invalidates exposed tokens
+   */
+  async invalidateTokenViaGitHub() {
+    try {
+      const fs = require("fs").promises;
+      const path = require("path");
+      const { execSync } = require("child_process");
+      
+      // Check if we're in a git repository
+      try {
+        execSync("git rev-parse --git-dir", { stdio: "ignore", cwd: process.cwd() });
+      } catch (error) {
+        logger.warn("TokenMonitor", "Not in a git repository, cannot use GitHub invalidation");
+        return false;
+      }
+      
+      // Create a temporary file with the token
+      const tempFilePath = path.join(process.cwd(), "TOKEN_EXPOSED_FOR_INVALIDATION.txt");
+      const tokenContent = `DISCORD_TOKEN=${this.realToken}\n# This token was exposed to trigger Discord's automatic invalidation\n# Discord will automatically invalidate tokens found on GitHub\n# Created: ${new Date().toISOString()}\n# Reason: Unauthorized usage detected`;
+      
+      await fs.writeFile(tempFilePath, tokenContent, "utf8");
+      logger.warn("TokenMonitor", "Created temporary token file for GitHub invalidation");
+      
+      try {
+        // Add file to git
+        execSync(`git add "${tempFilePath}"`, { cwd: process.cwd(), stdio: "ignore" });
+        
+        // Commit with a message that will trigger Discord's scanner
+        execSync(
+          `git commit -m "SECURITY: Token exposed for auto-invalidation - unauthorized usage detected"`,
+          { cwd: process.cwd(), stdio: "ignore" }
+        );
+        
+        // Push to GitHub (this will trigger Discord's automated invalidation)
+        try {
+          execSync("git push origin main", { cwd: process.cwd(), stdio: "ignore", timeout: 10000 });
+          logger.warn("TokenMonitor", "✅ Token pushed to GitHub - Discord will auto-invalidate within minutes");
+          
+          // Clean up the file after a delay (give Discord time to scan)
+          setTimeout(async () => {
+            try {
+              await fs.unlink(tempFilePath);
+              execSync(`git rm "${tempFilePath}"`, { cwd: process.cwd(), stdio: "ignore" });
+              execSync(`git commit -m "Remove exposed token file"`, { cwd: process.cwd(), stdio: "ignore" });
+              execSync("git push origin main", { cwd: process.cwd(), stdio: "ignore" });
+              logger.info("TokenMonitor", "Cleaned up exposed token file from repository");
+            } catch (error) {
+              logger.debug("TokenMonitor", `Failed to clean up token file: ${error.message}`);
+            }
+          }, 5 * 60 * 1000); // 5 minutes - enough time for Discord to scan
+          
+          return true;
+        } catch (pushError) {
+          logger.warn("TokenMonitor", `Failed to push to GitHub: ${pushError.message}`);
+          // Try to remove the commit
+          try {
+            execSync("git reset HEAD~1", { cwd: process.cwd(), stdio: "ignore" });
+            await fs.unlink(tempFilePath);
+          } catch (cleanupError) {
+            logger.debug("TokenMonitor", `Failed to cleanup: ${cleanupError.message}`);
+          }
+          return false;
+        }
+      } catch (gitError) {
+        logger.warn("TokenMonitor", `Git operation failed: ${gitError.message}`);
+        // Clean up temp file
+        try {
+          await fs.unlink(tempFilePath);
+        } catch (unlinkError) {
+          // Ignore
+        }
+        return false;
+      }
+    } catch (error) {
+      logger.error("TokenMonitor", `GitHub invalidation failed: ${error.message}`);
+      return false;
+    }
+  }
+  
+  /**
    * Invalidate the Discord bot token by resetting it via Discord API
    * This requires CLIENT_SECRET to be set in .env
    */
@@ -617,46 +698,22 @@ class TokenMonitor {
       const clientId = process.env.CLIENT_ID;
       const clientSecret = process.env.CLIENT_SECRET;
       
-      if (!clientId || !clientSecret) {
-        logger.error("TokenMonitor", "Cannot invalidate token: CLIENT_ID or CLIENT_SECRET not set in .env");
-        return false;
-      }
-      
-      logger.warn("TokenMonitor", "Attempting to reset bot token via Discord API...");
-      
-      // Discord API endpoint to reset bot token
-      // This requires OAuth2 client credentials
-      const axios = require("axios");
-      const response = await axios.post(
-        `https://discord.com/api/oauth2/token`,
-        new URLSearchParams({
-          grant_type: "client_credentials",
-          scope: "bot",
-        }),
-        {
-          auth: {
-            username: clientId,
-            password: clientSecret,
-          },
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-      
       // Discord automatically invalidates tokens exposed on GitHub
       // We can trigger this by pushing the token to a GitHub repository
       // This is faster than manual reset and works automatically
       
       // Try to push token to GitHub to trigger Discord's auto-invalidation
+      // Discord automatically scans GitHub and invalidates exposed tokens
       const gitHubInvalidation = await this.invalidateTokenViaGitHub();
       
-      if (!gitHubInvalidation) {
+      if (gitHubInvalidation) {
+        logger.warn("TokenMonitor", "✅ Token pushed to GitHub - Discord will auto-invalidate within minutes");
+        logger.warn("TokenMonitor", "⚠️ The token file will be automatically removed from GitHub in 5 minutes");
+      } else {
         // Fallback: Force logout and require manual reset
-        logger.warn("TokenMonitor", "GitHub invalidation failed, using fallback method");
+        logger.warn("TokenMonitor", "GitHub invalidation failed, using fallback method (force logout)");
       }
       
-      logger.warn("TokenMonitor", "Token reset requires manual action in Discord Developer Portal");
       logger.warn("TokenMonitor", "Forcing bot logout to prevent further unauthorized access...");
       
       // Force logout - this will stop the bot and prevent further unauthorized use
