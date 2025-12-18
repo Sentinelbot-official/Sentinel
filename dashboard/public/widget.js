@@ -133,7 +133,7 @@
 
     if (showButton) {
       html += `
-        <a href="https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=8&scope=bot%20applications.commands" 
+        <a href="https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=268443574&scope=bot%20applications.commands" 
            target="_blank" 
            class="sentinel-widget-button">
           Invite to Server

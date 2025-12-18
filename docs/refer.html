@@ -92,7 +92,7 @@
       if (!referrerId) {
         // No referrer, redirect to main invite page
         window.location.href =
-          "https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=8&scope=bot%20applications.commands";
+          "https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=268443574&scope=bot%20applications.commands";
       } else {
         // Track referral in backend
         const apiUrl =
@@ -119,7 +119,7 @@
           });
 
         // Build OAuth URL
-        const oauthUrl = `https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=8&scope=bot%20applications.commands&state=${encodeURIComponent(
+        const oauthUrl = `https://discord.com/oauth2/authorize?client_id=1450948411313619199&permissions=268443574&scope=bot%20applications.commands&state=${encodeURIComponent(
           JSON.stringify({ ref: referrerId })
         )}`;
 
