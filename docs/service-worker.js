@@ -173,8 +173,86 @@ self.addEventListener("sync", (event) => {
 });
 
 async function doBackgroundSync() {
-  // Placeholder for future offline action sync
   console.log("[Service Worker] Performing background sync...");
+  
+  try {
+    // Get all pending offline actions from IndexedDB
+    const db = await openOfflineDB();
+    const pendingActions = await getPendingActions(db);
+    
+    if (pendingActions.length === 0) {
+      console.log("[Service Worker] No pending actions to sync");
+      return;
+    }
+    
+    console.log(`[Service Worker] Syncing ${pendingActions.length} pending actions`);
+    
+    // Process each pending action
+    for (const action of pendingActions) {
+      try {
+        // Retry the failed request
+        const response = await fetch(action.url, {
+          method: action.method,
+          headers: action.headers,
+          body: action.body
+        });
+        
+        if (response.ok) {
+          // Success - remove from pending queue
+          await removeAction(db, action.id);
+          console.log(`[Service Worker] Synced action: ${action.id}`);
+        } else {
+          console.warn(`[Service Worker] Failed to sync action: ${action.id}, status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error(`[Service Worker] Error syncing action ${action.id}:`, error);
+      }
+    }
+    
+    console.log("[Service Worker] Background sync complete");
+  } catch (error) {
+    console.error("[Service Worker] Background sync failed:", error);
+  }
+}
+
+// IndexedDB helpers for offline action queue
+function openOfflineDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("SentinelOfflineDB", 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains("pendingActions")) {
+        const store = db.createObjectStore("pendingActions", { keyPath: "id", autoIncrement: true });
+        store.createIndex("timestamp", "timestamp", { unique: false });
+      }
+    };
+  });
+}
+
+function getPendingActions(db) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(["pendingActions"], "readonly");
+    const store = transaction.objectStore("pendingActions");
+    const request = store.getAll();
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+  });
+}
+
+function removeAction(db, actionId) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(["pendingActions"], "readwrite");
+    const store = transaction.objectStore("pendingActions");
+    const request = store.delete(actionId);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
 }
 
 // Message handler for cache management
