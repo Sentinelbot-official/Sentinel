@@ -247,15 +247,44 @@
         }
       }
 
+      // Admin password (prompt on first load)
+      let adminPassword = sessionStorage.getItem("adminPassword");
+
       async function loadUsagePatterns() {
+        // Check if admin password is set
+        if (!adminPassword) {
+          adminPassword = prompt("Enter admin password:");
+          if (!adminPassword) {
+            document.body.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center;">
+                <div>
+                  <h1>🔐 Admin Authentication Required</h1>
+                  <p>Please refresh the page and enter your admin password.</p>
+                </div>
+              </div>
+            `;
+            return;
+          }
+          sessionStorage.setItem("adminPassword", adminPassword);
+        }
+
         try {
           const response = await fetch(`${USAGE_API}?days=7`, {
             headers: {
               "ngrok-skip-browser-warning": "true",
+              "x-admin-password": adminPassword,
             },
           });
 
           if (!response.ok) {
+            // If 401, clear stored password and prompt again
+            if (response.status === 401) {
+              sessionStorage.removeItem("adminPassword");
+              adminPassword = null;
+              alert("❌ Invalid admin password. Please try again.");
+              location.reload();
+              return;
+            }
             throw new Error(
               `Failed to load data (${response.status}). Make sure bot is restarted with latest code.`
             );
