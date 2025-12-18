@@ -331,34 +331,29 @@ module.exports = {
           },
         ],
       },
-      integrations:       {
+      integrations: {
         title: "🔗 Platform Integrations",
         description:
-          "**Now Available:**\n\n" +
-          "📺 **Twitch** - Stream go-live notifications\n" +
-          "🎥 **YouTube** - Upload & live stream alerts\n" +
-          "🐙 **GitHub** - Repository webhooks\n\n" +
-          "Use `/integrations` to connect your platforms!",
+          "**Future Feature:**\n\n" +
+          "Platform integrations are planned for a future update.\n\n" +
+          "Potential integrations include:\n" +
+          "• Twitch stream notifications\n" +
+          "• YouTube upload alerts\n" +
+          "• GitHub webhooks\n\n" +
+          "Focus is currently on core security features!",
         color: 0x9b59b6,
         pages: [
           {
             title: "Platform Integrations",
             description:
-              "**Available Now:**\n\n" +
-              "📺 **Twitch Integration**\n" +
-              "• Stream go-live notifications\n" +
-              "• Automatic monitoring\n" +
-              "• Stream thumbnails & links\n\n" +
-              "🎥 **YouTube Integration**\n" +
-              "• Upload notifications\n" +
-              "• Live stream alerts\n" +
-              "• RSS feed monitoring\n\n" +
-              "🐙 **GitHub Integration**\n" +
-              "• Push notifications\n" +
-              "• Pull request updates\n" +
-              "• Issue tracking\n" +
-              "• Release announcements\n\n" +
-              "Use `/integrations` to get started!",
+              "**Planned for Future:**\n\n" +
+              "Platform integrations are not currently available.\n\n" +
+              "Sentinel focuses on core security features:\n" +
+              "• Anti-raid protection\n" +
+              "• Anti-nuke defense\n" +
+              "• Auto-moderation\n" +
+              "• Threat detection\n\n" +
+              "External integrations may be added later!",
             color: 0x9b59b6,
           },
         ],

@@ -976,7 +976,9 @@ async function loadCustomTemplates() {
       return;
     }
 
-    grid.innerHTML = templates.map(template => `
+    grid.innerHTML = templates
+      .map(
+        (template) => `
       <div class="setting-card" style="height: auto;">
         <div style="text-align: center; margin-bottom: 20px;">
           <div style="font-size: 4rem; margin-bottom: 10px;">⭐</div>
@@ -991,8 +993,9 @@ async function loadCustomTemplates() {
           🗑️ Delete Template
         </button>
       </div>
-    `).join("");
-
+    `
+      )
+      .join("");
   } catch (error) {
     console.error("Error loading custom templates:", error);
     document.getElementById("custom-templates-grid").innerHTML = `
@@ -1017,11 +1020,14 @@ async function applyCustomTemplate(templateId) {
 
   try {
     // Get template config
-    const response = await fetch(`${API_BASE}/api/v1/templates/custom/${templateId}`, {
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    });
+    const response = await fetch(
+      `${API_BASE}/api/v1/templates/custom/${templateId}`,
+      {
+        headers: {
+          "x-api-key": API_KEY,
+        },
+      }
+    );
 
     const result = await response.json();
 
@@ -1032,14 +1038,17 @@ async function applyCustomTemplate(templateId) {
     const config = result.data.config;
 
     // Apply config to current server
-    const applyResponse = await fetch(`${API_BASE}/api/v1/server/${currentGuildId}/config`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY,
-      },
-      body: JSON.stringify(config),
-    });
+    const applyResponse = await fetch(
+      `${API_BASE}/api/v1/server/${currentGuildId}/config`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+        },
+        body: JSON.stringify(config),
+      }
+    );
 
     const applyResult = await applyResponse.json();
 
@@ -1049,7 +1058,6 @@ async function applyCustomTemplate(templateId) {
 
     alert("✅ Custom template applied successfully!");
     loadPage("overview"); // Reload to show new config
-
   } catch (error) {
     console.error("Error applying custom template:", error);
     alert(`❌ Failed to apply template: ${error.message}`);
@@ -1062,12 +1070,15 @@ async function deleteCustomTemplate(templateId) {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/api/v1/templates/custom/${templateId}`, {
-      method: "DELETE",
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    });
+    const response = await fetch(
+      `${API_BASE}/api/v1/templates/custom/${templateId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "x-api-key": API_KEY,
+        },
+      }
+    );
 
     const result = await response.json();
 
@@ -1077,7 +1088,6 @@ async function deleteCustomTemplate(templateId) {
 
     alert("✅ Template deleted successfully!");
     loadCustomTemplates(); // Reload templates
-
   } catch (error) {
     console.error("Error deleting custom template:", error);
     alert(`❌ Failed to delete template: ${error.message}`);
@@ -1086,7 +1096,7 @@ async function deleteCustomTemplate(templateId) {
 
 async function saveTemplate() {
   const templateName = document.getElementById("template-name").value.trim();
-  
+
   if (!templateName) {
     alert("❌ Please enter a template name!");
     return;
@@ -1099,8 +1109,10 @@ async function saveTemplate() {
 
   try {
     // Get current server config
-    const response = await window.apiCall(`/api/v1/server/${currentGuildId}/config`);
-    
+    const response = await window.apiCall(
+      `/api/v1/server/${currentGuildId}/config`
+    );
+
     if (!response.success) {
       throw new Error("Failed to fetch server config");
     }
@@ -1143,7 +1155,6 @@ async function saveTemplate() {
     setTimeout(() => {
       loadTemplates();
     }, 2000);
-
   } catch (error) {
     console.error("Error saving template:", error);
     alert(`❌ Failed to save template: ${error.message}`);

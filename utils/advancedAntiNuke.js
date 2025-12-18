@@ -74,10 +74,7 @@ class AdvancedAntiNuke {
       ),
       rolesDeleted: customRoles
         ? customRoles
-        : Math.max(
-            1,
-            Math.ceil(this.baseThresholds.rolesDeleted * multiplier)
-          ),
+        : Math.max(1, Math.ceil(this.baseThresholds.rolesDeleted * multiplier)),
       rolesCreated: Math.ceil(this.baseThresholds.rolesCreated * multiplier),
       membersBanned: customBans
         ? customBans

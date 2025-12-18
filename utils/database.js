@@ -6300,48 +6300,6 @@ class Database {
     });
   }
 
-  async getIntegration(guildId, platform) {
-    return new Promise((resolve, reject) => {
-      this.db.get(
-        `SELECT * FROM integrations WHERE guild_id = ? AND platform = ?`,
-        [guildId, platform],
-        (err, row) => {
-          if (err) {
-            reject(err);
-          } else {
-            if (row && row.config) {
-              row.config = JSON.parse(row.config);
-            }
-            resolve(row);
-          }
-        }
-      );
-    });
-  }
-
-  async setIntegration(guildId, platform, config) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        `INSERT OR REPLACE INTO integrations (guild_id, platform, config, enabled, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          guildId,
-          platform,
-          JSON.stringify(config),
-          config.enabled ? 1 : 0,
-          Date.now(),
-          Date.now(),
-        ],
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
-      );
-    });
-  }
 
   // ========== PERFORMANCE OPTIMIZATION METHODS ==========
 
