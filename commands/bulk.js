@@ -188,6 +188,20 @@ module.exports = {
 
       for (const userId of userIds) {
         try {
+          // Skip bot itself
+          if (userId === interaction.client.user.id) {
+            results.failed++;
+            results.errors.push(`${userId}: Cannot ban the bot itself`);
+            continue;
+          }
+
+          // Skip server owner
+          if (userId === interaction.guild.ownerId) {
+            results.failed++;
+            results.errors.push(`${userId}: Cannot ban server owner`);
+            continue;
+          }
+
           await interaction.guild.members.ban(userId, {
             deleteMessageSeconds: deleteDays * 24 * 60 * 60,
             reason: `${reason} (Bulk ban by ${interaction.user.tag})`,
@@ -267,6 +281,20 @@ module.exports = {
 
       for (const userId of userIds) {
         try {
+          // Skip bot itself
+          if (userId === interaction.client.user.id) {
+            results.failed++;
+            results.errors.push(`${userId}: Cannot kick the bot itself`);
+            continue;
+          }
+
+          // Skip server owner
+          if (userId === interaction.guild.ownerId) {
+            results.failed++;
+            results.errors.push(`${userId}: Cannot kick server owner`);
+            continue;
+          }
+
           const member = await interaction.guild.members.fetch(userId);
           await member.kick(`${reason} (Bulk kick by ${interaction.user.tag})`);
           results.success++;
@@ -557,6 +585,20 @@ module.exports = {
 
       for (const userId of userIds) {
         try {
+          // Skip bot itself
+          if (userId === interaction.client.user.id) {
+            results.failed++;
+            results.errors.push(`${userId}: Cannot timeout the bot itself`);
+            continue;
+          }
+
+          // Skip server owner
+          if (userId === interaction.guild.ownerId) {
+            results.failed++;
+            results.errors.push(`${userId}: Cannot timeout server owner`);
+            continue;
+          }
+
           const member = await interaction.guild.members.fetch(userId);
           await member.timeout(
             durationMs,

@@ -30,6 +30,11 @@ module.exports = {
       });
     }
 
+    // Prevent moderating the bot
+    if (user.id === interaction.client.user.id) {
+      return interaction.reply(ErrorMessages.cannotTargetBot());
+    }
+
     // Prevent moderating the server owner
     if (user.id === interaction.guild.ownerId) {
       return interaction.reply({
