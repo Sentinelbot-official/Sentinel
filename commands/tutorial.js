@@ -331,35 +331,34 @@ module.exports = {
           },
         ],
       },
-      integrations: {
+      integrations:       {
         title: "🔗 Platform Integrations",
         description:
-          "**Coming Soon:**\n\n" +
-          "🎮 **Twitch** - Stream notifications, sub alerts\n" +
-          "📺 **YouTube** - Upload & live stream alerts\n" +
-          "📋 **Trello** - Task management sync\n" +
-          "📝 **Notion** - Note-taking integration\n" +
-          "📅 **Google Calendar** - Event sync\n\n" +
-          "Stay tuned for these features in upcoming updates!",
+          "**Now Available:**\n\n" +
+          "📺 **Twitch** - Stream go-live notifications\n" +
+          "🎥 **YouTube** - Upload & live stream alerts\n" +
+          "🐙 **GitHub** - Repository webhooks\n\n" +
+          "Use `/integrations` to connect your platforms!",
         color: 0x9b59b6,
         pages: [
           {
-            title: "Platform Integrations (Coming Soon)",
+            title: "Platform Integrations",
             description:
-              "**Planned Features:**\n\n" +
-              "🎮 **Twitch Integration**\n" +
+              "**Available Now:**\n\n" +
+              "📺 **Twitch Integration**\n" +
               "• Stream go-live notifications\n" +
-              "• Subscriber alerts\n" +
-              "• Clip sharing\n\n" +
-              "📺 **YouTube Integration**\n" +
+              "• Automatic monitoring\n" +
+              "• Stream thumbnails & links\n\n" +
+              "🎥 **YouTube Integration**\n" +
               "• Upload notifications\n" +
               "• Live stream alerts\n" +
-              "• Premiere reminders\n\n" +
-              "📋 **Productivity Tools**\n" +
-              "• Trello board sync\n" +
-              "• Notion integration\n" +
-              "• Calendar events\n\n" +
-              "These features are in development!",
+              "• RSS feed monitoring\n\n" +
+              "🐙 **GitHub Integration**\n" +
+              "• Push notifications\n" +
+              "• Pull request updates\n" +
+              "• Issue tracking\n" +
+              "• Release announcements\n\n" +
+              "Use `/integrations` to get started!",
             color: 0x9b59b6,
           },
         ],
