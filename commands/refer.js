@@ -53,7 +53,7 @@ module.exports = {
 
     const userId = interaction.user.id;
     const referralCode = this.generateReferralCode(userId);
-    const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${interaction.client.user.id}&permissions=8&scope=bot%20applications.commands&ref=${referralCode}`;
+    const inviteLink = `https://discord.com/oauth2/authorize?client_id=${interaction.client.user.id}&permissions=268443574&scope=bot%20applications.commands&ref=${referralCode}`;
 
     const embed = new EmbedBuilder()
       .setTitle("🔗 Your Referral Link")
