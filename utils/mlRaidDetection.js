@@ -1,12 +1,27 @@
-const tf = require("@tensorflow/tfjs-node");
 const logger = require("./logger");
 const db = require("./database");
 const fs = require("fs");
 const path = require("path");
 
+// Try to load TensorFlow.js with error handling
+let tf = null;
+let tfLoadError = null;
+
+try {
+  tf = require("@tensorflow/tfjs-node");
+  logger.info("MLRaidDetection", "TensorFlow.js loaded successfully");
+} catch (error) {
+  tfLoadError = error.message;
+  logger.warn(
+    "MLRaidDetection",
+    `TensorFlow.js failed to load: ${error.message}. ML features will be disabled.`
+  );
+}
+
 /**
  * ML-Based Raid Pattern Recognition
  * Uses TensorFlow.js to learn and predict raid patterns
+ * Falls back to rule-based detection if TensorFlow is unavailable
  */
 class MLRaidDetection {
   constructor(client) {
@@ -16,6 +31,8 @@ class MLRaidDetection {
     this.isTraining = false;
     this.lastTrainingTime = 0;
     this.trainingInterval = 24 * 60 * 60 * 1000; // Retrain every 24 hours
+    this.tfAvailable = tf !== null;
+    this.tfLoadError = tfLoadError;
 
     // Feature normalization parameters (learned from training data)
     this.normalizationParams = {
@@ -35,6 +52,15 @@ class MLRaidDetection {
    * Initialize ML model (load or create new)
    */
   async initialize() {
+    // Check if TensorFlow is available
+    if (!this.tfAvailable) {
+      logger.warn(
+        "MLRaidDetection",
+        "TensorFlow not available. Using rule-based detection fallback."
+      );
+      return;
+    }
+
     try {
       // Try to load existing model
       if (fs.existsSync(this.modelPath + "/model.json")) {
@@ -53,8 +79,12 @@ class MLRaidDetection {
       this.scheduleRetraining();
     } catch (error) {
       logger.error("MLRaidDetection", `Failed to initialize: ${error.message}`);
-      // Create new model as fallback
-      this.model = this.createModel();
+      // Mark TensorFlow as unavailable
+      this.tfAvailable = false;
+      logger.warn(
+        "MLRaidDetection",
+        "ML features disabled. Using rule-based detection."
+      );
     }
   }
 
@@ -223,9 +253,9 @@ class MLRaidDetection {
    * Predict if current pattern is a raid
    */
   async predict(member, recentJoins, timeWindow = 10000) {
-    if (!this.model) {
-      logger.warn("MLRaidDetection", "Model not initialized, cannot predict");
-      return { isRaid: false, confidence: 0, features: {} };
+    // Fall back to rule-based detection if TensorFlow unavailable
+    if (!this.tfAvailable || !this.model) {
+      return this.ruleBasedPredict(member, recentJoins, timeWindow);
     }
 
     try {
@@ -274,9 +304,76 @@ class MLRaidDetection {
   }
 
   /**
+   * Rule-based prediction fallback (when TensorFlow unavailable)
+   */
+  ruleBasedPredict(member, recentJoins, timeWindow = 10000) {
+    try {
+      // Extract features
+      const features = this.extractFeatures(member, recentJoins, timeWindow);
+
+      // Calculate threat score using rules
+      let threatScore = 0;
+
+      // Rule 1: High join rate (> 5 per second = suspicious)
+      if (features.joinRate > 5) {
+        threatScore += 0.3;
+      }
+
+      // Rule 2: New account (< 7 days = suspicious)
+      if (features.accountAge < 7) {
+        threatScore += 0.25;
+      }
+
+      // Rule 3: Just joined (< 1 hour = suspicious)
+      if (features.membershipAge < 1) {
+        threatScore += 0.15;
+      }
+
+      // Rule 4: High avatar similarity
+      if (features.avatarSimilarity > 0.7) {
+        threatScore += 0.2;
+      }
+
+      // Rule 5: Suspicious name pattern
+      if (features.namePattern > 0.5) {
+        threatScore += 0.1;
+      }
+
+      const isRaid = threatScore >= 0.7;
+
+      logger.debug(
+        "MLRaidDetection",
+        `Rule-based prediction: ${isRaid ? "RAID" : "Safe"} (score: ${(threatScore * 100).toFixed(1)}%)`
+      );
+
+      return {
+        isRaid,
+        confidence: threatScore,
+        features,
+        method: "rule-based",
+      };
+    } catch (error) {
+      logger.error(
+        "MLRaidDetection",
+        `Rule-based prediction failed: ${error.message}`
+      );
+      return { isRaid: false, confidence: 0, features: {}, method: "error" };
+    }
+  }
+
+  /**
    * Train model on historical raid data
    */
   async train() {
+    // Skip if TensorFlow unavailable
+    if (!this.tfAvailable) {
+      logger.warn(
+        "MLRaidDetection",
+        "TensorFlow unavailable. Cannot train model."
+      );
+      return;
+    }
+
     if (this.isTraining) {
       logger.warn("MLRaidDetection", "Training already in progress");
       return;
@@ -477,6 +574,8 @@ class MLRaidDetection {
    */
   getStats() {
     return {
+      tfAvailable: this.tfAvailable,
+      tfLoadError: this.tfLoadError,
       modelLoaded: this.model !== null,
       isTraining: this.isTraining,
       lastTrainingTime: this.lastTrainingTime,
@@ -484,6 +583,7 @@ class MLRaidDetection {
         0,
         this.trainingInterval - (Date.now() - this.lastTrainingTime)
       ),
+      detectionMethod: this.tfAvailable && this.model ? "ml" : "rule-based",
     };
   }
 }
