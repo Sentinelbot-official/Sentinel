@@ -299,6 +299,20 @@ class MLRaidDetection {
       };
     } catch (error) {
       logger.error("MLRaidDetection", `Prediction failed: ${error.message}`);
+
+      // If TensorFlow operations fail, disable ML and fall back
+      if (error.message && error.message.includes("isNullOrUndefined")) {
+        logger.warn(
+          "MLRaidDetection",
+          "TensorFlow compatibility issue. Disabling ML, using rule-based detection."
+        );
+        this.tfAvailable = false;
+        this.tfLoadError = error.message;
+
+        // Fall back to rule-based immediately
+        return this.ruleBasedPredict(member, recentJoins, timeWindow);
+      }
+
       return { isRaid: false, confidence: 0, features: {} };
     }
   }
@@ -401,18 +415,35 @@ class MLRaidDetection {
       );
 
       // Prepare training tensors
-      const xs = tf.tensor2d(
-        trainingData.map((d) => [
-          d.features.joinRate,
-          d.features.accountAge,
-          d.features.membershipAge,
-          d.features.avatarSimilarity,
-          d.features.namePattern,
-          d.features.timeWindow,
-        ])
-      );
+      let xs, ys;
+      try {
+        xs = tf.tensor2d(
+          trainingData.map((d) => [
+            d.features.joinRate,
+            d.features.accountAge,
+            d.features.membershipAge,
+            d.features.avatarSimilarity,
+            d.features.namePattern,
+            d.features.timeWindow,
+          ])
+        );
 
-      const ys = tf.tensor2d(trainingData.map((d) => [d.isRaid ? 1 : 0]));
+        ys = tf.tensor2d(trainingData.map((d) => [d.isRaid ? 1 : 0]));
+      } catch (tensorError) {
+        // TensorFlow operations failed - disable ML features
+        logger.error(
+          "MLRaidDetection",
+          `TensorFlow operations failed: ${tensorError.message}`
+        );
+        logger.warn(
+          "MLRaidDetection",
+          "Disabling ML features. Switching to rule-based detection permanently."
+        );
+        this.tfAvailable = false;
+        this.tfLoadError = tensorError.message;
+        this.isTraining = false;
+        return;
+      }
 
       // Train model
       const history = await this.model.fit(xs, ys, {
@@ -449,6 +480,16 @@ class MLRaidDetection {
       this.lastTrainingTime = Date.now();
     } catch (error) {
       logger.error("MLRaidDetection", `Training failed: ${error.message}`);
+
+      // If it's the isNullOrUndefined error, disable TensorFlow
+      if (error.message && error.message.includes("isNullOrUndefined")) {
+        logger.warn(
+          "MLRaidDetection",
+          "TensorFlow compatibility issue detected. Disabling ML features."
+        );
+        this.tfAvailable = false;
+        this.tfLoadError = error.message;
+      }
     } finally {
       this.isTraining = false;
     }
@@ -554,6 +595,11 @@ class MLRaidDetection {
   scheduleRetraining() {
     setInterval(
       async () => {
+        // Skip if TensorFlow is unavailable
+        if (!this.tfAvailable) {
+          return;
+        }
+
         const timeSinceLastTraining = Date.now() - this.lastTrainingTime;
         if (timeSinceLastTraining >= this.trainingInterval) {
           logger.info("MLRaidDetection", "Scheduled retraining triggered");
