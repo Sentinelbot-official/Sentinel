@@ -121,10 +121,10 @@ https://Sentinelbot-official.github.io/Sentinel/invite.html?source=githubreadme
 
 ## 📈 Stats
 
-- **18+ Servers Protected**
-- **1000+ Members Secured**
-- **100% Uptime**
-- **100% Free Forever**
+- **Growing Fast** - Active development
+- **100% Uptime** - Reliable protection
+- **100% Free Forever** - No paywalls
+- **Open Source** - Full transparency
 
 ---
 
@@ -212,7 +212,3 @@ Just better security, free forever.
 _Sentinel - Beyond Wick. Beyond Everything._ 🛡️
 
 </div>
-"# Sentinel" 
-"# Sentinel" 
-"# Sentinel" 
-"# Sentinel"

@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Beyond Wick. Beyond Everything.",
       "Free. Open Source. Powerful.",
       "AI-Powered Discord Protection.",
-      "Trusted by 18+ Servers.",
+      "Built for Scale.",
       "Zero Cost. Complete Transparency.",
     ]);
   }
