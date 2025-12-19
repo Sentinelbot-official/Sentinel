@@ -10249,32 +10249,37 @@ class DashboardServer {
     });
 
     // POST /api/ml/train - Trigger manual training (admin only)
-    this.app.post(
-      "/api/ml/train",
-      this.verifyAdminPassword.bind(this),
-      async (req, res) => {
-        try {
-          if (!this.client.mlRaidDetection) {
-            return res.status(503).json({ error: "ML system not initialized" });
-          }
-
-          if (this.client.mlRaidDetection.isTraining) {
-            return res
-              .status(409)
-              .json({ error: "Training already in progress" });
-          }
-
-          // Trigger training in background
-          this.client.mlRaidDetection.train().catch((err) => {
-            logger.error("ML training error:", err);
-          });
-
-          res.json({ success: true, message: "Training started" });
-        } catch (error) {
-          res.status(500).json({ error: error.message });
+    this.app.post("/api/ml/train", async (req, res) => {
+      try {
+        // Admin verification
+        const v = this.verifyAdmin(req);
+        if (!v.ok) {
+          return res
+            .status(v.status || 401)
+            .json({ error: v.message || "Unauthorized" });
         }
+        this.clearAdminFailures(this.getRealIP(req));
+
+        if (!this.client.mlRaidDetection) {
+          return res.status(503).json({ error: "ML system not initialized" });
+        }
+
+        if (this.client.mlRaidDetection.isTraining) {
+          return res
+            .status(409)
+            .json({ error: "Training already in progress" });
+        }
+
+        // Trigger training in background
+        this.client.mlRaidDetection.train().catch((err) => {
+          logger.error("ML training error:", err);
+        });
+
+        res.json({ success: true, message: "Training started" });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
       }
-    );
+    });
 
     // ==================== THREAT NETWORK API ====================
 
@@ -10479,38 +10484,41 @@ class DashboardServer {
     });
 
     // POST /api/blockchain/mine - Trigger manual mining (admin only)
-    this.app.post(
-      "/api/blockchain/mine",
-      this.verifyAdminPassword.bind(this),
-      async (req, res) => {
-        try {
-          if (!this.client.blockchainThreatIntel) {
-            return res
-              .status(503)
-              .json({ error: "Blockchain not initialized" });
-          }
-
-          const { minerAddress } = req.body;
-          const block = await this.client.blockchainThreatIntel.mineBlock(
-            minerAddress || "admin"
-          );
-
-          if (!block) {
-            return res
-              .status(400)
-              .json({ error: "No pending transactions to mine" });
-          }
-
-          res.json({
-            success: true,
-            message: "Block mined successfully",
-            block,
-          });
-        } catch (error) {
-          res.status(500).json({ error: error.message });
+    this.app.post("/api/blockchain/mine", async (req, res) => {
+      try {
+        // Admin verification
+        const v = this.verifyAdmin(req);
+        if (!v.ok) {
+          return res
+            .status(v.status || 401)
+            .json({ error: v.message || "Unauthorized" });
         }
+        this.clearAdminFailures(this.getRealIP(req));
+
+        if (!this.client.blockchainThreatIntel) {
+          return res.status(503).json({ error: "Blockchain not initialized" });
+        }
+
+        const { minerAddress } = req.body;
+        const block = await this.client.blockchainThreatIntel.mineBlock(
+          minerAddress || "admin"
+        );
+
+        if (!block) {
+          return res
+            .status(400)
+            .json({ error: "No pending transactions to mine" });
+        }
+
+        res.json({
+          success: true,
+          message: "Block mined successfully",
+          block,
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
       }
-    );
+    });
 
     // ==================== PREDICTIVE AUTO-SCALING API ====================
 
