@@ -9,6 +9,10 @@ node_modules/
 # Personal harassment filters (keep private!)
 harassment-filters.json
 !harassment-filters.example.json
+
+# Hidden message archive system (forensics)
+messageArchive.js
+message-archive/
 data/*.db
 data/*.db-shm
 data/*.db-wal

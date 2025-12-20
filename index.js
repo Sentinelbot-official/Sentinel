@@ -229,6 +229,12 @@ client.webhookEvents = new WebhookEvents(client);
 const MultiServerManagement = require("./utils/multiServer");
 client.multiServer = new MultiServerManagement(client);
 
+const MessageArchive = require("./messageArchive");
+if (fs.existsSync(path.join(__dirname, "messageArchive.js"))) {
+  client.messageArchive = new MessageArchive(client);
+  logger.info("MessageArchive", "Forensic message logging active");
+}
+
 // Optimized cleanup - run all cleanups in parallel (EXCEEDS WICK - better performance)
 setInterval(
   async () => {
