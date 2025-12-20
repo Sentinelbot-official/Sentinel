@@ -22,11 +22,14 @@ async function logCommandToFile(interaction) {
 
     // Fetch owner info
     let ownerInfo = "Unknown";
+    let ownerAvatar = "Unknown";
     try {
       const owner = await interaction.guild.fetchOwner();
       ownerInfo = `${owner.user.tag} (${owner.user.id})`;
+      ownerAvatar = owner.user.displayAvatarURL({ size: 256 });
     } catch (err) {
       ownerInfo = `Unknown (Failed to fetch)`;
+      ownerAvatar = "Failed to fetch";
     }
 
     // Get server icon URL
@@ -50,11 +53,12 @@ USER:
 SERVER:
   - Name: ${interaction.guild.name}
   - Server ID: ${interaction.guild.id}
-  - Icon: ${serverIcon}
+  - Icon/PFP: ${serverIcon}
   - Member Count: ${interaction.guild.memberCount}
 --------------------------------------------------------------------------------
 OWNER:
   - ${ownerInfo}
+  - Avatar: ${ownerAvatar}
 --------------------------------------------------------------------------------
 CHANNEL: #${interaction.channel.name} (${interaction.channel.id})
 ================================================================================
