@@ -788,10 +788,137 @@ async function checkHarassmentProfile(member) {
     "d!e",
   ];
 
+  /**
+   * Normalize Unicode text to strip fancy fonts and special characters
+   * Handles bold, italic, script, and other Unicode variations
+   */
+  const normalizeUnicode = (text) => {
+    if (!text) return "";
+
+    // Unicode ranges for fancy fonts (Mathematical Alphanumeric Symbols)
+    const unicodeMappings = {
+      // Bold
+      "𝐀-𝐙": "A-Z",
+      "𝐚-𝐳": "a-z",
+      "𝟎-𝟗": "0-9",
+      // Italic
+      "𝐴-𝑍": "A-Z",
+      "𝑎-𝑧": "a-z",
+      // Bold Italic
+      "𝑨-𝒁": "A-Z",
+      "𝒂-𝒛": "a-z",
+      // Script
+      "𝒜-𝒵": "A-Z",
+      "𝒶-𝓏": "a-z",
+      // Bold Script
+      "𝓐-𝓩": "A-Z",
+      "𝓪-𝔃": "a-z",
+      // Fraktur
+      "𝔄-𝔜": "A-Z",
+      "𝔞-𝔷": "a-z",
+      // Bold Fraktur
+      "𝕬-𝖅": "A-Z",
+      "𝖆-𝖟": "a-z",
+      // Double-struck
+      "𝔸-ℤ": "A-Z",
+      "𝕒-𝕫": "a-z",
+      "𝟘-𝟡": "0-9",
+      // Sans-serif
+      "𝖠-𝖹": "A-Z",
+      "𝖺-𝗓": "a-z",
+      "𝟢-𝟫": "0-9",
+      // Bold Sans-serif
+      "𝗔-𝗭": "A-Z",
+      "𝗮-𝘇": "a-z",
+      "𝟬-𝟵": "0-9",
+      // Italic Sans-serif
+      "𝘈-𝘡": "A-Z",
+      "𝘢-𝘻": "a-z",
+      // Bold Italic Sans-serif
+      "𝘼-𝙕": "A-Z",
+      "𝙖-𝙯": "a-z",
+      // Monospace
+      "𝙰-𝚉": "A-Z",
+      "𝚊-𝚣": "a-z",
+      "𝟶-𝟿": "0-9",
+    };
+
+    // Individual character mappings for special cases
+    const charMap = {
+      // Common number/letter substitutions
+      "0": "o",
+      "1": "i",
+      "3": "e",
+      "4": "a",
+      "5": "s",
+      "7": "t",
+      "8": "b",
+      "@": "a",
+      "$": "s",
+      "!": "i",
+      "|": "i",
+      // Special spaces and separators
+      "\u00A0": " ", // Non-breaking space
+      "\u2000": " ", // En quad
+      "\u2001": " ", // Em quad
+      "\u2002": " ", // En space
+      "\u2003": " ", // Em space
+      "\u2004": " ", // Three-per-em space
+      "\u2005": " ", // Four-per-em space
+      "\u2006": " ", // Six-per-em space
+      "\u2007": " ", // Figure space
+      "\u2008": " ", // Punctuation space
+      "\u2009": " ", // Thin space
+      "\u200A": " ", // Hair space
+      "\u200B": "", // Zero-width space
+      "\u200C": "", // Zero-width non-joiner
+      "\u200D": "", // Zero-width joiner
+      "\uFEFF": "", // Zero-width no-break space
+      // Remove all diacritics/accents
+    };
+
+    let normalized = text;
+
+    // Map Unicode fancy fonts to normal characters
+    for (const [fancy, normal] of Object.entries(unicodeMappings)) {
+      const fancyStart = fancy.split("-")[0].codePointAt(0);
+      const fancyEnd = fancy.split("-")[1].codePointAt(0);
+      const normalStart = normal.split("-")[0].charCodeAt(0);
+
+      for (let i = fancyStart; i <= fancyEnd; i++) {
+        const fancyChar = String.fromCodePoint(i);
+        const normalChar = String.fromCharCode(normalStart + (i - fancyStart));
+        normalized = normalized.replace(new RegExp(fancyChar, "g"), normalChar);
+      }
+    }
+
+    // Apply character mappings
+    for (const [special, normal] of Object.entries(charMap)) {
+      normalized = normalized.replace(new RegExp(special, "g"), normal);
+    }
+
+    // Use NFD normalization to decompose characters, then remove diacritics
+    normalized = normalized
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    // Remove remaining special characters except alphanumeric and basic punctuation
+    normalized = normalized.replace(/[^\w\s.,!?-]/g, "");
+
+    // Collapse multiple spaces
+    normalized = normalized.replace(/\s+/g, " ").trim();
+
+    return normalized;
+  };
+
   // Helper function to check if text contains any keywords (case-insensitive)
   const containsKeyword = (text, keywords) => {
     if (!text) return null;
-    const lowerText = text.toLowerCase();
+    
+    // Normalize text to strip Unicode fonts and special chars
+    const normalizedText = normalizeUnicode(text);
+    const lowerText = normalizedText.toLowerCase();
+    
     for (const keyword of keywords) {
       // For multi-word keywords like "george stephen adams", check as whole phrase
       if (keyword.includes(" ")) {
