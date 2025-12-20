@@ -28,11 +28,17 @@ const client = new Client({
     GatewayIntentBits.Guilds, // Required for all guild events
     GatewayIntentBits.GuildMessages, // Required for message events
     GatewayIntentBits.DirectMessages, // For verification, warnings, and notifications
-    GatewayIntentBits.MessageContent, // Required to read message content
+    GatewayIntentBits.MessageContent, // PRIVILEGED - Required to read message content
     GatewayIntentBits.GuildMembers, // PRIVILEGED - Required for guildMemberAdd/Remove events
     GatewayIntentBits.GuildModeration, // Required for ban/kick/timeout events
     GatewayIntentBits.GuildInvites, // Required for invite tracking
     GatewayIntentBits.GuildVoiceStates, // Required for voice channel monitoring
+    GatewayIntentBits.GuildPresences, // PRIVILEGED - Required for presence/status tracking
+    GatewayIntentBits.GuildMessageReactions, // Required for reaction tracking
+    GatewayIntentBits.GuildWebhooks, // Required for webhook activity monitoring
+    GatewayIntentBits.GuildScheduledEvents, // Required for scheduled event tracking
+    GatewayIntentBits.AutoModerationConfiguration, // Required for automod rule tracking
+    GatewayIntentBits.AutoModerationExecution, // Required for automod action tracking
   ],
   partials: [
     Partials.Channel, // Required for DMs
