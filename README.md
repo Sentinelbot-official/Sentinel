@@ -6,7 +6,7 @@
 
 _Formerly known as Nexus Bot_
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Support-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/p7rh9sdhHD)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Support-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/9vQzqBVMNX)
 [![Top.gg](https://img.shields.io/badge/Top.gg-Vote-FF3366?style=for-the-badge&logo=))](https://top.gg/bot/1444739230679957646)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-4.3.10-blue?style=for-the-badge)](https://github.com/nexusBot-official/nexus)
@@ -147,7 +147,7 @@ Nexus (formerly nexus) is **open source** and **community-driven**.
 - 🐛 Found a bug? [Open an issue](https://github.com/nexusBot-official/nexus/issues)
 - 💡 Have a feature idea? [Request it](https://github.com/nexusBot-official/nexus/issues)
 - 🔧 Want to contribute? PRs welcome!
-- 💬 Need help? [Join support server](https://discord.gg/p7rh9sdhHD)
+- 💬 Need help? [Join support server](https://discord.gg/9vQzqBVMNX)
 
 **Star ⭐ this repo if you find it useful!**
 
@@ -157,7 +157,7 @@ Nexus (formerly nexus) is **open source** and **community-driven**.
 - 📚 **Full Documentation:** https://nexusbot-official.github.io/nexus/docs.html
 - ⚔️ **nexus vs Wick Comparison:** https://nexusbot-official.github.io/nexus/comparison.html
 - 📊 **API Documentation:** https://nexusbot-official.github.io/nexus/api.html
-- 💬 **Support Server:** https://discord.gg/p7rh9sdhHD
+- 💬 **Support Server:** https://discord.gg/9vQzqBVMNX
 - 🗳️ **Vote on Top.gg:** https://top.gg/bot/1444739230679957646
 
 ---
@@ -211,6 +211,6 @@ Just better security, free forever.
 
 ---
 
-_Nexus (formerly nexus) - Beyond Wick. Beyond Everything._ 🛡️
+_Nexus (formerly sentinel) - Beyond Wick. Beyond Everything._ 🛡️
 
 </div>
