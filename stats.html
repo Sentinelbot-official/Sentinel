@@ -450,6 +450,156 @@
           box-shadow: 0 0 20px 10px rgba(74, 222, 128, 0);
         }
       }
+
+      .velocity-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+
+      .velocity-accelerating {
+        background: rgba(74, 222, 128, 0.2);
+        color: #22c55e;
+      }
+
+      .velocity-steady {
+        background: rgba(102, 126, 234, 0.2);
+        color: #667eea;
+      }
+
+      .velocity-decelerating {
+        background: rgba(248, 113, 113, 0.2);
+        color: #f87171;
+      }
+
+      .velocity-arrow {
+        font-size: 1.5em;
+        animation: bounce 1s infinite;
+      }
+
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+
+      .records-section {
+        background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin: 20px 0;
+      }
+
+      .records-section h3 {
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 1.3em;
+      }
+
+      .records-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .record-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      .record-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+
+      .record-value {
+        font-size: 1.8em;
+        font-weight: bold;
+        margin: 5px 0;
+      }
+
+      .record-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+      }
+
+      .peak-hours-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+      }
+
+      .peak-hours-section h3 {
+        color: #333;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .peak-hour-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 4px solid #667eea;
+      }
+
+      .peak-hour-card.best {
+        border-left-color: #4ade80;
+      }
+
+      .peak-hour-card.worst {
+        border-left-color: #f87171;
+      }
+
+      .retention-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .retention-percentage {
+        font-size: 3em;
+        font-weight: bold;
+        margin: 15px 0;
+      }
+
+      .retention-details {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .retention-stat {
+        flex: 1;
+        min-width: 120px;
+      }
+
+      .retention-stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+      }
+
+      .retention-stat-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+        margin-top: 5px;
+      }
     </style>
   </head>
   <body>
@@ -502,6 +652,25 @@
       <div class="daily-tracker" id="daily-tracker" style="display: none">
         <h3>📅 Daily Progress Tracker</h3>
         <div id="daily-goals"></div>
+      </div>
+
+      <!-- Records Section -->
+      <div class="records-section" id="records-section" style="display: none">
+        <h3>🏆 Growth Records</h3>
+        <div class="records-grid" id="records-grid"></div>
+      </div>
+
+      <!-- Retention Rate -->
+      <div class="retention-section" id="retention-section" style="display: none">
+        <h3>📊 Server Retention Rate</h3>
+        <div class="retention-percentage" id="retention-percentage">-</div>
+        <div class="retention-details" id="retention-details"></div>
+      </div>
+
+      <!-- Peak Hours Analysis -->
+      <div class="peak-hours-section" id="peak-hours-section" style="display: none">
+        <h3>⏰ Peak Growth Hours</h3>
+        <div id="peak-hours-content"></div>
       </div>
 
       <!-- Growth Statistics -->
@@ -649,6 +818,139 @@
         return "📉 Slowing";
       }
 
+      function getGrowthVelocity() {
+        const historical = getHistoricalData();
+        if (historical.length < 6) return null;
+
+        // Compare recent growth rate to older growth rate
+        const recent = historical.slice(-3);
+        const older = historical.slice(-6, -3);
+
+        const recentRate = (recent[recent.length - 1].servers - recent[0].servers) / 
+                          ((recent[recent.length - 1].timestamp - recent[0].timestamp) / 1000 / 3600);
+        const olderRate = (older[older.length - 1].servers - older[0].servers) / 
+                         ((older[older.length - 1].timestamp - older[0].timestamp) / 1000 / 3600);
+
+        const change = recentRate - olderRate;
+        
+        if (change > 0.5) return { type: 'accelerating', arrow: '↗️', change: change.toFixed(2) };
+        if (change < -0.5) return { type: 'decelerating', arrow: '↘️', change: Math.abs(change).toFixed(2) };
+        return { type: 'steady', arrow: '→', change: '0' };
+      }
+
+      function getRecords() {
+        const historical = getHistoricalData();
+        const records = JSON.parse(localStorage.getItem('growthRecords') || '{}');
+        
+        if (historical.length < 2) return records;
+
+        let bestHourGrowth = records.bestHour || 0;
+        let bestDayGrowth = records.bestDay || 0;
+        let longestStreak = records.longestStreak || 0;
+        let currentStreak = 0;
+
+        // Calculate hourly and daily growth
+        for (let i = 1; i < historical.length; i++) {
+          const timeDiff = (historical[i].timestamp - historical[i - 1].timestamp) / 1000 / 3600;
+          const serverDiff = historical[i].servers - historical[i - 1].servers;
+          
+          // Best hour (if data points are ~1 hour apart)
+          if (timeDiff <= 1.5 && serverDiff > bestHourGrowth) {
+            bestHourGrowth = serverDiff;
+          }
+
+          // Streak tracking
+          if (serverDiff > 0) {
+            currentStreak++;
+            if (currentStreak > longestStreak) {
+              longestStreak = currentStreak;
+            }
+          } else {
+            currentStreak = 0;
+          }
+        }
+
+        // Best day (last 24 hours)
+        if (historical.length > 0) {
+          const last24h = historical.filter(d => d.timestamp > Date.now() - 24 * 60 * 60 * 1000);
+          if (last24h.length >= 2) {
+            const dayGrowth = last24h[last24h.length - 1].servers - last24h[0].servers;
+            if (dayGrowth > bestDayGrowth) {
+              bestDayGrowth = dayGrowth;
+            }
+          }
+        }
+
+        const updatedRecords = {
+          bestHour: bestHourGrowth,
+          bestDay: bestDayGrowth,
+          longestStreak: longestStreak
+        };
+
+        localStorage.setItem('growthRecords', JSON.stringify(updatedRecords));
+        return updatedRecords;
+      }
+
+      function getPeakHours() {
+        const historical = getHistoricalData();
+        if (historical.length < 3) return null;
+
+        const hourlyGrowth = {};
+        
+        for (let i = 1; i < historical.length; i++) {
+          const hour = new Date(historical[i].timestamp).getHours();
+          const growth = historical[i].servers - historical[i - 1].servers;
+          
+          if (!hourlyGrowth[hour]) {
+            hourlyGrowth[hour] = { total: 0, count: 0 };
+          }
+          hourlyGrowth[hour].total += growth;
+          hourlyGrowth[hour].count++;
+        }
+
+        // Calculate averages
+        const averages = Object.entries(hourlyGrowth).map(([hour, data]) => ({
+          hour: parseInt(hour),
+          average: data.total / data.count
+        }));
+
+        if (averages.length === 0) return null;
+
+        averages.sort((a, b) => b.average - a.average);
+        
+        return {
+          best: averages[0],
+          worst: averages[averages.length - 1]
+        };
+      }
+
+      function getRetentionRate() {
+        const historical = getHistoricalData();
+        if (historical.length < 2) return null;
+
+        let totalGains = 0;
+        let totalLosses = 0;
+
+        for (let i = 1; i < historical.length; i++) {
+          const change = historical[i].servers - historical[i - 1].servers;
+          if (change > 0) {
+            totalGains += change;
+          } else if (change < 0) {
+            totalLosses += Math.abs(change);
+          }
+        }
+
+        const totalServers = totalGains + totalLosses;
+        const retentionRate = totalServers > 0 ? ((totalGains - totalLosses) / totalGains) * 100 : 100;
+
+        return {
+          rate: Math.max(0, Math.min(100, retentionRate)),
+          gains: totalGains,
+          losses: totalLosses,
+          net: totalGains - totalLosses
+        };
+      }
+
       function updateCountdownBanner(currentServers) {
         const banner = document.getElementById("countdown-banner");
         if (!banner) return;
@@ -766,6 +1068,109 @@
 
         goalsDiv.innerHTML = html;
         tracker.style.display = "block";
+      }
+
+      function updateRecordsSection() {
+        const section = document.getElementById("records-section");
+        const grid = document.getElementById("records-grid");
+        if (!section || !grid) return;
+
+        const records = getRecords();
+        
+        grid.innerHTML = `
+          <div class="record-card">
+            <div class="record-icon">⚡</div>
+            <div class="record-value">+${records.bestHour || 0}</div>
+            <div class="record-label">Best Hour</div>
+          </div>
+          <div class="record-card">
+            <div class="record-icon">🌟</div>
+            <div class="record-value">+${records.bestDay || 0}</div>
+            <div class="record-label">Best Day</div>
+          </div>
+          <div class="record-card">
+            <div class="record-icon">🔥</div>
+            <div class="record-value">${records.longestStreak || 0}</div>
+            <div class="record-label">Longest Streak</div>
+          </div>
+        `;
+        
+        section.style.display = "block";
+      }
+
+      function updateRetentionSection() {
+        const section = document.getElementById("retention-section");
+        const percentage = document.getElementById("retention-percentage");
+        const details = document.getElementById("retention-details");
+        if (!section || !percentage || !details) return;
+
+        const retention = getRetentionRate();
+        
+        if (!retention) {
+          section.style.display = "none";
+          return;
+        }
+
+        percentage.textContent = `${retention.rate.toFixed(1)}%`;
+        
+        details.innerHTML = `
+          <div class="retention-stat">
+            <div class="retention-stat-value">+${retention.gains}</div>
+            <div class="retention-stat-label">Servers Gained</div>
+          </div>
+          <div class="retention-stat">
+            <div class="retention-stat-value">-${retention.losses}</div>
+            <div class="retention-stat-label">Servers Lost</div>
+          </div>
+          <div class="retention-stat">
+            <div class="retention-stat-value">${retention.net > 0 ? '+' : ''}${retention.net}</div>
+            <div class="retention-stat-label">Net Growth</div>
+          </div>
+        `;
+        
+        section.style.display = "block";
+      }
+
+      function updatePeakHoursSection() {
+        const section = document.getElementById("peak-hours-section");
+        const content = document.getElementById("peak-hours-content");
+        if (!section || !content) return;
+
+        const peakHours = getPeakHours();
+        
+        if (!peakHours) {
+          section.style.display = "none";
+          return;
+        }
+
+        const formatHour = (hour) => {
+          const period = hour >= 12 ? 'PM' : 'AM';
+          const displayHour = hour % 12 || 12;
+          return `${displayHour}:00 ${period}`;
+        };
+
+        content.innerHTML = `
+          <div class="peak-hour-card best">
+            <div>
+              <div style="font-weight: bold; color: #22c55e;">🌟 Best Hour</div>
+              <div style="color: #666; font-size: 0.9em; margin-top: 5px;">${formatHour(peakHours.best.hour)}</div>
+            </div>
+            <div style="font-size: 1.5em; font-weight: bold; color: #22c55e;">
+              ${peakHours.best.average > 0 ? '+' : ''}${peakHours.best.average.toFixed(2)}
+            </div>
+          </div>
+          <div class="peak-hour-card worst">
+            <div>
+              <div style="font-weight: bold; color: #f87171;">📉 Slowest Hour</div>
+              <div style="color: #666; font-size: 0.9em; margin-top: 5px;">${formatHour(peakHours.worst.hour)}</div>
+            </div>
+            <div style="font-size: 1.5em; font-weight: bold; color: #f87171;">
+              ${peakHours.worst.average > 0 ? '+' : ''}${peakHours.worst.average.toFixed(2)}
+            </div>
+          </div>
+        `;
+        
+        section.style.display = "block";
       }
 
       function renderChart() {
@@ -1031,8 +1436,20 @@
             document.getElementById("time-to-goal").textContent =
               estimateTimeToGoal(currentServerCount, growthRate);
 
-            document.getElementById("growth-trend").textContent =
-              getGrowthTrend();
+            const trendElement = document.getElementById("growth-trend");
+            const velocity = getGrowthVelocity();
+            
+            if (velocity) {
+              trendElement.innerHTML = `
+                ${getGrowthTrend()}
+                <span class="velocity-indicator velocity-${velocity.type}">
+                  <span class="velocity-arrow">${velocity.arrow}</span>
+                  ${velocity.type === 'steady' ? 'Steady' : velocity.type === 'accelerating' ? 'Speeding up' : 'Slowing down'}
+                </span>
+              `;
+            } else {
+              trendElement.textContent = getGrowthTrend();
+            }
           }
 
           // Update additional stats
@@ -1055,6 +1472,9 @@
           updateCountdownBanner(currentServerCount);
           updateProjectedDate(currentServerCount, growthRate);
           updateDailyTracker(currentServerCount, growthRate);
+          updateRecordsSection();
+          updateRetentionSection();
+          updatePeakHoursSection();
 
           // Render chart
           const chartContainer = document.getElementById("chart-container");
