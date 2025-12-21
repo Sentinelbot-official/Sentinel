@@ -161,10 +161,20 @@ module.exports = {
                   mod_log_channel: logChannel.id,
                 });
 
-                await btnInt.update({
-                  content: `✅ Created ${logChannel} and configured logging!`,
-                  components: [],
-                });
+                try {
+                  await btnInt.update({
+                    content: `✅ Created ${logChannel} and configured logging!`,
+                    components: [],
+                  });
+                } catch (err) {
+                  // Interaction token expired, send follow-up instead
+                  if (err.code === 10062) {
+                    await interaction.followUp({
+                      content: `✅ Created ${logChannel} and configured logging!`,
+                      ephemeral: true,
+                    });
+                  }
+                }
               } catch (error) {
                 let errorMsg = "❌ Failed to create channel. ";
 
@@ -184,16 +194,36 @@ module.exports = {
                 errorMsg +=
                   "\n\n💡 **Manual Setup**: Create a channel called `#nexus-logs` and use `/config logchannel #nexus-logs` to configure it.";
 
-                await btnInt.update({
-                  content: errorMsg,
-                  components: [],
-                });
+                try {
+                  await btnInt.update({
+                    content: errorMsg,
+                    components: [],
+                  });
+                } catch (err) {
+                  // Interaction token expired, send follow-up instead
+                  if (err.code === 10062) {
+                    await interaction.followUp({
+                      content: errorMsg,
+                      ephemeral: true,
+                    });
+                  }
+                }
               }
             } else {
-              await btnInt.update({
-                content: "⏭️ Skipped log channel setup.",
-                components: [],
-              });
+              try {
+                await btnInt.update({
+                  content: "⏭️ Skipped log channel setup.",
+                  components: [],
+                });
+              } catch (err) {
+                // Interaction token expired, send follow-up instead
+                if (err.code === 10062) {
+                  await interaction.followUp({
+                    content: "⏭️ Skipped log channel setup.",
+                    ephemeral: true,
+                  });
+                }
+              }
             }
           });
         } else {
