@@ -1015,11 +1015,13 @@
             });
           }
 
+          // Calculate growth rate (needed for multiple sections)
+          const growthRate = calculateGrowthRate();
+
           // Update growth stats
           const growthStatsSection = document.getElementById("growth-stats");
           if (growthStatsSection) {
             growthStatsSection.style.display = "block";
-            const growthRate = calculateGrowthRate();
 
             document.getElementById("servers-per-hour").textContent =
               growthRate !== null
