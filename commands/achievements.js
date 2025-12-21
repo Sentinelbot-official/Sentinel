@@ -174,10 +174,15 @@ module.exports = {
         row.components[0].setDisabled(currentPage === 0);
         row.components[1].setDisabled(currentPage === pages.length - 1);
 
-        await i.update({
-          embeds: [pages[currentPage]],
-          components: [row],
-        });
+        try {
+          await i.update({
+            embeds: [pages[currentPage]],
+            components: [row],
+          });
+        } catch (err) {
+          // Interaction token expired, ignore
+          if (err.code !== 10062) throw err;
+        }
       });
 
       collector.on("end", () => {
