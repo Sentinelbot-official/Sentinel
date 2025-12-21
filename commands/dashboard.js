@@ -79,7 +79,7 @@ module.exports = {
       const config = await db.getServerConfig(interaction.guild.id);
 
       const embed = new EmbedBuilder()
-        .setTitle("📊 Sentinel Dashboard - Overview")
+        .setTitle("📊 Nexus Dashboard - Overview")
         .setDescription("Comprehensive server analytics and insights")
         .addFields(
           {
@@ -111,7 +111,7 @@ module.exports = {
         .setColor(0x0099ff)
         .setTimestamp()
         .setFooter({
-          text: "Sentinel - Beyond Wick. Free. Open Source. Powerful.",
+          text: "Nexus - Beyond Wick. Free. Open Source. Powerful.",
         });
 
       const row1 = new ActionRowBuilder().addComponents(

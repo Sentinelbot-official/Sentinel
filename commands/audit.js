@@ -175,7 +175,7 @@ module.exports = {
 
     if (enabledModules < totalModules * 0.5) {
       recommendations.push(
-        `💡 Only ${enabledModules}/${totalModules} Sentinel modules enabled - enable more for better protection`
+        `💡 Only ${enabledModules}/${totalModules} Nexus modules enabled - enable more for better protection`
       );
       securityScore -= 10;
     }

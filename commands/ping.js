@@ -4,7 +4,7 @@ const ErrorMessages = require("../utils/errorMessages");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("ping")
-    .setDescription("Check how Sentinel is doing!"),
+    .setDescription("Check how Nexus is doing!"),
 
   async execute(interaction) {
     const interactionTime = interaction.createdTimestamp;
@@ -15,7 +15,7 @@ module.exports = {
     const wsPing = interaction.client.ws.ping;
 
     const embed = new EmbedBuilder()
-      .setTitle("🏓 Sentinel Status")
+      .setTitle("🏓 Nexus Status")
       .addFields(
         {
           name: "WebSocket Ping",

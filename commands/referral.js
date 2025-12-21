@@ -27,7 +27,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle("🎁 Your Referral Code")
           .setDescription(
-            `Share Sentinel with others and earn rewards!\n\n` +
+            `Share Nexus with others and earn rewards!\n\n` +
               `**Your Code:** \`${code}\`\n\n` +
               `**How to Use:**\n` +
               `1. Share your code with server owners\n` +
@@ -82,7 +82,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle("🎁 Referral Rewards")
           .setDescription(
-            "Unlock premium features by inviting Sentinel to servers!"
+            "Unlock premium features by inviting Nexus to servers!"
           )
           .setColor(0x9333ea)
           .addFields(
