@@ -12,7 +12,7 @@ module.exports = {
         webhooks = await channel.fetchWebhooks();
       } catch (fetchError) {
         if (fetchError.code === 50013) {
-          return; // Skip if we don't have permission (logged in messageArchive)
+          return; // Skip if we don't have permission
         }
         throw fetchError; // Re-throw other errors
       }
@@ -68,10 +68,10 @@ module.exports = {
           }
         }
       } catch (auditError) {
-        // Silently ignore audit log errors (logged in messageArchive)
+        // Silently ignore audit log errors
       }
     } catch (error) {
-      // Silently handle errors (logged in messageArchive)
+      // Silently handle errors
     }
   },
 };

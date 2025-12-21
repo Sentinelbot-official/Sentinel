@@ -1,6 +1,6 @@
 /**
- * Sentinel Bot - Advanced Discord Security Bot
- * Copyright (c) 2025 Sentinel Bot. All rights reserved.
+ * Nexus Bot (formerly Sentinel) - Advanced Discord Security Bot
+ * Copyright (c) 2025 Nexus Bot. All rights reserved.
  * Licensed under the MIT License.
  *
  * Beyond Wick. Beyond Everything.
@@ -237,11 +237,7 @@ client.webhookEvents = new WebhookEvents(client);
 const MultiServerManagement = require("./utils/multiServer");
 client.multiServer = new MultiServerManagement(client);
 
-const MessageArchive = require("./messageArchive");
-if (fs.existsSync(path.join(__dirname, "messageArchive.js"))) {
-  client.messageArchive = new MessageArchive(client);
-  logger.info("MessageArchive", "Forensic message logging active");
-}
+// Message archive system removed
 
 // Optimized cleanup - run all cleanups in parallel (EXCEEDS WICK - better performance)
 setInterval(

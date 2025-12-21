@@ -1,8 +1,10 @@
 <div align="center">
 
-# 🛡️ Sentinel Bot
+# 🛡️ Nexus Bot
 
 ### The Free Discord Security Bot That Exceeds Wick
+
+_Formerly known as Sentinel Bot_
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Support-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/p7rh9sdhHD)
 [![Top.gg](https://img.shields.io/badge/Top.gg-Vote-FF3366?style=for-the-badge&logo=))](https://top.gg/bot/1450948411313619199)
@@ -23,9 +25,9 @@ Tired of paying for Wick? Want **better security** AND **save money**? Sentinel 
 
 Sentinel is an **open-source Discord security bot** that matches everything Wick offers, adds AI-powered features Wick doesn't have, and costs **$0/month**.
 
-## ⚔️ Sentinel vs Wick
+## ⚔️ Nexus vs Wick
 
-| Feature                    | Wick                | Sentinel                            |
+| Feature                    | Wick                | Nexus                               |
 | -------------------------- | ------------------- | ----------------------------------- |
 | **💰 Price**               | $3-10/month premium | **100% FREE** ✅                    |
 | **🤖 AI Features**         | ❌ None             | ✅ Predictions, behavioral analysis |
@@ -84,7 +86,7 @@ Sentinel is an **open-source Discord security bot** that matches everything Wick
 ## 🚀 Quick Start
 
 ```bash
-# 1. Invite Sentinel to your Discord server
+# 1. Invite Nexus to your Discord server
 https://Sentinelbot-official.github.io/Sentinel/invite.html?source=githubreadme
 # 2. Run setup command in Discord
 /setup preset
@@ -140,7 +142,7 @@ https://Sentinelbot-official.github.io/Sentinel/invite.html?source=githubreadme
 
 ## 🤝 Contributing
 
-Sentinel is **open source** and **community-driven**.
+Nexus (formerly Sentinel) is **open source** and **community-driven**.
 
 - 🐛 Found a bug? [Open an issue](https://github.com/SentinelBot-official/Sentinel/issues)
 - 💡 Have a feature idea? [Request it](https://github.com/SentinelBot-official/Sentinel/issues)
@@ -181,10 +183,10 @@ This project is licensed under the **MIT License** with additional branding rest
 
 **You CANNOT:**
 
-- ❌ Use "Sentinel Bot" branding, name, or logo
+- ❌ Use "Nexus Bot" or "Sentinel Bot" branding, name, or logo
 - ❌ Copy our Privacy Policy, Terms of Service, or legal documents
 - ❌ Use our bot profile pictures or avatars
-- ❌ Present your fork as an official Sentinel Bot product
+- ❌ Present your fork as an official Nexus Bot or Sentinel Bot product
 - ❌ Use our documentation verbatim
 
 **All branding, legal documents, and intellectual property remain protected.**
@@ -195,7 +197,7 @@ This project is licensed under the **MIT License** with additional branding rest
 
 ## 🚀 Ready to Exceed Wick?
 
-### [**Invite Sentinel Free**](https://Sentinelbot-official.github.io/Sentinel/invite.html?source=github)
+### [**Invite Nexus Free**](https://Sentinelbot-official.github.io/Sentinel/invite.html?source=github)
 
 **No credit card. No premium tiers. No catch.**
 
@@ -203,12 +205,12 @@ Just better security, free forever.
 
 ---
 
-### ⭐ Star this repo if Sentinel protects your server!
+### ⭐ Star this repo if Nexus protects your server!
 
 [![GitHub stars](https://img.shields.io/github/stars/SentinelBot-official/Sentinel?style=social)](https://github.com/SentinelBot-official/Sentinel)
 
 ---
 
-_Sentinel - Beyond Wick. Beyond Everything._ 🛡️
+_Nexus (formerly Sentinel) - Beyond Wick. Beyond Everything._ 🛡️
 
 </div>
