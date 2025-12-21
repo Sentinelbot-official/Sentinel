@@ -1,13 +1,12 @@
 const { ShardingManager } = require("discord.js");
 const path = require("path");
 require("dotenv").config();
+const logger = require("./utils/logger");
 
 if (!process.env.DISCORD_TOKEN) {
-  console.error("❌ DISCORD_TOKEN not found in .env file!");
+  logger.error("❌ DISCORD_TOKEN not found in .env file!");
   process.exit(1);
 }
-
-const logger = require("./utils/logger");
 
 const manager = new ShardingManager(path.join(__dirname, "index.js"), {
   token: process.env.DISCORD_TOKEN,

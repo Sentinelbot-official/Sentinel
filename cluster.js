@@ -77,7 +77,7 @@ manager.on("clusterCreate", (cluster) => {
   cluster.on("message", (message) => {
     // Handle inter-cluster communication
     if (message._type === "stats") {
-      console.log(
+      logger.info(
         `📊 ${clusterName} - ${message.guilds} guilds, ${message.users} users`
       );
     }
@@ -101,7 +101,7 @@ manager
 
 // Graceful shutdown with parallel cluster termination (EXCEEDS WICK - faster shutdown)
 async function gracefulShutdown(signal) {
-  console.log(`Received ${signal}, shutting down clusters gracefully...`);
+  logger.info(`Received ${signal}, shutting down clusters gracefully...`);
 
   // Stop health monitoring
   try {
@@ -133,7 +133,7 @@ async function gracefulShutdown(signal) {
   });
 
   await Promise.all(killPromises);
-  console.log("All clusters terminated.");
+  logger.info("All clusters terminated.");
   process.exit(0);
 }
 
@@ -143,7 +143,7 @@ process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 // Cluster manager stats
 manager.on("debug", (info) => {
   if (process.env.DEBUG === "true") {
-    console.log(`[DEBUG] ${info}`);
+    logger.info(`[DEBUG] ${info}`);
   }
 });
 
@@ -180,7 +180,7 @@ setInterval(
   async () => {
     const stats = await getTotalStats();
     if (stats) {
-      console.log(
+      logger.info(
         `\n📊 [Total Stats] ${stats.guilds} guilds, ${stats.users} users, ${stats.channels} channels across ${manager.totalClusters} clusters\n`
       );
     }
@@ -188,10 +188,10 @@ setInterval(
   30 * 60 * 1000
 );
 
-console.log(`\n🚀 Cluster Manager Started`);
-console.log(
+logger.info(`\n🚀 Cluster Manager Started`);
+logger.info(
   `📊 Clusters: ${totalClusters === "auto" ? "Auto" : totalClusters}`
 );
-console.log(`⚙️  Shards per cluster: ${shardsPerCluster}`);
-console.log(`🔄 Mode: process`);
-console.log(`\n`);
+logger.info(`⚙️  Shards per cluster: ${shardsPerCluster}`);
+logger.info(`🔄 Mode: process`);
+logger.info(`\n`);

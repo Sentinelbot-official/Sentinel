@@ -219,6 +219,15 @@ class DatabaseOptimizer {
       for (const table of tables) {
         const tableName = table.name;
 
+        // Validate table name to prevent SQL injection (whitelist alphanumeric + underscore)
+        if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
+          logger.warn(
+            "DB Optimizer",
+            `Skipping invalid table name: ${tableName}`
+          );
+          continue;
+        }
+
         // Get row count
         const count = await new Promise((resolve, reject) => {
           db.db.get(

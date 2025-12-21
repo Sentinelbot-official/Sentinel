@@ -20,7 +20,7 @@ class DocGenerator {
    * Main generation function
    */
   async generate() {
-    console.log("🚀 Starting documentation generation...\n");
+    logger.info("🚀 Starting documentation generation...\n");
 
     // Scan directories
     await this.scanCommands();
@@ -33,8 +33,8 @@ class DocGenerator {
     this.generateEventsDocs();
     this.generateIndexDocs();
 
-    console.log("\n✅ Documentation generation complete!");
-    console.log("📁 Output: readmes/AUTO_GENERATED_DOCS.md");
+    logger.info("\n✅ Documentation generation complete!");
+    logger.info("📁 Output: readmes/AUTO_GENERATED_DOCS.md");
   }
 
   /**
@@ -54,7 +54,7 @@ class DocGenerator {
       }
     }
 
-    console.log(`📜 Found ${this.commands.length} commands`);
+    logger.info(`📜 Found ${this.commands.length} commands`);
   }
 
   /**
@@ -74,7 +74,7 @@ class DocGenerator {
       }
     }
 
-    console.log(`🔧 Found ${this.utils.length} utilities`);
+    logger.info(`🔧 Found ${this.utils.length} utilities`);
   }
 
   /**
@@ -94,7 +94,7 @@ class DocGenerator {
       }
     }
 
-    console.log(`📡 Found ${this.events.length} event handlers`);
+    logger.info(`📡 Found ${this.events.length} event handlers`);
   }
 
   /**

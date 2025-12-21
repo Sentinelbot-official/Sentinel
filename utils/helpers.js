@@ -121,49 +121,6 @@ class ResponseHelpers {
 }
 
 /**
- * Validation Helpers - Common validation patterns
- * @deprecated Use InputValidator from utils/inputValidator.js instead
- * This class is kept for backward compatibility and will delegate to InputValidator
- */
-class ValidationHelpers {
-  /**
-   * Validate required fields exist
-   * @deprecated Use InputValidator.validateRequired() instead
-   */
-  static validateRequired(data, fields) {
-    const InputValidator = require("./inputValidator");
-    return InputValidator.validateRequired(data, fields);
-  }
-
-  /**
-   * Validate number range
-   * @deprecated Use InputValidator.validateRange() instead
-   */
-  static validateRange(value, min, max, fieldName = "value") {
-    const InputValidator = require("./inputValidator");
-    return InputValidator.validateRange(value, min, max, fieldName);
-  }
-
-  /**
-   * Validate string length
-   * @deprecated Use InputValidator.validateLength() instead
-   */
-  static validateLength(str, min, max, fieldName = "value") {
-    const InputValidator = require("./inputValidator");
-    return InputValidator.validateLength(str, min, max, fieldName);
-  }
-
-  /**
-   * Validate Discord snowflake ID
-   * @deprecated Use InputValidator.validateSnowflake() instead
-   */
-  static validateSnowflake(id, fieldName = "ID") {
-    const InputValidator = require("./inputValidator");
-    return InputValidator.validateSnowflake(id, fieldName);
-  }
-}
-
-/**
  * Time Helpers - Date/time utilities
  */
 class TimeHelpers {

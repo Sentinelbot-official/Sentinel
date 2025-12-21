@@ -23,6 +23,9 @@ class Database {
     this.queryCache = new Map();
     this.queryCacheTimeout = 30000; // 30 second cache
 
+    // Start cache cleanup interval to prevent memory leaks
+    this.startCacheCleanup();
+
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
@@ -6338,6 +6341,31 @@ class Database {
     });
 
     return result;
+  }
+
+  /**
+   * Clean up expired cache entries periodically
+   */
+  startCacheCleanup() {
+    // Run cleanup every 5 minutes
+    setInterval(
+      () => {
+        const now = Date.now();
+        let cleaned = 0;
+
+        for (const [key, value] of this.queryCache.entries()) {
+          if (now >= value.expires) {
+            this.queryCache.delete(key);
+            cleaned++;
+          }
+        }
+
+        if (cleaned > 0) {
+          logger.debug("Database", `Cleaned ${cleaned} expired cache entries`);
+        }
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
   }
 
   /**

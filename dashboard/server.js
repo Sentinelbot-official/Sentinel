@@ -7,6 +7,7 @@ const fs = require("fs"); // For sync methods (existsSync, readFileSync, writeFi
 const fsPromises = require("fs").promises; // For async methods (readFile, writeFile)
 const crypto = require("crypto");
 const compression = require("compression");
+const rateLimit = require("express-rate-limit");
 // Ensure logger is loaded first to prevent initialization errors
 const logger = require("../utils/logger");
 const db = require("../utils/database");
@@ -4731,6 +4732,23 @@ class DashboardServer {
   setupPublicAPI() {
     // Bind verifyApiKey to this instance
     const verifyApiKey = this.verifyApiKey.bind(this);
+
+    // Rate limiter for public API endpoints
+    const publicApiLimiter = rateLimit({
+      windowMs: 1 * 60 * 1000, // 1 minute
+      max: 60, // 60 requests per minute
+      message: {
+        error: "Too many requests",
+        message: "Rate limit exceeded. Please try again later.",
+        retryAfter: 60,
+      },
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
+
+    // Apply rate limiting to all public API routes
+    this.app.use("/api/v1", publicApiLimiter);
+    this.app.use("/api/v2", publicApiLimiter);
 
     // GET /api/v1/banner - Public endpoint to get banner (for website display)
     // This must be defined BEFORE the catch-all /api/v1 middleware
