@@ -9,23 +9,6 @@ const { isGuildBlacklisted } = require("../utils/guildBlacklist");
 module.exports = {
   name: "guildCreate",
   async execute(guild, client) {
-    // AUTO-LEAVE ALL GUILDS (bot is in lockdown mode)
-    logger.warn(
-      "Guild Create",
-      `🔒 LOCKDOWN MODE: Auto-leaving guild "${guild.name}" (${guild.id})`
-    );
-    try {
-      await guild.leave();
-      logger.info("Guild Create", `Left guild ${guild.id} (lockdown mode)`);
-    } catch (err) {
-      logger.error(
-        "Guild Create",
-        `Failed to leave guild (${guild.id}):`,
-        err
-      );
-    }
-    return;
-
     // Auto-leave if guild is blacklisted (by guild ID or owner ID)
     if (await isGuildBlacklisted(guild)) {
       logger.warn(
