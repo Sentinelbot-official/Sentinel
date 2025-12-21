@@ -356,7 +356,7 @@ class DashboardServer {
       } else {
         res.header(
           "Access-Control-Allow-Origin",
-          "https://Nexusbot-official.github.io"
+          "https://Sentinelbot-official.github.io"
         );
       }
 
