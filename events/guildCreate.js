@@ -28,65 +28,6 @@ module.exports = {
       return;
     }
 
-    // Check if guild name contains personal information (harassment protection)
-    try {
-      const fs = require("fs");
-      const path = require("path");
-      const filtersPath = path.join(__dirname, "..", "harassment-filters.json");
-
-      if (fs.existsSync(filtersPath)) {
-        const filtersData = JSON.parse(fs.readFileSync(filtersPath, "utf8"));
-        const personalNames = filtersData.personalInfo?.names || [];
-
-        // Normalize guild name (strip Unicode fonts, special chars)
-        const normalizeText = (text) => {
-          if (!text) return "";
-          // Use same normalization as guildMemberAdd
-          let normalized = text
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^\w\s]/g, "")
-            .replace(/\s+/g, " ")
-            .trim()
-            .toLowerCase();
-          return normalized;
-        };
-
-        const normalizedGuildName = normalizeText(guild.name);
-
-        // Check if guild name contains any personal names
-        for (const name of personalNames) {
-          const normalizedName = normalizeText(name);
-          if (normalizedGuildName.includes(normalizedName)) {
-            logger.warn(
-              "Guild Create",
-              `🚨 Guild name contains personal info: "${guild.name}" (${guild.id}) - Auto-leaving`
-            );
-            try {
-              await guild.leave();
-              logger.info(
-                "Guild Create",
-                `Left harassment guild ${guild.id} (name: "${guild.name}")`
-              );
-            } catch (err) {
-              logger.error(
-                "Guild Create",
-                `Failed to leave harassment guild (${guild.id}):`,
-                err
-              );
-            }
-            return;
-          }
-        }
-      }
-    } catch (error) {
-      logger.error(
-        "Guild Create",
-        "Failed to check guild name for personal info:",
-        error
-      );
-      // Continue execution - don't block guild join on this check failing
-    }
 
     // Check for offensive content and auto-leave if detected
     const wasFiltered = await contentFilter.autoModerateGuild(guild);
