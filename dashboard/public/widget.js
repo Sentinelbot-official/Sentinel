@@ -91,7 +91,7 @@
     let html = `
       <div class="sentinel-widget">
         <div class="sentinel-widget-header">
-          <img src="https://cdn.discordapp.com/app-icons/1444739230679957646/f3b87982830f72bc256ee6279bde8d03.png?size=256" 
+          <img src="https://cdn.discordapp.com/app-icons/1444739230679957646/32f2d77d44c2f3989fecd858be53f396.png?size=256" 
                alt="Nexus Bot" 
                class="sentinel-widget-avatar">
           <div>
