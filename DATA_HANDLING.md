@@ -274,7 +274,7 @@ Since Nexus Bot is open source:
 
 For data-related questions, data requests, or concerns:
 
-- **Discord Support Server:** https://discord.gg/p7rh9sdhHD (Preferred method)
+- **Discord Support Server:** https://discord.gg/9vQzqBVMNX (Preferred method)
 - **Privacy Email:** Sentinelbot0@proton.me (For formal data requests)
 - **General Contact:** Open a ticket in our support server
 - **GitHub:** https://github.com/Azzraya/Sentinel (For code-related questions)

@@ -32,7 +32,7 @@ module.exports = {
       )
       .setColor(0x667eea)
       .setFooter({
-        text: "Need help? discord.gg/p7rh9sdhHD | You can change settings later",
+        text: "Need help? discord.gg/9vQzqBVMNX | You can change settings later",
       });
 
     const buttons = new ActionRowBuilder().addComponents(
@@ -278,7 +278,7 @@ module.exports = {
               )
               .setColor(0x00ff88)
               .setFooter({
-                text: "Need help? discord.gg/p7rh9sdhHD | Thank you for choosing Sentinel!",
+                text: "Need help? discord.gg/9vQzqBVMNX | Thank you for choosing Sentinel!",
               }),
           ],
           components: [],

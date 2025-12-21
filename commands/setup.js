@@ -344,7 +344,7 @@ module.exports = {
         )
         .setColor(0x00ff00)
         .setFooter({
-          text: "Need help? discord.gg/p7rh9sdhHD | Your server is now protected!",
+          text: "Need help? discord.gg/9vQzqBVMNX | Your server is now protected!",
         })
         .setTimestamp();
 
@@ -448,7 +448,7 @@ module.exports = {
           completion === 100 ? 0x00ff00 : completion >= 50 ? 0xffaa00 : 0xff0000
         )
         .setFooter({
-          text: "Need help? discord.gg/p7rh9sdhHD | Use /setup preset or /setup wizard",
+          text: "Need help? discord.gg/9vQzqBVMNX | Use /setup preset or /setup wizard",
         })
         .setTimestamp();
 

@@ -40,7 +40,7 @@ module.exports = {
           name: "🔗 Quick Links",
           value: [
             "• [Official Website](https://Sentinelbot-official.github.io/Sentinel/)",
-            "• [Support Server](https://discord.gg/p7rh9sdhHD)",
+            "• [Support Server](https://discord.gg/9vQzqBVMNX)",
             "• [GitHub Repository](https://github.com/SentinelBot-official/Sentinel)",
             "• [Privacy Policy](https://github.com/SentinelBot-official/Sentinel/blob/main/PRIVACY_POLICY.md)",
             "• [Terms of Service](https://github.com/SentinelBot-official/Sentinel/blob/main/TERMS_OF_SERVICE.md)",
@@ -70,7 +70,7 @@ module.exports = {
 
     const supportButton = new ButtonBuilder()
       .setLabel("Support Server")
-      .setURL("https://discord.gg/p7rh9sdhHD")
+      .setURL("https://discord.gg/9vQzqBVMNX")
       .setStyle(ButtonStyle.Link);
 
     const githubButton = new ButtonBuilder()
