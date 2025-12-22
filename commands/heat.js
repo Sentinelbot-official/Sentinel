@@ -16,7 +16,7 @@ module.exports = {
   async execute(interaction) {
     const target = interaction.options.getUser("user") || interaction.user;
     const key = `${interaction.guild.id}-${target.id}`;
-    const heatData = interaction.client.heatSystem.get(key);
+    const heatData = interaction.client.heatSystem.heatData.get(key);
 
     if (!heatData || heatData.score === 0) {
       await interaction.reply({
