@@ -740,6 +740,107 @@ class Database {
             )
         `);
 
+    // Advanced Metrics Tables (EXCEEDS WICK - deep analytics)
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS command_metrics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                command_name TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                execution_time INTEGER NOT NULL,
+                success INTEGER DEFAULT 1,
+                timestamp INTEGER NOT NULL
+            )
+        `);
+
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS user_engagement (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                event_type TEXT NOT NULL,
+                metadata TEXT,
+                timestamp INTEGER NOT NULL
+            )
+        `);
+
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS server_health_metrics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                member_count INTEGER,
+                online_count INTEGER,
+                message_rate REAL,
+                command_rate REAL,
+                violation_rate REAL,
+                avg_response_time REAL,
+                timestamp INTEGER NOT NULL
+            )
+        `);
+
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS moderation_metrics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                action TEXT NOT NULL,
+                moderator_id TEXT,
+                target_id TEXT,
+                reason TEXT,
+                timestamp INTEGER NOT NULL
+            )
+        `);
+
+    // ML Models (EXCEEDS WICK - self-learning automod)
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS ml_models (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                model_type TEXT NOT NULL,
+                model_data TEXT NOT NULL,
+                accuracy REAL,
+                trained_at INTEGER NOT NULL,
+                UNIQUE(guild_id, model_type, trained_at)
+            )
+        `);
+
+    // Retention Predictions (EXCEEDS WICK - predictive churn analysis)
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS retention_predictions (
+                guild_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                risk_score REAL NOT NULL,
+                risk_level TEXT NOT NULL,
+                reasons TEXT,
+                predicted_at INTEGER NOT NULL,
+                PRIMARY KEY (guild_id, user_id)
+            )
+        `);
+
+    // Threat Correlation (EXCEEDS WICK - cross-server threat intelligence)
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS threat_reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                type TEXT NOT NULL,
+                severity INTEGER NOT NULL,
+                metadata TEXT,
+                timestamp INTEGER NOT NULL
+            )
+        `);
+
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS threat_correlations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL,
+                threat_type TEXT NOT NULL,
+                affected_servers TEXT NOT NULL,
+                metadata TEXT,
+                confidence REAL NOT NULL,
+                detected_at INTEGER NOT NULL
+            )
+        `);
+
     // Enhanced logging
     this.db.run(`
             CREATE TABLE IF NOT EXISTS enhanced_logs (
