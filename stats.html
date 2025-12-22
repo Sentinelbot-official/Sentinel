@@ -1116,15 +1116,27 @@
         );
 
         const formattedDate = formatDateWithOrdinal(projectedDate);
-        const daysAway = Math.ceil(hoursNeeded / 24);
         
+        // Format time away more precisely
+        let timeAwayText;
+        if (hoursNeeded < 1) {
+          const minutesAway = Math.ceil(hoursNeeded * 60);
+          timeAwayText = `${minutesAway} minute${minutesAway !== 1 ? "s" : ""}`;
+        } else if (hoursNeeded < 24) {
+          const hoursAway = Math.ceil(hoursNeeded);
+          timeAwayText = `${hoursAway} hour${hoursAway !== 1 ? "s" : ""}`;
+        } else {
+          const daysAway = Math.ceil(hoursNeeded / 24);
+          timeAwayText = `${daysAway} day${daysAway !== 1 ? "s" : ""}`;
+        }
+
         // Debug info
         console.log("Projection Debug:", {
           currentTime: new Date().toLocaleString(),
           serversNeeded,
           growthRate: growthRate.toFixed(4),
           hoursNeeded: hoursNeeded.toFixed(2),
-          daysAway,
+          timeAwayText,
           projectedDate: projectedDate.toLocaleString()
         });
 
@@ -1133,7 +1145,7 @@
             <div class="projection-title">📅 Projected ${goalLabel} Date</div>
             <div class="projection-date">${formattedDate}</div>
             <div class="projection-details">
-              That's approximately ${daysAway} day${daysAway !== 1 ? "s" : ""} away at current growth rate
+              That's approximately ${timeAwayText} away at current growth rate
             </div>
           </div>
         `;
