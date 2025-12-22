@@ -648,21 +648,6 @@
         </div>
       </div>
 
-      <!-- Connection Status -->
-      <div
-        id="connection-status"
-        style="
-          margin: 20px 0;
-          padding: 10px;
-          background: rgba(102, 126, 234, 0.1);
-          border-radius: 10px;
-          font-size: 0.9em;
-          color: #667eea;
-        "
-      >
-        🔍 Connecting to dashboard...
-      </div>
-
       <!-- Countdown Banner -->
       <div id="countdown-banner" style="display: none"></div>
 
@@ -750,18 +735,7 @@
     </div>
 
     <script>
-      // Try multiple dashboard URLs in order
-      const DASHBOARD_URLS = [
-        "http://localhost:3000", // Local development
-        "http://127.0.0.1:3000", // Localhost alternative
-        window.location.hostname !== "localhost" &&
-        window.location.hostname !== "127.0.0.1"
-          ? `http://${window.location.hostname}:3000`
-          : null, // Current host IP
-        "https://regular-puma-clearly.ngrok-free.app", // Ngrok fallback
-      ].filter(Boolean); // Remove null values
-
-      let DASHBOARD_URL = DASHBOARD_URLS[0]; // Start with first URL
+      const DASHBOARD_URL = "https://regular-puma-clearly.ngrok-free.app";
       const VERIFICATION_GOAL = 75; // Discord verification requirement
       const MILESTONES = [
         75, 82, 100, 150, 200, 250, 500, 750, 1000, 1500, 2000, 2500, 5000,
@@ -1429,66 +1403,21 @@
         setTimeout(() => indicator.remove(), 1000);
       }
 
-      // Try to fetch from a specific URL
-      async function fetchFromUrl(url) {
-        const response = await fetch(`${url}/api/stats`, {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
-          signal: AbortSignal.timeout(3000), // 3 second timeout
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        return response.json();
-      }
-
-      // Update connection status display
-      function updateConnectionStatus(message, isError = false) {
-        const statusEl = document.getElementById("connection-status");
-        if (statusEl) {
-          statusEl.textContent = message;
-          statusEl.style.background = isError
-            ? "rgba(255, 0, 0, 0.1)"
-            : "rgba(102, 126, 234, 0.1)";
-          statusEl.style.color = isError ? "#ff0000" : "#667eea";
-        }
-      }
-
-      // Try all URLs until one works
-      async function fetchStatsFromAnyUrl() {
-        let lastError = null;
-
-        for (const url of DASHBOARD_URLS) {
-          try {
-            console.log(`🔍 Trying: ${url}`);
-            updateConnectionStatus(`🔍 Trying: ${url}`);
-            const stats = await fetchFromUrl(url);
-            console.log(`✅ Connected to: ${url}`);
-            updateConnectionStatus(`✅ Connected to: ${url}`);
-            DASHBOARD_URL = url; // Update global URL for future requests
-            return stats;
-          } catch (error) {
-            console.log(`❌ Failed: ${url} - ${error.message}`);
-            lastError = error;
-            continue;
-          }
-        }
-
-        updateConnectionStatus(
-          `❌ Could not connect to any dashboard URL`,
-          true
-        );
-        throw lastError || new Error("Could not connect to any dashboard URL");
-      }
-
       async function loadStats() {
         const container = document.getElementById("stats-container");
 
         try {
-          const stats = await fetchStatsFromAnyUrl();
+          const response = await fetch(`${DASHBOARD_URL}/api/stats`, {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const stats = await response.json();
           const currentServerCount = stats.servers;
 
           // Save historical data
