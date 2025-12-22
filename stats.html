@@ -648,6 +648,21 @@
         </div>
       </div>
 
+      <!-- Connection Status -->
+      <div
+        id="connection-status"
+        style="
+          margin: 20px 0;
+          padding: 10px;
+          background: rgba(102, 126, 234, 0.1);
+          border-radius: 10px;
+          font-size: 0.9em;
+          color: #667eea;
+        "
+      >
+        🔍 Connecting to dashboard...
+      </div>
+
       <!-- Countdown Banner -->
       <div id="countdown-banner" style="display: none"></div>
 
@@ -735,9 +750,23 @@
     </div>
 
     <script>
-      const DASHBOARD_URL = "https://regular-puma-clearly.ngrok-free.app";
+      // Try multiple dashboard URLs in order
+      const DASHBOARD_URLS = [
+        "http://localhost:3000", // Local development
+        "http://127.0.0.1:3000", // Localhost alternative
+        window.location.hostname !== "localhost" &&
+        window.location.hostname !== "127.0.0.1"
+          ? `http://${window.location.hostname}:3000`
+          : null, // Current host IP
+        "https://regular-puma-clearly.ngrok-free.app", // Ngrok fallback
+      ].filter(Boolean); // Remove null values
+
+      let DASHBOARD_URL = DASHBOARD_URLS[0]; // Start with first URL
       const VERIFICATION_GOAL = 75; // Discord verification requirement
-      const MILESTONES = [75, 82, 100, 150, 200, 250, 500, 750, 1000, 1500, 2000, 2500, 5000, 7500, 10000];
+      const MILESTONES = [
+        75, 82, 100, 150, 200, 250, 500, 750, 1000, 1500, 2000, 2500, 5000,
+        7500, 10000,
+      ];
       let previousServerCount = null;
       let serversAt75 = null;
 
@@ -807,12 +836,16 @@
       }
 
       function getOrdinalSuffix(day) {
-        if (day > 3 && day < 21) return 'th';
+        if (day > 3 && day < 21) return "th";
         switch (day % 10) {
-          case 1: return 'st';
-          case 2: return 'nd';
-          case 3: return 'rd';
-          default: return 'th';
+          case 1:
+            return "st";
+          case 2:
+            return "nd";
+          case 3:
+            return "rd";
+          default:
+            return "th";
         }
       }
 
@@ -821,8 +854,12 @@
         const month = date.toLocaleDateString("en-US", { month: "long" });
         const day = date.getDate();
         const year = date.getFullYear();
-        const time = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
-        
+        const time = date.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+
         return `${weekday}, ${month} ${day}${getOrdinalSuffix(day)}, ${year} at ${time}`;
       }
 
@@ -1084,7 +1121,7 @@
             </div>
           `;
         }
-        
+
         banner.style.display = "block";
       }
 
@@ -1116,7 +1153,7 @@
         );
 
         const formattedDate = formatDateWithOrdinal(projectedDate);
-        
+
         // Format time away more precisely
         let timeAwayText;
         if (hoursNeeded < 1) {
@@ -1137,7 +1174,7 @@
           growthRate: growthRate.toFixed(4),
           hoursNeeded: hoursNeeded.toFixed(2),
           timeAwayText,
-          projectedDate: projectedDate.toLocaleString()
+          projectedDate: projectedDate.toLocaleString(),
         });
 
         section.innerHTML = `
@@ -1315,7 +1352,9 @@
           type: "line",
           data: {
             labels: historical.map((d) =>
-              new Date(d.timestamp).toLocaleTimeString("en-US", { hour12: false })
+              new Date(d.timestamp).toLocaleTimeString("en-US", {
+                hour12: false,
+              })
             ),
             datasets: [
               {
@@ -1390,21 +1429,66 @@
         setTimeout(() => indicator.remove(), 1000);
       }
 
+      // Try to fetch from a specific URL
+      async function fetchFromUrl(url) {
+        const response = await fetch(`${url}/api/stats`, {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+          signal: AbortSignal.timeout(3000), // 3 second timeout
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return response.json();
+      }
+
+      // Update connection status display
+      function updateConnectionStatus(message, isError = false) {
+        const statusEl = document.getElementById("connection-status");
+        if (statusEl) {
+          statusEl.textContent = message;
+          statusEl.style.background = isError
+            ? "rgba(255, 0, 0, 0.1)"
+            : "rgba(102, 126, 234, 0.1)";
+          statusEl.style.color = isError ? "#ff0000" : "#667eea";
+        }
+      }
+
+      // Try all URLs until one works
+      async function fetchStatsFromAnyUrl() {
+        let lastError = null;
+
+        for (const url of DASHBOARD_URLS) {
+          try {
+            console.log(`🔍 Trying: ${url}`);
+            updateConnectionStatus(`🔍 Trying: ${url}`);
+            const stats = await fetchFromUrl(url);
+            console.log(`✅ Connected to: ${url}`);
+            updateConnectionStatus(`✅ Connected to: ${url}`);
+            DASHBOARD_URL = url; // Update global URL for future requests
+            return stats;
+          } catch (error) {
+            console.log(`❌ Failed: ${url} - ${error.message}`);
+            lastError = error;
+            continue;
+          }
+        }
+
+        updateConnectionStatus(
+          `❌ Could not connect to any dashboard URL`,
+          true
+        );
+        throw lastError || new Error("Could not connect to any dashboard URL");
+      }
+
       async function loadStats() {
         const container = document.getElementById("stats-container");
 
         try {
-          const response = await fetch(`${DASHBOARD_URL}/api/stats`, {
-            headers: {
-              "ngrok-skip-browser-warning": "true",
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-
-          const stats = await response.json();
+          const stats = await fetchStatsFromAnyUrl();
           const currentServerCount = stats.servers;
 
           // Save historical data
@@ -1529,19 +1613,28 @@
           const progressPercentage = document.getElementById(
             "progress-percentage"
           );
-          const progressGoalLabel = document.getElementById("progress-goal-label");
+          const progressGoalLabel = document.getElementById(
+            "progress-goal-label"
+          );
 
           if (progressSection && progressBar) {
             progressSection.style.display = "block";
             const nextMilestone = getNextMilestone(currentServerCount);
-            const goalLabel = getCurrentGoalLabel(currentServerCount, nextMilestone);
-            
+            const goalLabel = getCurrentGoalLabel(
+              currentServerCount,
+              nextMilestone
+            );
+
             // Calculate progress to next milestone
-            const previousMilestone = MILESTONES.filter(m => m <= currentServerCount).pop() || 0;
+            const previousMilestone =
+              MILESTONES.filter((m) => m <= currentServerCount).pop() || 0;
             const progressRange = nextMilestone - previousMilestone;
             const progressMade = currentServerCount - previousMilestone;
-            const progress = Math.min((progressMade / progressRange) * 100, 100);
-            
+            const progress = Math.min(
+              (progressMade / progressRange) * 100,
+              100
+            );
+
             progressBar.style.width = `${progress}%`;
             progressPercentage.textContent = `${Math.round(progress)}%`;
             progressText.textContent = `${currentServerCount}/${nextMilestone}`;
@@ -1571,7 +1664,10 @@
 
             // Update time to goal based on current progress
             const nextMilestone = getNextMilestone(currentServerCount);
-            const goalLabel = getCurrentGoalLabel(currentServerCount, nextMilestone);
+            const goalLabel = getCurrentGoalLabel(
+              currentServerCount,
+              nextMilestone
+            );
             document.getElementById("time-to-goal-label").textContent =
               `Estimated Time to ${goalLabel}`;
             document.getElementById("time-to-goal").textContent =
