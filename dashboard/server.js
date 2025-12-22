@@ -10668,6 +10668,7 @@ class DashboardServer {
     // Middleware to log all admin actions
     this.auditMiddleware = (req, res, next) => {
       const originalSend = res.send;
+      const db = this.db; // Capture db reference
       res.send = function (data) {
         // Log successful actions
         if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -10681,24 +10682,22 @@ class DashboardServer {
           };
 
           // Store in database
-          this.db
-            .run(
-              `INSERT INTO audit_logs (timestamp, ip, method, path, body, status) VALUES (?, ?, ?, ?, ?, ?)`,
-              [
-                auditEntry.timestamp,
-                auditEntry.ip,
-                auditEntry.method,
-                auditEntry.path,
-                JSON.stringify(auditEntry.body),
-                auditEntry.status,
-              ]
-            )
-            .catch((err) => {
-              logger.error("Audit", "Failed to log action:", err);
-            });
+          db.run(
+            `INSERT INTO dashboard_audit_logs (timestamp, ip, method, path, body, status) VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              auditEntry.timestamp,
+              auditEntry.ip,
+              auditEntry.method,
+              auditEntry.path,
+              JSON.stringify(auditEntry.body),
+              auditEntry.status,
+            ]
+          ).catch((err) => {
+            logger.error("Audit", "Failed to log action:", err);
+          });
         }
         originalSend.call(this, data);
-      }.bind(this);
+      };
       next();
     };
 
@@ -10708,12 +10707,12 @@ class DashboardServer {
         const { limit = 100, offset = 0 } = req.query;
 
         const logs = await this.db.all(
-          `SELECT * FROM audit_logs ORDER BY timestamp DESC LIMIT ? OFFSET ?`,
+          `SELECT * FROM dashboard_audit_logs ORDER BY timestamp DESC LIMIT ? OFFSET ?`,
           [parseInt(limit), parseInt(offset)]
         );
 
         const total = await this.db.get(
-          `SELECT COUNT(*) as count FROM audit_logs`
+          `SELECT COUNT(*) as count FROM dashboard_audit_logs`
         );
 
         res.json({
@@ -10971,16 +10970,20 @@ class DashboardServer {
             .json({ error: "Guild ID, name, and URL are required" });
         }
 
+        const webhookId = `${guildId}_${name}`;
         await this.db.run(
-          `INSERT INTO webhooks (guild_id, name, url, config) VALUES (?, ?, ?, ?)
-           ON CONFLICT(guild_id, name) DO UPDATE SET url = ?, config = ?`,
+          `INSERT INTO webhook_configs (id, guild_id, name, url, config, created_at) VALUES (?, ?, ?, ?, ?, ?)
+           ON CONFLICT(id) DO UPDATE SET url = ?, config = ?, updated_at = ?`,
           [
+            webhookId,
             guildId,
             name,
             url,
             JSON.stringify(config),
+            Date.now(),
             url,
             JSON.stringify(config),
+            Date.now(),
           ]
         );
 
@@ -10997,7 +11000,7 @@ class DashboardServer {
         const { guildId } = req.params;
 
         const webhooks = await this.db.all(
-          `SELECT * FROM webhooks WHERE guild_id = ?`,
+          `SELECT * FROM webhook_configs WHERE guild_id = ?`,
           [guildId]
         );
 
@@ -11013,10 +11016,10 @@ class DashboardServer {
       try {
         const { guildId, name } = req.params;
 
-        await this.db.run(
-          `DELETE FROM webhooks WHERE guild_id = ? AND name = ?`,
-          [guildId, name]
-        );
+        const webhookId = `${guildId}_${name}`;
+        await this.db.run(`DELETE FROM webhook_configs WHERE id = ?`, [
+          webhookId,
+        ]);
 
         res.json({ success: true });
       } catch (error) {

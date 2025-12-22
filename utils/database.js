@@ -703,6 +703,32 @@ class Database {
             )
         `);
 
+    // Dashboard audit logs
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS dashboard_audit_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp INTEGER NOT NULL,
+                ip TEXT,
+                method TEXT,
+                path TEXT,
+                body TEXT,
+                status INTEGER
+            )
+        `);
+
+    // Webhook configurations for dashboard
+    this.db.run(`
+            CREATE TABLE IF NOT EXISTS webhook_configs (
+                id TEXT PRIMARY KEY,
+                guild_id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                url TEXT NOT NULL,
+                config TEXT,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER
+            )
+        `);
+
     // Enhanced logging
     this.db.run(`
             CREATE TABLE IF NOT EXISTS enhanced_logs (
