@@ -236,6 +236,19 @@ client.webhookEvents = new WebhookEvents(client);
 const MultiServerManagement = require("./utils/multiServer");
 client.multiServer = new MultiServerManagement(client);
 
+// Advanced AI & Intelligence Systems (EXCEEDS WICK - next-gen features)
+const AdvancedMetrics = require("./utils/advancedMetrics");
+client.advancedMetrics = new AdvancedMetrics(client);
+
+const AutomodMLTrainer = require("./utils/automodMLTrainer");
+client.mlTrainer = new AutomodMLTrainer(client);
+
+const MemberRetentionPredictor = require("./utils/memberRetentionPredictor");
+client.retentionPredictor = new MemberRetentionPredictor(client);
+
+const ThreatCorrelationEngine = require("./utils/threatCorrelationEngine");
+client.threatCorrelation = new ThreatCorrelationEngine(client);
+
 // Message archive system removed
 
 // Optimized cleanup - run all cleanups in parallel (EXCEEDS WICK - better performance)

@@ -236,6 +236,30 @@ module.exports = {
       logger.info("Ready", "⏰ Scheduled Actions system started");
     }
 
+    // Start Advanced AI & Intelligence Systems (EXCEEDS WICK - next-gen)
+    if (!shardInfo.isSharded || shardInfo.shardId === 0) {
+      if (client.advancedMetrics) {
+        client.advancedMetrics.start();
+        logger.info("Ready", "📊 Advanced Metrics system started");
+      }
+
+      if (client.mlTrainer) {
+        client.mlTrainer.start();
+        await client.mlTrainer.loadAllModels();
+        logger.info("Ready", "🧠 ML Training system started");
+      }
+
+      if (client.retentionPredictor) {
+        client.retentionPredictor.start();
+        logger.info("Ready", "🔮 Retention Prediction system started");
+      }
+
+      if (client.threatCorrelation) {
+        client.threatCorrelation.start();
+        logger.info("Ready", "🔗 Threat Correlation engine started");
+      }
+    }
+
     // Generate initial recommendations for all guilds
     const SmartRecommendations = require("../utils/smartRecommendations");
     for (const guild of client.guilds.cache.values()) {
