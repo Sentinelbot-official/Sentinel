@@ -5099,9 +5099,11 @@ class Database {
 
       values.push(guildId);
 
-      this.db.run(query, values, (err) => {
-        if (err) {
-          // If update fails (no row exists), try INSERT
+      const dbInstance = this.db; // Store reference for nested callback
+
+      this.db.run(query, values, function (err) {
+        if (err || this.changes === 0) {
+          // If update fails or no row exists, try INSERT
           const insertFields = Object.keys(config).filter(
             (key) => config[key] !== undefined
           );
@@ -5119,13 +5121,17 @@ class Database {
           const insertQuery = `INSERT INTO automod_config (guild_id, ${insertFields.join(", ")}) 
                                VALUES (?, ${insertFields.map(() => "?").join(", ")})`;
 
-          this.db.run(insertQuery, [guildId, ...insertValues], (insertErr) => {
-            if (insertErr) {
-              reject(insertErr);
-            } else {
-              resolve();
+          dbInstance.run(
+            insertQuery,
+            [guildId, ...insertValues],
+            (insertErr) => {
+              if (insertErr) {
+                reject(insertErr);
+              } else {
+                resolve();
+              }
             }
-          });
+          );
         } else {
           resolve();
         }
