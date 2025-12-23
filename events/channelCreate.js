@@ -33,15 +33,8 @@ module.exports = {
         const isBot = entry.executor.id === client.user.id;
         const isGuildOwner = entry.executor.id === channel.guild.ownerId;
 
-        logger.info(
-          `[channelCreate] Lockdown active - Channel "${channel.name}" created by ${entry.executor.tag} (${entry.executor.id}) | Guild Owner ID: ${channel.guild.ownerId} | isGuildOwner: ${isGuildOwner} | isBot: ${isBot}`
-        );
-
         // Skip lockdown ONLY for bot and guild owner (NOT whitelisted users during lockdown)
         if (isBot || isGuildOwner) {
-          logger.info(
-            `[channelCreate] ✅ Allowing channel "${channel.name}" - created by ${isBot ? "bot" : "guild owner"} ${entry.executor.tag}`
-          );
           return; // Allow and skip all monitoring
         }
       }
@@ -50,15 +43,7 @@ module.exports = {
       try {
         await channel
           .delete("Anti-Nuke: Channel created during lockdown")
-          .catch((err) => {
-            logger.debug(
-              `[channelCreate] Failed to delete channel during lockdown:`,
-              err.message
-            );
-          });
-        logger.warn(
-          `[Anti-Nuke] Deleted channel ${channel.id} created during lockdown in ${channel.guild.id}`
-        );
+          .catch(() => {});
         return; // Don't process further
       } catch (error) {
         // Continue to monitoring
@@ -138,10 +123,6 @@ module.exports = {
         // INSTANT RESPONSE: If rapid creation OR raid channel detected (but NOT guild owner/bot)
         // NOTE: Whitelisted users are NOT exempt from raid detection - they can still trigger if they spam
         if ((isRapidCreation || isRaidChannel) && !isGuildOwner && !isBot) {
-          logger.warn(
-            `[Anti-Nuke] INSTANT DETECTION: ${isRapidCreation ? `Rapid channel creation (${recentCreations.length} in 10s)` : "Raid channel"} "${channel.name}" by ${entry.executor.tag} (${entry.executor.id}) | Guild Owner ID: ${channel.guild.ownerId} | isGuildOwner: ${isGuildOwner} in ${channel.guild.name}`
-          );
-
           // Delete channel immediately
           await channel.delete("Anti-Nuke: Raid detected").catch(() => {});
 
