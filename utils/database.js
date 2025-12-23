@@ -2862,6 +2862,16 @@ class Database {
         });
       }
     });
+
+    // Migration: Add options column to command_analytics
+    this.db.run(
+      `ALTER TABLE command_analytics ADD COLUMN options TEXT`,
+      (err) => {
+        if (err && !err.message.includes("duplicate column")) {
+          logger.error("Migration error (command_analytics options):", err);
+        }
+      }
+    );
   }
 
   // Server config methods

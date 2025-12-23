@@ -86,20 +86,27 @@ module.exports = {
         // Start performance tracking
         const perfTimer = performanceMonitor.start(command.data.name);
 
+        // Extract command options for logging
+        const commandOptions = {};
+        interaction.options?.data?.forEach((option) => {
+          commandOptions[option.name] = option.value;
+        });
+
         try {
           await command.execute(interaction);
 
           // Record successful execution
           const executionTime = performanceMonitor.end(perfTimer, true);
 
-          // Track command analytics
+          // Track command analytics with options
           if (client.commandAnalytics) {
             client.commandAnalytics.trackCommand(
               interaction.guild.id,
               interaction.user.id,
               interaction.commandName,
               true,
-              executionTime
+              executionTime,
+              commandOptions
             );
           }
         } catch (cmdError) {
@@ -110,14 +117,15 @@ module.exports = {
             cmdError
           );
 
-          // Track failed command
+          // Track failed command with options
           if (client.commandAnalytics) {
             client.commandAnalytics.trackCommand(
               interaction.guild.id,
               interaction.user.id,
               interaction.commandName,
               false,
-              executionTime
+              executionTime,
+              commandOptions
             );
           }
 

@@ -19,24 +19,36 @@ class CommandAnalytics {
     userId,
     commandName,
     success = true,
-    executionTime = 0
+    executionTime = 0,
+    options = null
   ) {
     // Update realtime counter
     const key = `${guildId}_${commandName}`;
     this.realtimeUsage.set(key, (this.realtimeUsage.get(key) || 0) + 1);
 
+    // Format options for logging
+    let optionsString = null;
+    if (options) {
+      try {
+        optionsString = JSON.stringify(options);
+      } catch (e) {
+        optionsString = String(options);
+      }
+    }
+
     // Store in database
     try {
       await db.db.run(
         `INSERT INTO command_analytics 
-         (guild_id, user_id, command_name, success, execution_time, timestamp) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
+         (guild_id, user_id, command_name, success, execution_time, options, timestamp) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           guildId,
           userId,
           commandName,
           success ? 1 : 0,
           executionTime,
+          optionsString,
           Date.now(),
         ]
       );
