@@ -151,11 +151,11 @@ module.exports = {
     // NOTE: We do NOT DM users unprompted - that's spam and gets bots kicked
     // Instead, we just log it and show the comparison in-server via /migrate
     try {
-      const WickMigration = require("../utils/competitorMigration");
-      const migration = new WickMigration(client);
-      const hasWick = await migration.detectWick(guild);
+      const CompetitorMigration = require("../utils/competitorMigration");
+      const migration = new CompetitorMigration(client);
+      const hasCompetitor = await migration.detectCompetitor(guild);
 
-      if (hasWick) {
+      if (hasCompetitor) {
         logger.info(
           "Competitive",
           `🎯 the leading competitor detected in ${guild.name} (${guild.id}) - user can run /migrate to see comparison`
@@ -166,17 +166,17 @@ module.exports = {
           db.db.run(
             `INSERT OR IGNORE INTO competitive_intel (guild_id, competitor_bot, detected_at) 
              VALUES (?, ?, ?)`,
-            [guild.id, "wick", Date.now()],
+            [guild.id, "competitor", Date.now()],
             () => resolve()
           );
         }).catch(() => {
           // Ignore if table doesn't exist
         });
       }
-    } catch (wickError) {
+    } catch (competitorError) {
       logger.debug(
         "Competitive",
-        `the leading competitor detection error in ${guild.name}: ${wickError.message}`
+        `the leading competitor detection error in ${guild.name}: ${competitorError.message}`
       );
     }
 

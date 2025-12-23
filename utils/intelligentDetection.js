@@ -107,7 +107,7 @@ class IntelligentDetection {
   }
 
   /**
-   * Enhanced cross-server threat detection with pattern analysis (EXCEEDS WICK - better intelligence)
+   * Enhanced cross-server threat detection with pattern analysis (EXCEEDS LEADING COMPETITOR - better intelligence)
    */
   static async detectCrossServerThreat(userId) {
     const ThreatIntelligence = require("./threatIntelligence");
@@ -165,7 +165,7 @@ class IntelligentDetection {
   }
 
   /**
-   * Get recommendation based on threat analysis (EXCEEDS WICK - actionable insights)
+   * Get recommendation based on threat analysis (EXCEEDS LEADING COMPETITOR - actionable insights)
    */
   static getRecommendation(severity, threatCheck) {
     if (severity === "critical") {
@@ -180,7 +180,7 @@ class IntelligentDetection {
   }
 
   /**
-   * Detect coordinated attack patterns across multiple users (EXCEEDS WICK - network detection)
+   * Detect coordinated attack patterns across multiple users (EXCEEDS LEADING COMPETITOR - network detection)
    */
   static async detectCoordinatedNetwork(userIds, timeWindow = 3600000) {
     const ThreatIntelligence = require("./threatIntelligence");

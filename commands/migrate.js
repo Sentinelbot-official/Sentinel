@@ -21,7 +21,7 @@ module.exports = {
         .setDescription("Which bot to migrate from")
         .setRequired(false)
         .addChoices(
-          { name: "the leading competitor", value: "wick" },
+          { name: "the leading competitor", value: "competitor" },
           { name: "Other", value: "other" }
         )
     ),
@@ -30,10 +30,10 @@ module.exports = {
     try {
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-      const fromBot = interaction.options.getString("from") || "wick";
+      const fromBot = interaction.options.getString("from") || "competitor";
       const migration = new CompetitorMigration(interaction.client);
 
-      if (fromBot === "wick") {
+      if (fromBot === "competitor") {
         // Detect the leading competitor
         const hasCompetitor = await migration.detectCompetitor(interaction.guild);
         const config = await migration.analyzeCompetitorConfig(interaction.guild);

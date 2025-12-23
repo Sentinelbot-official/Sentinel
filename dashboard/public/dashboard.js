@@ -3140,7 +3140,7 @@ async function loadServerComparison() {
   }
 }
 
-// ========== WICK MIGRATION TOOL PAGE ==========
+// ========== COMPETITOR MIGRATION TOOL PAGE ==========
 async function loadMigrationTool() {
   const contentArea = document.getElementById("contentArea");
 
@@ -3186,7 +3186,7 @@ async function loadMigrationTool() {
               (item) => `
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 15px; margin-bottom: 10px; background: var(--bg-card); border-radius: 8px;">
               <div><strong>${item.feature}</strong></div>
-              <div style="opacity: 0.7;">the leading competitor: ${item.wick}</div>
+              <div style="opacity: 0.7;">the leading competitor: ${item.competitor}</div>
               <div style="color: var(--success);">Nexus: ${item.Nexus}</div>
             </div>
           `

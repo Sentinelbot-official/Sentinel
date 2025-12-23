@@ -59,7 +59,7 @@
         border-color: #00d1b2;
       }
 
-      .comparison-card.wick {
+      .comparison-card.competitor {
         border-color: #ff6b6b;
       }
 
@@ -89,7 +89,7 @@
         color: #00d1b2;
       }
 
-      .metric-value.wick {
+      .metric-value.competitor {
         color: #ff6b6b;
       }
 
@@ -288,9 +288,9 @@
             <div id="sentinel-metrics"></div>
           </div>
 
-          <div class="comparison-card wick">
+          <div class="comparison-card competitor">
             <h2 style="margin-bottom: 20px; color: #ff6b6b">⚔️ the leading competitor Bot</h2>
-            <div id="wick-metrics"></div>
+            <div id="competitor-metrics"></div>
           </div>
         </div>
 
@@ -328,7 +328,7 @@
 
       function displayBenchmark(data) {
         const sentinel = data.sentinel;
-        const wick = data.wick;
+        const competitor = data.competitor;
 
         // Display Nexus metrics
         const sentinelMetrics = document.getElementById("sentinel-metrics");
@@ -337,7 +337,7 @@
             <span class="metric-label">Response Time</span>
             <span class="metric-value sentinel">${sentinel.responseTime}ms</span>
             ${
-              sentinel.responseTime < wick.responseTime
+              sentinel.responseTime < competitor.responseTime
                 ? '<span class="winner-badge winner">FASTER</span>'
                 : '<span class="winner-badge loser">SLOWER</span>'
             }
@@ -346,7 +346,7 @@
             <span class="metric-label">Raid Detection Speed</span>
             <span class="metric-value sentinel">${sentinel.detectionSpeed}ms</span>
             ${
-              sentinel.detectionSpeed < wick.detectionSpeed
+              sentinel.detectionSpeed < competitor.detectionSpeed
                 ? '<span class="winner-badge winner">FASTER</span>'
                 : '<span class="winner-badge loser">SLOWER</span>'
             }
@@ -355,7 +355,7 @@
             <span class="metric-label">Memory Usage</span>
             <span class="metric-value sentinel">${sentinel.memory}MB</span>
             ${
-              sentinel.memory < wick.memory
+              sentinel.memory < competitor.memory
                 ? '<span class="winner-badge winner">LIGHTER</span>'
                 : '<span class="winner-badge loser">HEAVIER</span>'
             }
@@ -364,7 +364,7 @@
             <span class="metric-label">CPU Usage</span>
             <span class="metric-value sentinel">${sentinel.cpu}%</span>
             ${
-              sentinel.cpu < wick.cpu
+              sentinel.cpu < competitor.cpu
                 ? '<span class="winner-badge winner">LOWER</span>'
                 : '<span class="winner-badge loser">HIGHER</span>'
             }
@@ -373,7 +373,7 @@
             <span class="metric-label">Uptime</span>
             <span class="metric-value sentinel">${sentinel.uptime}%</span>
             ${
-              sentinel.uptime > wick.uptime
+              sentinel.uptime > competitor.uptime
                 ? '<span class="winner-badge winner">BETTER</span>'
                 : '<span class="winner-badge loser">WORSE</span>'
             }
@@ -382,7 +382,7 @@
             <span class="metric-label">Commands/sec</span>
             <span class="metric-value sentinel">${sentinel.commandsPerSecond}</span>
             ${
-              sentinel.commandsPerSecond > wick.commandsPerSecond
+              sentinel.commandsPerSecond > competitor.commandsPerSecond
                 ? '<span class="winner-badge winner">FASTER</span>'
                 : '<span class="winner-badge loser">SLOWER</span>'
             }
@@ -390,58 +390,58 @@
         `;
 
         // Display the leading competitor metrics
-        const wickMetrics = document.getElementById("wick-metrics");
-        wickMetrics.innerHTML = `
+        const competitorMetrics = document.getElementById("competitor-metrics");
+        competitorMetrics.innerHTML = `
           <div class="metric-row">
             <span class="metric-label">Response Time</span>
-            <span class="metric-value wick">${wick.responseTime}ms</span>
+            <span class="metric-value competitor">${competitor.responseTime}ms</span>
             ${
-              wick.responseTime < sentinel.responseTime
+              competitor.responseTime < sentinel.responseTime
                 ? '<span class="winner-badge winner">FASTER</span>'
                 : '<span class="winner-badge loser">SLOWER</span>'
             }
           </div>
           <div class="metric-row">
             <span class="metric-label">Raid Detection Speed</span>
-            <span class="metric-value wick">${wick.detectionSpeed}ms</span>
+            <span class="metric-value competitor">${competitor.detectionSpeed}ms</span>
             ${
-              wick.detectionSpeed < sentinel.detectionSpeed
+              competitor.detectionSpeed < sentinel.detectionSpeed
                 ? '<span class="winner-badge winner">FASTER</span>'
                 : '<span class="winner-badge loser">SLOWER</span>'
             }
           </div>
           <div class="metric-row">
             <span class="metric-label">Memory Usage</span>
-            <span class="metric-value wick">${wick.memory}MB</span>
+            <span class="metric-value competitor">${competitor.memory}MB</span>
             ${
-              wick.memory < sentinel.memory
+              competitor.memory < sentinel.memory
                 ? '<span class="winner-badge winner">LIGHTER</span>'
                 : '<span class="winner-badge loser">HEAVIER</span>'
             }
           </div>
           <div class="metric-row">
             <span class="metric-label">CPU Usage</span>
-            <span class="metric-value wick">${wick.cpu}%</span>
+            <span class="metric-value competitor">${competitor.cpu}%</span>
             ${
-              wick.cpu < sentinel.cpu
+              competitor.cpu < sentinel.cpu
                 ? '<span class="winner-badge winner">LOWER</span>'
                 : '<span class="winner-badge loser">HIGHER</span>'
             }
           </div>
           <div class="metric-row">
             <span class="metric-label">Uptime</span>
-            <span class="metric-value wick">${wick.uptime}%</span>
+            <span class="metric-value competitor">${competitor.uptime}%</span>
             ${
-              wick.uptime > sentinel.uptime
+              competitor.uptime > sentinel.uptime
                 ? '<span class="winner-badge winner">BETTER</span>'
                 : '<span class="winner-badge loser">WORSE</span>'
             }
           </div>
           <div class="metric-row">
             <span class="metric-label">Commands/sec</span>
-            <span class="metric-value wick">${wick.commandsPerSecond}</span>
+            <span class="metric-value competitor">${competitor.commandsPerSecond}</span>
             ${
-              wick.commandsPerSecond > sentinel.commandsPerSecond
+              competitor.commandsPerSecond > sentinel.commandsPerSecond
                 ? '<span class="winner-badge winner">FASTER</span>'
                 : '<span class="winner-badge loser">SLOWER</span>'
             }

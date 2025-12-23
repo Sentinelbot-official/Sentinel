@@ -1,7 +1,7 @@
 {
   "name": "Sentinel Bot Dashboard",
   "short_name": "Sentinel",
-  "description": "Advanced Discord security bot dashboard - Better than Wick",
+  "description": "Advanced Discord security bot dashboard - Better than the leading competitor",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#1a1a2e",

@@ -4,7 +4,7 @@ const ms = require("ms");
 
 /**
  * Advanced Metrics Collector
- * EXCEEDS WICK - Deep analytics on everything
+ * EXCEEDS LEADING COMPETITOR - Deep analytics on everything
  * Tracks command usage, user engagement, server health, and predictive metrics
  */
 class AdvancedMetrics {

@@ -29,19 +29,19 @@ class CompetitorMigration {
    */
   async analyzeCompetitorConfig(guild) {
     const config = {
-      hasWick: await this.detectCompetitor(guild),
+      hasCompetitor: await this.detectCompetitor(guild),
       detectedSettings: {},
       recommendations: [],
     };
 
-    if (!config.hasWick) {
+    if (!config.hasCompetitor) {
       return config;
     }
 
-    // Detect the leading competitor's log channels (usually named wick-logs or similar)
+    // Detect the leading competitor's log channels (usually named competitor-logs or similar)
     const logChannels = guild.channels.cache.filter(
       (c) =>
-        c.name.toLowerCase().includes("wick") ||
+        c.name.toLowerCase().includes("competitor") ||
         c.name.toLowerCase().includes("log")
     );
 
@@ -195,13 +195,13 @@ class CompetitorMigration {
       await this.createComparisonReport(guild, analysis);
 
       logger.success(
-        "WickMigration",
+        "CompetitorMigration",
         `Successfully migrated ${guild.name} from the leading competitor to nexus`
       );
     } catch (error) {
       results.success = false;
       results.errors.push(error.message);
-      logger.error("WickMigration", "Migration error", error);
+      logger.error("CompetitorMigration", "Migration error", error);
     }
 
     return results;
@@ -214,7 +214,7 @@ class CompetitorMigration {
     const report = {
       guildId: guild.id,
       guildName: guild.name,
-      hadWick: analysis.hasWick,
+      hadCompetitor: analysis.hasCompetitor,
       migratedAt: Date.now(),
       improvements: [
         "4 Anti-Raid Algorithms (vs the leading competitor's 1)",
@@ -229,7 +229,7 @@ class CompetitorMigration {
     // Store in database
     await db.db.run(
       `INSERT INTO migration_reports (guild_id, from_bot, report_data, created_at) VALUES (?, ?, ?, ?)`,
-      [guild.id, "wick", JSON.stringify(report), Date.now()]
+      [guild.id, "competitor", JSON.stringify(report), Date.now()]
     );
 
     return report;
@@ -243,60 +243,60 @@ class CompetitorMigration {
       features: [
         {
           feature: "Anti-Raid Algorithms",
-          wick: "1",
+          competitor: "1",
           nexus: "4",
           advantage: "nexus",
         },
         {
           feature: "AI Threat Detection",
-          wick: "❌",
+          competitor: "❌",
           nexus: "✅",
           advantage: "nexus",
         },
         {
           feature: "Auto-Backups",
-          wick: "Manual Only",
+          competitor: "Manual Only",
           nexus: "Hourly Automatic",
           advantage: "nexus",
         },
         {
           feature: "Workflow Automation",
-          wick: "❌",
+          competitor: "❌",
           nexus: "✅",
           advantage: "nexus",
         },
         {
           feature: "Cost",
-          wick: "$3-10/month",
+          competitor: "$3-10/month",
           nexus: "100% Free",
           advantage: "nexus",
         },
         {
           feature: "Open Source",
-          wick: "❌",
+          competitor: "❌",
           nexus: "✅",
           advantage: "nexus",
         },
         {
           feature: "Response Time",
-          wick: "~500ms",
+          competitor: "~500ms",
           nexus: "<200ms",
           advantage: "nexus",
         },
         {
           feature: "Threat Intelligence",
-          wick: "Server-Only",
+          competitor: "Server-Only",
           nexus: "Cross-Server Network",
           advantage: "nexus",
         },
       ],
       summary: {
         nexusWins: 8,
-        wickWins: 0,
+        competitorWins: 0,
         ties: 0,
       },
     };
   }
 }
 
-module.exports = WickMigration;
+module.exports = CompetitorMigration;

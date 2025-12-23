@@ -4,7 +4,7 @@ const ms = require("ms");
 
 /**
  * Real-Time Threat Correlation Engine
- * EXCEEDS WICK - Cross-references threats across all servers in real-time
+ * EXCEEDS LEADING COMPETITOR - Cross-references threats across all servers in real-time
  * Identifies coordinated attacks, bot networks, and emerging threat patterns
  */
 class ThreatCorrelationEngine {

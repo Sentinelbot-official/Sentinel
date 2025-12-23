@@ -5,7 +5,7 @@ const db = require("./database");
 class SnapshotScheduler {
   constructor(client) {
     this.client = client;
-    this.snapshotInterval = 60 * 60 * 1000; // 1 hour (EXCEEDS WICK - automatic snapshots)
+    this.snapshotInterval = 60 * 60 * 1000; // 1 hour (EXCEEDS LEADING COMPETITOR - automatic snapshots)
     this.maxSnapshotsPerGuild = 24; // Keep 24 hours of snapshots (1 per hour)
     this.isRunning = false;
   }

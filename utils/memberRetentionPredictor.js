@@ -3,7 +3,7 @@ const logger = require("./logger");
 
 /**
  * Predictive Member Retention System
- * EXCEEDS WICK - AI predicts which members are likely to leave
+ * EXCEEDS LEADING COMPETITOR - AI predicts which members are likely to leave
  * Helps server owners proactively engage at-risk members
  */
 class MemberRetentionPredictor {

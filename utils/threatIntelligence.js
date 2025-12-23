@@ -3,7 +3,7 @@ const logger = require("./logger");
 
 class ThreatIntelligence {
   /**
-   * Enhanced threat reporting with cross-server pattern detection (EXCEEDS WICK - better intelligence)
+   * Enhanced threat reporting with cross-server pattern detection (EXCEEDS LEADING COMPETITOR - better intelligence)
    */
   static async reportThreat(
     userId,
@@ -56,7 +56,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Enhanced cross-server pattern detection (EXCEEDS WICK - detects coordinated attacks)
+   * Enhanced cross-server pattern detection (EXCEEDS LEADING COMPETITOR - detects coordinated attacks)
    */
   static async detectCrossServerPattern(userId, threatType, sourceGuildId) {
     try {
@@ -142,7 +142,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Store detected pattern for analytics (EXCEEDS WICK - pattern tracking)
+   * Store detected pattern for analytics (EXCEEDS LEADING COMPETITOR - pattern tracking)
    */
   static async storePattern(pattern) {
     return new Promise((resolve, reject) => {
@@ -171,7 +171,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Enhanced threat checking with cross-server analytics (EXCEEDS WICK - better intelligence)
+   * Enhanced threat checking with cross-server analytics (EXCEEDS LEADING COMPETITOR - better intelligence)
    */
   static async checkThreat(userId, guildId = null) {
     // If guildId provided, check if cross-server sharing is enabled
@@ -245,7 +245,7 @@ class ThreatIntelligence {
     );
     riskScore += recentThreats.length * settings.recent_multiplier;
 
-    // Enhanced: Cross-server threats add significant risk (EXCEEDS WICK - network-wide intelligence)
+    // Enhanced: Cross-server threats add significant risk (EXCEEDS LEADING COMPETITOR - network-wide intelligence)
     if (crossServerThreats.length > 0) {
       const crossServerMultiplier = 1.5; // 50% bonus for cross-server threats
       riskScore += Math.min(
@@ -291,7 +291,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Get patterns detected for a user (EXCEEDS WICK - pattern analytics)
+   * Get patterns detected for a user (EXCEEDS LEADING COMPETITOR - pattern analytics)
    */
   static async getUserPatterns(userId) {
     return new Promise((resolve, reject) => {
@@ -320,7 +320,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Group threats by type for analytics (EXCEEDS WICK - better insights)
+   * Group threats by type for analytics (EXCEEDS LEADING COMPETITOR - better insights)
    */
   static groupByType(threats) {
     const grouped = {};
@@ -334,7 +334,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Get threat timeline for analytics (EXCEEDS WICK - temporal analysis)
+   * Get threat timeline for analytics (EXCEEDS LEADING COMPETITOR - temporal analysis)
    */
   static getThreatTimeline(threats) {
     const now = Date.now();
@@ -362,7 +362,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Enhanced threat summary with cross-server analytics (EXCEEDS WICK - comprehensive insights)
+   * Enhanced threat summary with cross-server analytics (EXCEEDS LEADING COMPETITOR - comprehensive insights)
    */
   static async getThreatSummary(userId) {
     const threats = await db.getThreatIntelligence(userId);
@@ -403,7 +403,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Get cross-server attack analytics (EXCEEDS WICK - network-wide intelligence)
+   * Get cross-server attack analytics (EXCEEDS LEADING COMPETITOR - network-wide intelligence)
    */
   static async getCrossServerAnalytics(timeWindow = 7 * 24 * 60 * 60 * 1000) {
     const since = Date.now() - timeWindow;
@@ -452,7 +452,7 @@ class ThreatIntelligence {
   }
 
   /**
-   * Detect coordinated attack patterns across multiple servers (EXCEEDS WICK - advanced pattern detection)
+   * Detect coordinated attack patterns across multiple servers (EXCEEDS LEADING COMPETITOR - advanced pattern detection)
    */
   static async detectCoordinatedAttack(userIds, timeWindow = 3600000) {
     const since = Date.now() - timeWindow;

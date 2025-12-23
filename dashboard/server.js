@@ -5097,7 +5097,7 @@ class DashboardServer {
         // NOTE: These are industry-standard estimates for similar Discord bots
         // We don't have access to the leading competitor's actual metrics, so these are based on
         // typical performance of bots with similar feature sets
-        const wickMetrics = {
+        const competitorMetrics = {
           responseTime: 80, // Typical WebSocket ping for similar bots
           detectionSpeed: 45, // Estimated based on typical detection algorithms
           memory: 180, // Typical memory usage for feature-rich bots
@@ -5126,21 +5126,21 @@ class DashboardServer {
             metric === "detectionSpeed"
           ) {
             // Lower is better
-            if (NexusMetrics[metric] < wickMetrics[metric]) {
+            if (NexusMetrics[metric] < competitorMetrics[metric]) {
               NexusWins++;
               const improvement =
-                ((wickMetrics[metric] - NexusMetrics[metric]) /
-                  wickMetrics[metric]) *
+                ((competitorMetrics[metric] - NexusMetrics[metric]) /
+                  competitorMetrics[metric]) *
                 100;
               improvements.push(improvement);
             }
           } else {
             // Higher is better (uptime, commandsPerSecond)
-            if (NexusMetrics[metric] > wickMetrics[metric]) {
+            if (NexusMetrics[metric] > competitorMetrics[metric]) {
               NexusWins++;
               const improvement =
-                ((NexusMetrics[metric] - wickMetrics[metric]) /
-                  wickMetrics[metric]) *
+                ((NexusMetrics[metric] - competitorMetrics[metric]) /
+                  competitorMetrics[metric]) *
                 100;
               improvements.push(improvement);
             }
@@ -5158,7 +5158,7 @@ class DashboardServer {
           success: true,
           data: {
             Nexus: NexusMetrics,
-            wick: wickMetrics,
+            competitor: competitorMetrics,
             summary: {
               NexusWins,
               totalMetrics: metrics.length,
@@ -10180,7 +10180,7 @@ class DashboardServer {
       }
     });
 
-    // ========== WICK MIGRATION API ==========
+    // ========== COMPETITOR MIGRATION API ==========
     this.app.get("/api/migration/analyze", this.checkAuth, async (req, res) => {
       try {
         const { guild } = req.query;

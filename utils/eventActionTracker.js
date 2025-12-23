@@ -1,6 +1,6 @@
 // Event-Based Action Tracking System
 // Replaces audit log monitor - tracks actions from Discord events instead of polling
-// EXCEEDS WICK - Real-time tracking without rate limit issues
+// EXCEEDS LEADING COMPETITOR - Real-time tracking without rate limit issues
 const logger = require("./logger");
 
 class EventActionTracker {
