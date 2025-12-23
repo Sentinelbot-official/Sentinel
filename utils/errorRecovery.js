@@ -1,5 +1,7 @@
 const logger = require("./logger");
 const { WebhookClient, EmbedBuilder } = require("discord.js");
+const cron = require("node-cron");
+const ms = require("ms");
 
 /**
  * Advanced Error Recovery System
@@ -31,7 +33,7 @@ class ErrorRecovery {
     }
 
     // Clean up old error counts every hour
-    setInterval(() => this.cleanupErrorCounts(), 3600000);
+    cron.schedule("0 * * * *", () => this.cleanupErrorCounts());
   }
 
   setClient(client) {

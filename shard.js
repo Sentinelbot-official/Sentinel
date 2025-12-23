@@ -2,6 +2,7 @@ const { ShardingManager } = require("discord.js");
 const path = require("path");
 require("dotenv").config();
 const logger = require("./utils/logger");
+const cron = require("node-cron");
 
 if (!process.env.DISCORD_TOKEN) {
   logger.error("❌ DISCORD_TOKEN not found in .env file!");
@@ -162,9 +163,9 @@ if (process.env.DISCORDBOTLIST_TOKEN) {
           }
         };
 
-        // Post immediately, then set interval
+        // Post immediately, then schedule hourly
         postStats();
-        dblInterval = setInterval(postStats, 3600000); // Every hour
+        dblInterval = cron.schedule("0 * * * *", postStats); // Every hour
 
         console.log("✅ [Discord Bot List] Stats posting initialized");
       }

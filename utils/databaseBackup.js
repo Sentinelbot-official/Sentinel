@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const logger = require("./logger");
+const cron = require("node-cron");
 
 class DatabaseBackup {
   constructor() {
@@ -164,31 +165,16 @@ class DatabaseBackup {
     // Create initial backup on startup
     this.createBackup();
 
-    // Schedule daily backups at 3 AM
-    const scheduleNextBackup = () => {
-      const now = new Date();
-      const next = new Date(now);
-      next.setHours(3, 0, 0, 0); // 3 AM
+    // Schedule daily backups at 3 AM using cron
+    cron.schedule("0 3 * * *", () => {
+      logger.info("DatabaseBackup", "Running scheduled backup (3:00 AM)");
+      this.createBackup();
+    });
 
-      // If 3 AM already passed today, schedule for tomorrow
-      if (next <= now) {
-        next.setDate(next.getDate() + 1);
-      }
-
-      const timeUntilBackup = next - now;
-
-      setTimeout(() => {
-        this.createBackup();
-        scheduleNextBackup(); // Schedule next backup
-      }, timeUntilBackup);
-
-      logger.info(
-        "DatabaseBackup",
-        `Next automatic backup scheduled for ${next.toLocaleString()}`
-      );
-    };
-
-    scheduleNextBackup();
+    logger.info(
+      "DatabaseBackup",
+      "Automatic backup scheduled (daily at 3:00 AM)"
+    );
   }
 }
 
