@@ -2,7 +2,7 @@ MIT License
 
 Copyright (c) 2025 Nexus Bot
 
-**TRADEMARK NOTICE**: "Nexus Bot", "Nexus", the Nexus Bot logo, and "Beyond The Competition. Beyond Everything." are trademarks of Nexus Bot. All rights reserved. Unauthorized use of these trademarks is strictly prohibited and may result in legal action.
+**PROPRIETARY NOTICE**: "Nexus Bot", "Nexus", the Nexus Bot logo, and "Beyond The Competition. Beyond Everything." are proprietary marks of Nexus Bot. All rights reserved. Unauthorized use of these proprietary marks is strictly prohibited and may result in legal action.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, and distribute copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -105,12 +105,14 @@ Violation of these restrictions constitutes trademark infringement and may resul
 3. **Legal Action**: If the violation is not remedied within the specified timeframe (48 hours for critical violations, 14 days for non-critical), we reserve the right to pursue all available legal remedies
 
 **Critical Violations** (48-hour remedy period):
+
 - Using "Nexus Bot" or confusingly similar names as your bot's primary name
 - Impersonating official Nexus Bot accounts, servers, or representatives
 - Using our branding to mislead users into believing your project is official Nexus Bot
 - Claiming endorsement or affiliation with Nexus Bot when none exists
 
 **Non-Critical Violations** (14-day remedy period):
+
 - Using our slogans or marketing copy
 - Substantially similar documentation or visual identity
 - Improper attribution or missing copyright notices
