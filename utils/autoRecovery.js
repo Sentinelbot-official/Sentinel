@@ -93,9 +93,6 @@ class AutoRecovery {
           avatar: webhook.avatar,
           url: webhook.url,
         }));
-        logger.info(
-          `[AutoRecovery] Captured ${webhooks.length} webhooks in snapshot`
-        );
       } catch (error) {
         logger.warn(`[AutoRecovery] Failed to capture webhooks:`, error);
         snapshotData.webhooks = [];
@@ -112,11 +109,7 @@ class AutoRecovery {
           animated: emoji.animated,
           url: emoji.imageURL(),
         }));
-        logger.info(
-          `[AutoRecovery] Captured ${snapshotData.emojis.length} emojis in snapshot`
-        );
       } catch (error) {
-        logger.warn(`[AutoRecovery] Failed to capture emojis:`, error);
         snapshotData.emojis = [];
       }
 
@@ -134,11 +127,7 @@ class AutoRecovery {
             url: sticker.url,
           })
         );
-        logger.info(
-          `[AutoRecovery] Captured ${snapshotData.stickers.length} stickers in snapshot`
-        );
       } catch (error) {
-        logger.warn(`[AutoRecovery] Failed to capture stickers:`, error);
         snapshotData.stickers = [];
       }
 
@@ -159,16 +148,6 @@ class AutoRecovery {
         publicUpdatesChannelId: guild.publicUpdatesChannelId,
         preferredLocale: guild.preferredLocale,
       };
-
-      logger.info(
-        `[AutoRecovery] Snapshot created: ${
-          snapshotData.channels.length
-        } channels, ${snapshotData.roles.length} roles, ${
-          snapshotData.webhooks?.length || 0
-        } webhooks, ${snapshotData.emojis?.length || 0} emojis, ${
-          snapshotData.stickers?.length || 0
-        } stickers, server settings`
-      );
     }
 
     await db.createRecoverySnapshot(
@@ -1101,9 +1080,7 @@ class AutoRecovery {
         );
       }
     } else {
-      logger.info(
-        `[AutoRecovery] Creating snapshot with ${guild.channels.cache.size} channels and ${guild.roles.cache.size} roles from cache`
-      );
+      // Creating snapshot from cache
     }
 
     return await this.createSnapshot(guild, "full", reason);
