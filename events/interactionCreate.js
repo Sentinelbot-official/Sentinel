@@ -56,10 +56,24 @@ module.exports = {
         // Track performance and log in parallel ( - faster response)
         const startTime = Date.now();
 
+        // Extract command options for logging
+        const commandOptions = {};
+        interaction.options?.data?.forEach((option) => {
+          commandOptions[option.name] = option.value;
+        });
+
+        // Format options for display
+        const optionsStr =
+          Object.keys(commandOptions).length > 0
+            ? ` ${Object.entries(commandOptions)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(", ")}`
+            : "";
+
         // Log command usage in parallel (non-blocking)
         logger.info(
           "Command",
-          `/${interaction.commandName} in ${interaction.guild.name} (${interaction.guild.id}) by ${interaction.user.tag}`
+          `/${interaction.commandName}${optionsStr} in ${interaction.guild.name} (${interaction.guild.id}) by ${interaction.user.tag}`
         );
 
         // Log to database (non-blocking)
@@ -85,12 +99,6 @@ module.exports = {
 
         // Start performance tracking
         const perfTimer = performanceMonitor.start(command.data.name);
-
-        // Extract command options for logging
-        const commandOptions = {};
-        interaction.options?.data?.forEach((option) => {
-          commandOptions[option.name] = option.value;
-        });
 
         try {
           await command.execute(interaction);
