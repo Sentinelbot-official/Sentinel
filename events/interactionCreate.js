@@ -52,6 +52,14 @@ module.exports = {
         return;
       }
 
+      // Block all commands from being used in DMs
+      if (!interaction.guild) {
+        return interaction.reply({
+          content: "❌ This bot can only be used in servers, not in DMs.",
+          ephemeral: true,
+        });
+      }
+
       try {
         // Track performance and log in parallel ( - faster response)
 
