@@ -1084,8 +1084,27 @@ class AutoRecovery {
     return await this.recover(guild, snapshotId, { incremental: true });
   }
 
-  static async autoSnapshot(guild, reason) {
+  static async autoSnapshot(guild, reason, shouldFetch = false) {
     // Automatically create snapshot before potential attack
+    // Only fetch if explicitly requested (e.g., periodic snapshots) to avoid rate limits during nuke detection
+    if (shouldFetch) {
+      try {
+        await guild.channels.fetch();
+        await guild.roles.fetch();
+        logger.info(
+          `[AutoRecovery] Fetched ${guild.channels.cache.size} channels and ${guild.roles.cache.size} roles for snapshot`
+        );
+      } catch (error) {
+        logger.warn(
+          `[AutoRecovery] Failed to fetch channels/roles before snapshot:`,
+          error
+        );
+      }
+    } else {
+      logger.info(
+        `[AutoRecovery] Creating snapshot with ${guild.channels.cache.size} channels and ${guild.roles.cache.size} roles from cache`
+      );
+    }
 
     return await this.createSnapshot(guild, "full", reason);
   }

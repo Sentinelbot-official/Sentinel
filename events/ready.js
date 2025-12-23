@@ -335,7 +335,8 @@ module.exports = {
               if (!hasRecentSnapshot) {
                 await AutoRecovery.autoSnapshot(
                   guild,
-                  "Periodic auto-snapshot"
+                  "Periodic auto-snapshot",
+                  true // Fetch fresh data for periodic snapshots
                 );
                 logger.info(
                   "Ready",
