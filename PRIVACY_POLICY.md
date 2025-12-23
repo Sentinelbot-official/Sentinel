@@ -461,7 +461,7 @@ For privacy concerns, data requests, or questions:
 - **Discord Support Server:** https://discord.gg/9vQzqBVMNX (Preferred method)
 - **Privacy Email:** nexusbot0@proton.me (For formal privacy requests)
 - **General Contact:** Open a ticket in our support server
-- **GitHub Issues:** https://github.com/nexusbot-official/nexus/issues (For code-related questions)
+- **GitHub Issues:** https://github.com/Sentinelbot-official/Sentinelissues (For code-related questions)
 
 ### Data Protection Officer and ICO
 
