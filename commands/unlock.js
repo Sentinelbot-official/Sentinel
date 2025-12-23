@@ -148,9 +148,14 @@ module.exports = {
     } catch (error) {
       const logger = require("../utils/logger");
       logger.error("Unlock command error:", error);
-      await interaction.editReply({
-        content: `❌ Error unlocking server: ${error.message}`,
-      });
+      try {
+        await interaction.editReply({
+          content: `❌ Error unlocking server: ${error.message}`,
+        });
+      } catch (replyError) {
+        // Interaction expired or already responded
+        logger.debug("Could not send error reply:", replyError.message);
+      }
     }
   },
 };

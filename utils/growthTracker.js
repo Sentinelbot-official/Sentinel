@@ -151,6 +151,7 @@ class GrowthTracker {
             reject(err);
           } else {
             logger.info(
+              "Growth Tracker",
               `📉 Server removed (${reason}): Active for ${daysActive} days`
             );
             resolve();
