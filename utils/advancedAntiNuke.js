@@ -223,9 +223,6 @@ class AdvancedAntiNuke {
         (c.type === "role_update" && c.targetType === "admin")
     );
     if (escalations.length >= 2) {
-      logger.warn(
-        `[Anti-Nuke] Permission escalation detected: ${userId} attempting to create/modify admin permissions`
-      );
       return {
         suspicious: true,
         reason: "permission_escalation",
@@ -318,18 +315,11 @@ class AdvancedAntiNuke {
 
     // Check whitelist first
     if (await this.isWhitelisted(guild.id, userId)) {
-      logger.warn(
-        `[Anti-Nuke] User ${userId} is WHITELISTED in ${guild.name} - skipping monitoring for ${actionType}`
-      );
       return; // Whitelisted users are exempt
     }
 
     // INSTANT TRIGGER: If this is flagged as an instant raid action, trigger immediately
     if (details.instantTrigger && details.isRaidChannel) {
-      logger.warn(
-        `[Anti-Nuke] INSTANT TRIGGER: Raid detected by ${userId} in ${guild.name}`
-      );
-
       // Immediately trigger threat handling with maximum priority
       await this.handleThreat(guild, userId, "mass_channel_creation", {
         channelsCreated: 10, // Force high count to trigger immediate action
@@ -386,9 +376,6 @@ class AdvancedAntiNuke {
                 await member.roles.remove(
                   role,
                   `Anti-Nuke: ${permCheck.reason}`
-                );
-                logger.info(
-                  `[Anti-Nuke] Removed role ${role.name} from ${member.user.tag}`
                 );
               } catch (err) {
                 // Silent - role removal failures are expected when member is banned
@@ -575,9 +562,7 @@ class AdvancedAntiNuke {
             if (
               !this.processedThreats.has(`${guild.id}-${userId}-rapid_nuke`)
             ) {
-              logger.warn(
-                `[Anti-Nuke] 🚨 RAPID NUKE: 2 channels ${timeDiff}ms apart - Banning ${userId}`
-              );
+              // Rapid nuke detected
             }
             break;
           }
@@ -749,9 +734,6 @@ class AdvancedAntiNuke {
         // Fallback to guild.ownerId
         ownerId = guild.ownerId;
         isOwner = member.id === guild.ownerId;
-        logger.warn(
-          `[Anti-Nuke] fetchOwner() returned null, using guild.ownerId: ${guild.ownerId}`
-        );
       }
     } catch (error) {
       // Fallback to guild.ownerId if fetchOwner fails
@@ -911,11 +893,6 @@ class AdvancedAntiNuke {
 
             // If new position equals attacker's position, we need to go higher
             if (newPosition <= attackerHighestRole.position) {
-              logger.warn(
-                `[Anti-Nuke] Calculated position ${newPosition} is not above attacker ${
-                  attackerHighestRole.position
-                }, using ${attackerHighestRole.position + 1}`
-              );
               // Force it to be at least 1 above
               const forcedPosition = Math.min(
                 attackerHighestRole.position + 1,
@@ -1214,9 +1191,6 @@ class AdvancedAntiNuke {
         try {
           await member.kick("Anti-Nuke: Emergency removal");
           removed = true;
-          logger.info(
-            `[Anti-Nuke] Successfully kicked ${userId} from ${guild.id}`
-          );
         } catch (kickError) {
           // Kick failed (no console logging)
         }
@@ -1410,9 +1384,7 @@ class AdvancedAntiNuke {
             } catch (error) {
               // Continue
               if (error.code === 429 || error.status === 429) {
-                logger.warn(
-                  `[Anti-Nuke] Rate limited during spam channel cleanup`
-                );
+                // Rate limited during cleanup
               }
             }
             this.spamChannels.delete(channelId);
@@ -1456,9 +1428,7 @@ class AdvancedAntiNuke {
                 .catch((error) => {
                   // Handle rate limits gracefully
                   if (error.code === 429 || error.status === 429) {
-                    logger.warn(
-                      `[Anti-Nuke] Rate limited while deleting channel ${channel.id}`
-                    );
+                    // Rate limited
                   }
                 });
               deletedSpamChannels++;
@@ -1475,9 +1445,7 @@ class AdvancedAntiNuke {
       }
 
       if (deletedSpamChannels > 0) {
-        logger.info(
-          `[Anti-Nuke] Deleted ${deletedSpamChannels} spam channels during lockdown in ${guild.id}`
-        );
+        // Spam channels deleted
       }
 
       // Lockdown: Set all channels to read-only for @everyone AND prevent channel creation
@@ -1716,10 +1684,6 @@ class AdvancedAntiNuke {
 
   async attemptRecovery(guild, threatType, counts, attackerUserId) {
     try {
-      logger.info(
-        `[Anti-Nuke] Starting recovery process for ${guild.id} after ${threatType}`
-      );
-
       // STEP 1: Delete all channels created by the attacker ONLY
       // IMPORTANT: This ONLY deletes channels created by the detected threat user
       // Channels created by server owner, mods, or other members are NOT touched
@@ -1938,9 +1902,7 @@ class AdvancedAntiNuke {
         );
 
         if (fallbackResult.recovered > 0) {
-          logger.info(
-            `[Anti-Nuke] Fallback recovery completed: ${fallbackResult.recovered} items recovered from memory/Discord`
-          );
+          // Fallback recovery completed
         } else {
           logger.warn(
             `[Anti-Nuke] Fallback recovery failed - no items could be recovered. Consider using /backup create to create a backup snapshot before an attack occurs`
@@ -1961,10 +1923,6 @@ class AdvancedAntiNuke {
 
       const AutoRecovery = require("./autoRecovery");
       const recoveryResult = await AutoRecovery.recover(guild, snapshot.id);
-
-      logger.info(
-        `[Anti-Nuke] Recovery completed for ${guild.id}: ${recoveryResult.recovered} items recovered`
-      );
 
       // Alert admins about recovery
       const config = await db.getServerConfig(guild.id);
@@ -2182,9 +2140,6 @@ class AdvancedAntiNuke {
       if (channelData.messageCount > 10) {
         await channel.delete("Anti-Nuke: Spam channel cleanup");
         this.spamChannels.delete(channelId);
-        logger.info(
-          `[Anti-Nuke] Deleted spam channel ${channelId} with ${channelData.messageCount} messages`
-        );
       } else {
         // Remove from tracking if it's clean
         this.spamChannels.delete(channelId);
@@ -2242,9 +2197,6 @@ class AdvancedAntiNuke {
               id: generalChannel.id,
               name: generalChannel.name,
             });
-            logger.info(
-              `[Anti-Nuke] Created fallback channel: #${generalChannel.name}`
-            );
           } catch (error) {
             logger.error(
               `[Anti-Nuke] Failed to create fallback channel:`,
@@ -2403,9 +2355,6 @@ class AdvancedAntiNuke {
               err.message
             );
           });
-          logger.warn(
-            `[Anti-Nuke] Deleted emoji spam message from ${userId} in ${message.guild.id}`
-          );
 
           // Warn user
           const member = await message.guild.members
@@ -2452,9 +2401,6 @@ class AdvancedAntiNuke {
     ) {
       try {
         await webhook.delete("Anti-Nuke: Webhook spam detected");
-        logger.warn(
-          `[Anti-Nuke] Deleted spam webhook ${webhook.id} in ${webhook.guild.id}`
-        );
         this.webhookSpam.delete(key);
       } catch (error) {
         logger.error(`[Anti-Nuke] Error deleting spam webhook:`, error);
