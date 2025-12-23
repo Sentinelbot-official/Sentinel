@@ -660,48 +660,11 @@ module.exports = {
       });
     }
 
-    // Register commands for the new server
-    try {
-      const commands = [];
-      const fs = require("fs");
-      const path = require("path");
-      const commandsPath = path.join(__dirname, "..", "commands");
-      const commandFiles = fs
-        .readdirSync(commandsPath)
-        .filter((file) => file.endsWith(".js"));
-
-      for (const file of commandFiles) {
-        const command = require(`../commands/${file}`);
-        if (command.data) {
-          commands.push(command.data.toJSON());
-        }
-      }
-
-      const { REST, Routes } = require("discord.js");
-      const rest = new REST({ version: "10" }).setToken(
-        process.env.DISCORD_TOKEN
-      );
-
-      await rest.put(
-        Routes.applicationGuildCommands(client.user.id, guild.id),
-        { body: commands }
-      );
-
-      logger.info(
-        "Guild Create",
-        `Registered ${commands.length} commands for ${guild.name}`
-      );
-    } catch (error) {
-      logger.error(
-        "Guild Create",
-        `Failed to register commands for ${guild.name}`,
-        {
-          message: error?.message || String(error),
-          stack: error?.stack,
-          name: error?.name,
-        }
-      );
-    }
+    // Commands are registered globally, no need to register per-guild
+    logger.info(
+      "Guild Create",
+      `Commands will be available via global registration (may take ~1 hour to propagate)`
+    );
 
     // Create initial recovery snapshot for new servers
     try {
