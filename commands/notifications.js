@@ -7,7 +7,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
-, MessageFlags} = require("discord.js");
+  MessageFlags, = require("discord.js");
 const db = require("../utils/database");
 const logger = require("../utils/logger");
 

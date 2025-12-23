@@ -2,7 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
-, MessageFlags} = require("discord.js");
+  MessageFlags, = require("discord.js");
 const customCommands = require("../utils/customCommands");
 const ErrorMessages = require("../utils/errorMessages");
 

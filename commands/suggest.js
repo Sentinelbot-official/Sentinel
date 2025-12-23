@@ -7,7 +7,7 @@ const {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
-, MessageFlags} = require("discord.js");
+  MessageFlags, = require("discord.js");
 const logger = require("../utils/logger");
 const db = require("../utils/database");
 

@@ -5,7 +5,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-, MessageFlags} = require("discord.js");
+  MessageFlags, = require("discord.js");
 const WickMigration = require("../utils/wickMigration");
 const logger = require("../utils/logger");
 

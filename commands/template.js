@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ActionRowBuilder,
   StringSelectMenuBuilder,
-, MessageFlags} = require("discord.js");
+  MessageFlags, = require("discord.js");
 const { ServerTemplates } = require("../utils/serverTemplates");
 const db = require("../utils/database");
 const logger = require("../utils/logger");

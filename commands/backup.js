@@ -2,7 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
-, MessageFlags} = require("discord.js");
+  MessageFlags, = require("discord.js");
 const backupManager = require("../utils/backupManager");
 const ErrorMessages = require("../utils/errorMessages");
 const securityAuditor = require("../utils/securityAuditor");

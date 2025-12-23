@@ -3,7 +3,8 @@ const {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
-, MessageFlags} = require("discord.js");
+  MessageFlags,
+} = require("discord.js");
 const db = require("./database");
 const logger = require("./logger");
 
