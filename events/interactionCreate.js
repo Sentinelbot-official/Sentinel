@@ -150,7 +150,7 @@ module.exports = {
           );
 
           // Track failed command with options
-          if (client.commandAnalytics) {
+          if (client.commandAnalytics && interaction.guild) {
             client.commandAnalytics.trackCommand(
               interaction.guild.id,
               interaction.user.id,

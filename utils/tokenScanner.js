@@ -72,7 +72,7 @@ class TokenScanner {
     }
 
     this.isScanning = true;
-    logger.info(`[TokenScanner] 🔍 Starting scan cycle...`);
+    // Starting scan cycle
 
     try {
       // Scan paste sites
