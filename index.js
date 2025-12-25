@@ -169,11 +169,19 @@ client.zeroDayDetection = new ZeroDayDetection(client);
 // Performance monitor is a singleton, automatically used in events/interactionCreate.js
 // No need to instantiate it here
 
+// Seasonal System - Automatic seasonal theming
+const seasonalSystem = require("./utils/seasonalSystem");
+client.seasonalSystem = seasonalSystem;
+
 // Smart Status - Auto-updating bot status
 const SmartStatus = require("./utils/smartStatus");
 const smartStatus = new SmartStatus(client);
 
 client.once("clientReady", () => {
+  // Log current season
+  const currentSeason = seasonalSystem.getSeasonalData();
+  logger.info(`🎨 Current Season: ${currentSeason.emoji} ${currentSeason.name}`);
+  
   // Start smart status after bot is ready
   setTimeout(() => {
     smartStatus.start(2); // Rotate every 2 minutes

@@ -1,6 +1,7 @@
 // Smart status messages that auto-update with live stats
 const logger = require("./logger");
 const { version } = require("../package.json");
+const seasonalSystem = require("./seasonalSystem");
 
 class SmartStatus {
   constructor(client) {
@@ -17,7 +18,11 @@ class SmartStatus {
       0
     );
 
-    return [
+    const season = seasonalSystem.getSeasonalData();
+    const seasonalEmoji = season.emoji;
+
+    // Base status messages
+    const baseMessages = [
       {
         type: "WATCHING",
         name: `${serverCount} servers | /help`,
@@ -52,6 +57,15 @@ class SmartStatus {
         url: "https://nexusbot-official.github.io/nexus",
       },
     ];
+
+    // Add seasonal status messages (2-3 per rotation)
+    const seasonalMessages = season.statusMessages.slice(0, 3).map(msg => ({
+      type: "PLAYING",
+      name: msg.replace('{servers}', serverCount),
+    }));
+
+    // Combine base and seasonal messages
+    return [...baseMessages, ...seasonalMessages];
   }
 
   // Update bot status
