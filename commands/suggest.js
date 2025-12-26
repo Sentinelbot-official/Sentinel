@@ -93,17 +93,9 @@ module.exports = {
 
       // Send to suggestion channel
       try {
-        const suggestionChannel = await client.channels.fetch(
+        const suggestionChannel = client.channels.cache.get(
           SUGGESTION_CHANNEL_ID
         );
-
-        if (!suggestionChannel) {
-          logger.error(
-            "suggest",
-            `Could not find suggestion channel with ID: ${SUGGESTION_CHANNEL_ID}`
-          );
-          return;
-        }
 
         const suggestionEmbed = new EmbedBuilder()
           .setTitle("💡 New Feature Suggestion")
