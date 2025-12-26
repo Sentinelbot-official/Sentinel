@@ -124,10 +124,6 @@ module.exports = {
           });
 
         await suggestionChannel.send({ embeds: [suggestionEmbed] });
-        logger.info(
-          "suggest",
-          `Suggestion sent to channel ${SUGGESTION_CHANNEL_ID} by ${interaction.user.tag}`
-        );
       } catch (channelError) {
         logger.error(
           "suggest",
