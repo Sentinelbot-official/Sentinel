@@ -46,19 +46,9 @@ class MemberRetentionPredictor {
    */
   async runPredictions() {
     try {
-      logger.info(
-        "MemberRetentionPredictor",
-        "Running retention predictions..."
-      );
-
       for (const guild of this.client.guilds.cache.values()) {
         await this.predictGuildRetention(guild.id);
       }
-
-      logger.info(
-        "MemberRetentionPredictor",
-        "Retention predictions completed"
-      );
     } catch (error) {
       logger.error(
         "MemberRetentionPredictor",
@@ -97,10 +87,6 @@ class MemberRetentionPredictor {
       // Save predictions to database
       if (atRiskMembers.length > 0) {
         await this.savePredictions(guildId, atRiskMembers);
-        logger.info(
-          "MemberRetentionPredictor",
-          `Guild ${guildId}: ${atRiskMembers.length} at-risk members identified`
-        );
       }
     } catch (error) {
       logger.error(
