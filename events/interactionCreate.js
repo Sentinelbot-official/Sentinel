@@ -133,7 +133,7 @@ module.exports = {
         const perfTimer = performanceMonitor.start(command.data.name);
 
         try {
-          await command.execute(interaction);
+          await command.execute(interaction, client);
 
           // Record successful execution
           const executionTime = performanceMonitor.end(perfTimer, true);
