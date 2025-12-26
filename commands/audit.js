@@ -211,6 +211,7 @@ module.exports = {
     // 12. Check Channel Permissions
     const publicChannels = guild.channels.cache.filter(
       (c) =>
+        c.permissionOverwrites &&
         c.permissionOverwrites.cache.has(guild.roles.everyone.id) &&
         c.permissionOverwrites.cache
           .get(guild.roles.everyone.id)
