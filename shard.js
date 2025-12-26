@@ -291,8 +291,6 @@ if (process.env.VOIDBOTS_TOKEN) {
 
   // Initialize when shards are ready
   const initializeVoidBots = async () => {
-   
-
     if (!botId) {
       try {
         const clientValues = await manager.fetchClientValues("user.id");
@@ -320,7 +318,6 @@ if (process.env.VOIDBOTS_TOKEN) {
 
   // Wait for manager to spawn all shards, then initialize
   manager.on("shardCreate", (shard) => {
-    
     shard.once("ready", async () => {
       // Only initialize once when first shard is ready
       if (!voidbotsInitialized) {

@@ -1,10 +1,9 @@
-const { ActivityType, GatewayIntentBits } = require("discord.js");
+const { ActivityType } = require("discord.js");
 const ShardManager = require("../utils/shardManager");
 const { registerCommands } = require("../utils/registerCommands");
 const logger = require("../utils/logger");
 const databaseBackup = require("../utils/databaseBackup");
 const rateLimitHandler = require("../utils/rateLimitHandler");
-const memoryMonitor = require("../utils/memoryMonitor");
 const autoScaling = require("../utils/autoScaling");
 const shardErrorTracker = require("../utils/shardErrorTracker");
 const ms = require("ms");
@@ -14,23 +13,6 @@ module.exports = {
   once: true,
   async execute(client) {
     const shardInfo = ShardManager.getShardInfo(client);
-
-    // Verify privileged intents are enabled
-    const intents = client.options.intents;
-    const hasGuildMembers = intents.has(GatewayIntentBits.GuildMembers);
-
-    if (!hasGuildMembers) {
-      logger.error(
-        "Ready",
-        "❌ CRITICAL: GuildMembers intent is NOT enabled! guildMemberAdd events will NOT work!"
-      );
-      logger.error(
-        "Ready",
-        "⚠️ Enable it in Discord Developer Portal → Your Bot → Privileged Gateway Intents → Server Members Intent"
-      );
-    } else {
-      // GuildMembers intent enabled (no console logging)
-    }
 
     // Register slash commands with timeout protection
     try {
@@ -179,7 +161,6 @@ module.exports = {
       for (const guild of client.guilds.cache.values()) {
         await client.workflows.loadWorkflows(guild.id);
       }
-      logger.info("Ready", "⚙️ Workflows loaded");
     }
 
     // Start automatic snapshot scheduler ( - point-in-time recovery)
@@ -208,10 +189,6 @@ module.exports = {
       for (const guild of client.guilds.cache.values()) {
         client.voteRewards.startAutoChecking(guild);
       }
-      logger.info(
-        "Ready",
-        `🎁 Vote rewards auto-checking started for ${client.guilds.cache.size} guilds`
-      );
     }
 
     // Start Dashboard Server ( - free dashboard vs Competition's premium)
@@ -234,30 +211,25 @@ module.exports = {
       (!shardInfo.isSharded || shardInfo.shardId === 0)
     ) {
       await client.scheduledActions.start();
-      logger.info("Ready", "⏰ Scheduled Actions system started");
     }
 
     // Start Advanced AI & Intelligence Systems ( - next-gen)
     if (!shardInfo.isSharded || shardInfo.shardId === 0) {
       if (client.advancedMetrics) {
         client.advancedMetrics.start();
-        logger.info("Ready", "📊 Advanced Metrics system started");
       }
 
       if (client.mlTrainer) {
         client.mlTrainer.start();
         await client.mlTrainer.loadAllModels();
-        logger.info("Ready", "🧠 ML Training system started");
       }
 
       if (client.retentionPredictor) {
         client.retentionPredictor.start();
-        logger.info("Ready", "🔮 Retention Prediction system started");
       }
 
       if (client.threatCorrelation) {
         client.threatCorrelation.start();
-        logger.info("Ready", "🔗 Threat Correlation engine started");
       }
     }
 
@@ -274,7 +246,6 @@ module.exports = {
         );
       }
     }
-    logger.info("Ready", "🤖 Smart recommendations generated");
 
     // Initialize default configs for all servers
     client.guilds.cache.forEach((guild) => {
@@ -372,29 +343,6 @@ module.exports = {
         if (!botRole) {
           continue;
         }
-
-        // Get all roles (excluding @everyone)
-        const allRoles = guild.roles.cache
-          .filter((r) => r.id !== guild.id)
-          .sort((a, b) => b.position - a.position);
-
-        // Check if bot role is in top 3 positions (should be highest for best protection)
-        const botRoleIndex = allRoles.findIndex((r) => r.id === botRole.id);
-        const totalRoles = allRoles.size;
-
-        if (botRoleIndex > 2) {
-          logger.warn(
-            `⚠️ [${guild.name}] Bot role "${botRole.name}" is at position ${
-              botRole.position
-            } (${botRoleIndex + 1}/${totalRoles}). ` +
-              `For best anti-nuke protection, position the bot's role ABOVE all other roles. ` +
-              `Use /security rolecheck for details.`
-          );
-        } else if (botRoleIndex === 0) {
-          logger.info(
-            `✅ [${guild.name}] Bot role is at highest position - optimal for anti-nuke protection`
-          );
-        }
       } catch (error) {
         // Silently continue - not critical
       }
@@ -463,19 +411,12 @@ module.exports = {
     if (shouldStartBackup) {
       try {
         databaseBackup.startSchedule();
-        logger.info("Ready", "📦 Database backup system started");
 
         // Start auto-scaling monitor (checks every hour)
         autoScaling.startMonitoring(client, 3600000);
-        logger.info("Ready", "📊 Auto-scaling monitor started");
 
         // Start shard error tracker cleanup
         shardErrorTracker.startCleanup();
-        logger.info("Ready", "🔍 Shard error tracking started");
-
-        // Start memory monitoring (DISABLED - too noisy)
-        // memoryMonitor.start(60000); // Check every minute
-        // logger.info("Ready", "🧠 Memory monitoring started");
 
         // Initialize rate limit handler
         rateLimitHandler.initialize(client);

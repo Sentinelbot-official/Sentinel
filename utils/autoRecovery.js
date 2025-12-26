@@ -494,7 +494,7 @@ class AutoRecovery {
                 } catch (createError) {
                   if (createError.code === 50013) {
                     // Missing Permissions - skip this role
-                    
+
                     skipped.push({
                       type: "role",
                       name: roleData.name,
