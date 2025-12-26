@@ -432,11 +432,6 @@ module.exports = {
                 `Send welcome message for ${member.user.id}`
               )
             );
-        } else {
-          // Silently skip if bot doesn't have permissions (don't log as error)
-          logger.debug(
-            `[guildMemberAdd] Skipping welcome message - bot lacks permissions in channel ${config.welcome_channel} for guild ${member.guild.id}`
-          );
         }
       } else {
         // Channel doesn't exist, isn't accessible, or isn't text-based - silently skip

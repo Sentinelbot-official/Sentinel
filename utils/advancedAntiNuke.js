@@ -867,66 +867,65 @@ class AdvancedAntiNuke {
           attackerHighestRole &&
           attackerHighestRole.position >= botHighestRole.position
         ) {
-            // Refresh roles cache first
-            await guild.roles.fetch();
+          // Refresh roles cache first
+          await guild.roles.fetch();
 
-            // Get all roles sorted by position (highest first)
-            const allRoles = Array.from(guild.roles.cache.values())
-              .filter((r) => r.id !== guild.id) // Exclude @everyone
-              .sort((a, b) => b.position - a.position);
+          // Get all roles sorted by position (highest first)
+          const allRoles = Array.from(guild.roles.cache.values())
+            .filter((r) => r.id !== guild.id) // Exclude @everyone
+            .sort((a, b) => b.position - a.position);
 
-            // Find attacker's role position in the sorted list
-            
+          // Find attacker's role position in the sorted list
 
-            // Calculate new position - must be STRICTLY above attacker (at least +1)
-            // Discord role positions: higher number = higher in hierarchy
-            // If positions are equal, we need to be at least 1 higher
-            const maxPosition = allRoles.length; // Highest possible position
-            const minRequiredPosition = attackerHighestRole.position + 1;
-            const newPosition = Math.min(
-              Math.max(minRequiredPosition, botHighestRole.position + 1),
+          // Calculate new position - must be STRICTLY above attacker (at least +1)
+          // Discord role positions: higher number = higher in hierarchy
+          // If positions are equal, we need to be at least 1 higher
+          const maxPosition = allRoles.length; // Highest possible position
+          const minRequiredPosition = attackerHighestRole.position + 1;
+          const newPosition = Math.min(
+            Math.max(minRequiredPosition, botHighestRole.position + 1),
+            maxPosition
+          );
+
+          // If new position equals attacker's position, we need to go higher
+          if (newPosition <= attackerHighestRole.position) {
+            // Force it to be at least 1 above
+            const forcedPosition = Math.min(
+              attackerHighestRole.position + 1,
               maxPosition
             );
-
-            // If new position equals attacker's position, we need to go higher
-            if (newPosition <= attackerHighestRole.position) {
-              // Force it to be at least 1 above
-              const forcedPosition = Math.min(
-                attackerHighestRole.position + 1,
-                maxPosition
+            // But we can't go above max, so if we're at max, we can't elevate
+            if (forcedPosition > maxPosition) {
+              logger.error(
+                `[Anti-Nuke] Cannot elevate bot role - already at maximum position ${maxPosition}`
               );
-              // But we can't go above max, so if we're at max, we can't elevate
-              if (forcedPosition > maxPosition) {
-                logger.error(
-                  `[Anti-Nuke] Cannot elevate bot role - already at maximum position ${maxPosition}`
-                );
-                throw new Error(
-                  "Bot role cannot be elevated above attacker - at maximum position"
-                );
-              }
+              throw new Error(
+                "Bot role cannot be elevated above attacker - at maximum position"
+              );
             }
+          }
 
-            // Check if bot has Administrator or ManageRoles permission
-            const hasAdmin = botMember.permissions.has("Administrator");
-            const hasManageRoles = botMember.permissions.has("ManageRoles");
+          // Check if bot has Administrator or ManageRoles permission
+          const hasAdmin = botMember.permissions.has("Administrator");
+          const hasManageRoles = botMember.permissions.has("ManageRoles");
 
-            if (hasAdmin || hasManageRoles) {
-              // Attempting to elevate bot role (no console logging)
+          if (hasAdmin || hasManageRoles) {
+            // Attempting to elevate bot role (no console logging)
 
-              // Try to set position - with Admin, this should work
-              await botHighestRole.setPosition(newPosition, {
-                reason:
-                  "Anti-Nuke: Emergency role elevation - must be above attacker bot",
-              });
+            // Try to set position - with Admin, this should work
+            await botHighestRole.setPosition(newPosition, {
+              reason:
+                "Anti-Nuke: Emergency role elevation - must be above attacker bot",
+            });
 
-              // Elevated bot role (no console logging)
+            // Elevated bot role (no console logging)
 
-              // Wait longer for Discord to process the role change and refresh cache
-              await new Promise((resolve) => setTimeout(resolve, 2000));
+            // Wait longer for Discord to process the role change and refresh cache
+            await new Promise((resolve) => setTimeout(resolve, 2000));
 
-              // Refresh guild roles cache
-              await guild.roles.fetch();
-            }
+            // Refresh guild roles cache
+            await guild.roles.fetch();
+          }
         }
       }
     } catch (error) {
