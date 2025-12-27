@@ -162,7 +162,10 @@ class XPSystem {
           });
         }, 5000);
       } catch (error) {
-        logger.error(`[XP] Failed to send level up message:`, error);
+        // Silently ignore permission errors - nothing we can do about it
+        if (error.code !== 50013 && error.message !== 'Missing Permissions') {
+          logger.error(`[XP] Failed to send level up message:`, error);
+        }
       }
     }
 
