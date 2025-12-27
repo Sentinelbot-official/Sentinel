@@ -79,6 +79,14 @@ module.exports = {
         const role = interaction.options.getRole(`role${i}`);
         const emoji = interaction.options.getString(`emoji${i}`);
         if (role && emoji) {
+          // Validate emoji format
+          const emojiRegex = /^(?:<a?:\w+:\d+>|[\p{Emoji_Presentation}\p{Extended_Pictographic}])$/u;
+          if (!emojiRegex.test(emoji)) {
+            return interaction.reply({
+              content: `❌ Invalid emoji format for role ${i}: \`${emoji}\`\n\nPlease use:\n• Unicode emoji (like 😀 👍 ⭐)\n• Custom emoji (like <:name:123456789>)\n• Animated emoji (like <a:name:123456789>)`,
+              flags: MessageFlags.Ephemeral,
+            });
+          }
           roles.push(role);
           emojis.push(emoji);
         }
@@ -108,15 +116,22 @@ module.exports = {
       }
 
       const buttons = new ActionRowBuilder();
-      roles.forEach((role, index) => {
-        buttons.addComponents(
-          new ButtonBuilder()
-            .setCustomId(`reactionrole_${role.id}_${index}`)
-            .setLabel(role.name)
-            .setStyle(ButtonStyle.Secondary)
-            .setEmoji(emojis[index])
-        );
-      });
+      try {
+        roles.forEach((role, index) => {
+          buttons.addComponents(
+            new ButtonBuilder()
+              .setCustomId(`reactionrole_${role.id}_${index}`)
+              .setLabel(role.name)
+              .setStyle(ButtonStyle.Secondary)
+              .setEmoji(emojis[index])
+          );
+        });
+      } catch (error) {
+        return interaction.reply({
+          content: `❌ Failed to create buttons: ${error.message}\n\nMake sure all emojis are valid Discord emojis or custom emojis from this server.`,
+          flags: MessageFlags.Ephemeral,
+        });
+      }
 
       await interaction.reply({
         embeds: [embed],
