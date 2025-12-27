@@ -930,7 +930,9 @@
       }
 
       function getRecords(growthHistory = []) {
+        console.log('getRecords called with', growthHistory.length, 'records');
         if (growthHistory.length < 2) {
+          console.log('Not enough data for records');
           return { bestHour: 0, bestDay: 0, longestStreak: 0 };
         }
 
@@ -977,6 +979,7 @@
           }
         }
 
+        console.log('Calculated records:', { bestHour: bestHourGrowth, bestDay: bestDayGrowth, longestStreak });
         return {
           bestHour: bestHourGrowth,
           bestDay: bestDayGrowth,
