@@ -19,8 +19,11 @@ class Moderation {
           moderator.tag || moderator.username || "Unknown"
         );
       }
+
+      return { success: true, message: `Banned ${user.tag}` };
     } catch (error) {
       logger.error(`Ban failed: ${error.message}`);
+      return { success: false, message: `Failed to ban: ${error.message}` };
     }
   }
 
