@@ -39,7 +39,7 @@ module.exports = {
         {
           name: "🔗 Quick Links",
           value: [
-            "• [Official Website](https://nexusbot-official.github.io/nexus/)",
+            "• [Official Website](https://sentinelbot-official.github.io/Sentinel/index.html)",
             "• [Support Server](https://discord.gg/9vQzqBVMNX)",
             "• [GitHub Repository](https://github.com/nexusBot-official/nexus)",
             "• [Privacy Policy](https://github.com/Sentinelbot-official/Sentinelblob/main/PRIVACY_POLICY.md)",
@@ -65,7 +65,7 @@ module.exports = {
 
     const websiteButton = new ButtonBuilder()
       .setLabel("Visit Website")
-      .setURL("https://nexusbot-official.github.io/nexus/")
+      .setURL("https://sentinelbot-official.github.io/Sentinel/index.html")
       .setStyle(ButtonStyle.Link);
 
     const supportButton = new ButtonBuilder()
@@ -81,7 +81,7 @@ module.exports = {
     const inviteButton = new ButtonBuilder()
       .setLabel("Invite Bot")
       .setURL(
-        `https://nexusbot-official.github.io/nexus/invite.html?source=discord-bot`
+        `https://sentinelbot-official.github.io/Sentinel/index.htmlinvite.html?source=discord-bot`
       )
       .setStyle(ButtonStyle.Link);
 

@@ -4,7 +4,7 @@
 
 ### The Free Discord Security Bot That Exceeds Wick
 
-_Formerly known as Nexus Bot_
+_Formerly known as Sentinel Bot_
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Support-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/9vQzqBVMNX)
 [![Top.gg](https://img.shields.io/badge/Top.gg-Vote-FF3366?style=for-the-badge&logo=))](https://top.gg/bot/1444739230679957646)
@@ -13,7 +13,7 @@ _Formerly known as Nexus Bot_
 
 **Everything Wick does, nexus does better. 100% FREE.**
 
-[🚀 Invite to Discord](https://nexusbot-official.github.io/nexus/invite.html?source=github) • [⚔️ Compare vs Competition](https://nexusbot-official.github.io/nexus/comparison.html) • [📚 Documentation](https://nexusbot-official.github.io/nexus/docs.html)
+[🚀 Invite to Discord](https://sentinelbot-official.github.io/Sentinel/index.htmlinvite.html?source=github) • [⚔️ Compare vs Competition](https://sentinelbot-official.github.io/Sentinel/index.htmlcomparison.html) • [📚 Documentation](https://sentinelbot-official.github.io/Sentinel/index.htmldocs.html)
 
 </div>
 
@@ -40,7 +40,7 @@ nexus is an **open-source Discord security bot** that matches everything Wick of
 | **🔧 Workflows**           | ❌ None             | ✅ Custom automation                |
 | **💾 Backups**             | Manual              | ✅ Hourly auto-snapshots            |
 
-**→ [See Full Comparison](https://nexusbot-official.github.io/nexus/comparison.html)**
+**→ [See Full Comparison](https://sentinelbot-official.github.io/Sentinel/index.htmlcomparison.html)**
 
 ---
 
@@ -87,7 +87,7 @@ nexus is an **open-source Discord security bot** that matches everything Wick of
 
 ```bash
 # 1. Invite Nexus to your Discord server
-https://nexusbot-official.github.io/nexus/invite.html?source=githubreadme
+https://sentinelbot-official.github.io/Sentinel/index.htmlinvite.html?source=githubreadme
 # 2. Run setup command in Discord
 /setup preset
 
@@ -119,7 +119,7 @@ https://nexusbot-official.github.io/nexus/invite.html?source=githubreadme
 
 `/level` `/leaderboard` `/giveaway` `/reactionrole` `/customcommand` `/autorole` `/vote` `/voterewards` `/refer` `/share`
 
-**→ [Full Command List](https://nexusbot-official.github.io/nexus/commands.html)**
+**→ [Full Command List](https://sentinelbot-official.github.io/Sentinel/index.htmlcommands.html)**
 
 ## 📈 Stats
 
@@ -142,7 +142,7 @@ https://nexusbot-official.github.io/nexus/invite.html?source=githubreadme
 
 ## 🤝 Contributing
 
-Nexus (formerly nexus) is **open source** and **community-driven**.
+Nexus  is **open source** and **community-driven**.
 
 - 🐛 Found a bug? [Open an issue](https://github.com/nexusBot-official/nexus/issues)
 - 💡 Have a feature idea? [Request it](https://github.com/nexusBot-official/nexus/issues)
@@ -153,10 +153,10 @@ Nexus (formerly nexus) is **open source** and **community-driven**.
 
 ## 🔗 Links
 
-- 🌐 **Website:** https://nexusbot-official.github.io/nexus/
-- 📚 **Full Documentation:** https://nexusbot-official.github.io/nexus/docs.html
-- ⚔️ **nexus vs Wick Comparison:** https://nexusbot-official.github.io/nexus/comparison.html
-- 📊 **API Documentation:** https://nexusbot-official.github.io/nexus/api.html
+- 🌐 **Website:** https://sentinelbot-official.github.io/Sentinel/index.html
+- 📚 **Full Documentation:** https://sentinelbot-official.github.io/Sentinel/index.htmldocs.html
+- ⚔️ **nexus vs Wick Comparison:** https://sentinelbot-official.github.io/Sentinel/index.htmlcomparison.html
+- 📊 **API Documentation:** https://sentinelbot-official.github.io/Sentinel/index.htmlapi.html
 - 💬 **Support Server:** https://discord.gg/9vQzqBVMNX
 - 🗳️ **Vote on Top.gg:** https://top.gg/bot/1444739230679957646
 
@@ -197,7 +197,7 @@ This project is licensed under the **MIT License** with additional branding rest
 
 ## 🚀 Ready to Exceed Wick?
 
-### [**Invite Nexus Free**](https://nexusbot-official.github.io/nexus/invite.html?source=github)
+### [**Invite Nexus Free**](https://sentinelbot-official.github.io/Sentinel/index.htmlinvite.html?source=github)
 
 **No credit card. No premium tiers. No catch.**
 

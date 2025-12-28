@@ -110,7 +110,7 @@ module.exports = {
             .setStyle(ButtonStyle.Primary),
           new ButtonBuilder()
             .setLabel("🌐 Visit Website")
-            .setURL("https://nexusbot-official.github.io/nexus/comparison.html")
+            .setURL("https://sentinelbot-official.github.io/Sentinel/index.htmlcomparison.html")
             .setStyle(ButtonStyle.Link)
         );
 

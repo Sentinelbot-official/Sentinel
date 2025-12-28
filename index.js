@@ -1,5 +1,5 @@
 /**
- * Nexus Bot (formerly nexus) - Advanced Discord Security Bot
+ * Nexus Bot  - Advanced Discord Security Bot
  * Copyright (c) 2025 Nexus Bot. All rights reserved.
  * Licensed under the MIT License.
  *
