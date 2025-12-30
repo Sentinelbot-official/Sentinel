@@ -110,7 +110,9 @@ module.exports = {
             .setStyle(ButtonStyle.Primary),
           new ButtonBuilder()
             .setLabel("🌐 Visit Website")
-            .setURL("https://sentinelbot-official.github.io/Sentinel/index.htmlcomparison.html")
+            .setURL(
+              "https://sentinelbot-official.github.io/Sentinel/index.htmlcomparison.html"
+            )
             .setStyle(ButtonStyle.Link)
         );
 

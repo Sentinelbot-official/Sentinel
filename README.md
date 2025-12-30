@@ -142,7 +142,7 @@ https://sentinelbot-official.github.io/Sentinel/index.htmlinvite.html?source=git
 
 ## 🤝 Contributing
 
-Nexus  is **open source** and **community-driven**.
+Nexus is **open source** and **community-driven**.
 
 - 🐛 Found a bug? [Open an issue](https://github.com/nexusBot-official/nexus/issues)
 - 💡 Have a feature idea? [Request it](https://github.com/nexusBot-official/nexus/issues)

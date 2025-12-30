@@ -80,7 +80,8 @@ module.exports = {
         const emoji = interaction.options.getString(`emoji${i}`);
         if (role && emoji) {
           // Validate emoji format
-          const emojiRegex = /^(?:<a?:\w+:\d+>|[\p{Emoji_Presentation}\p{Extended_Pictographic}])$/u;
+          const emojiRegex =
+            /^(?:<a?:\w+:\d+>|[\p{Emoji_Presentation}\p{Extended_Pictographic}])$/u;
           if (!emojiRegex.test(emoji)) {
             return interaction.reply({
               content: `❌ Invalid emoji format for role ${i}: \`${emoji}\`\n\nPlease use:\n• Unicode emoji (like 😀 👍 ⭐)\n• Custom emoji (like <:name:123456789>)\n• Animated emoji (like <a:name:123456789>)`,
